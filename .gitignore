@@ -1,0 +1,55 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs
+*.log
+*.log.*
+*.out
+*.pid
+*.seed
+*.pid.lock
+
+# Editor & system files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+frontend/.vscode/extensions.json
+frontend/.vscode/settings.json
+
+# Env files
+.env
+.env.*.local
+*.local
+
+# Build outputs
+dist/
+build/
+.quasar/
+.next/
+.nuxt/
+out/
+coverage/
+
+# Quasar specific
+frontend/.quasar/
+frontend/dist/
+frontend/.output/
+
+# AdonisJS specific
+backend/build/
+backend/tmp/
+backend/.adonisjs/
+
+# Typescript build
+*.tsbuildinfo
+
+# Misc
+*.tgz
+*.zip
