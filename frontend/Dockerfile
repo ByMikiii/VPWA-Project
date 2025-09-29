@@ -10,6 +10,6 @@ COPY . .
 
 RUN npx quasar prepare
 
-EXPOSE 8080
+EXPOSE 9000
 
 CMD ["npx", "quasar", "dev", "-H", "0.0.0.0"]
