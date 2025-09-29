@@ -12,4 +12,5 @@ RUN node ace add @adonisjs/cors
 
 EXPOSE 3333
 
+
 CMD ["node", "ace", "serve", "--watch"]
