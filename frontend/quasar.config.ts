@@ -5,13 +5,16 @@ import { defineConfig } from '#q-app/wrappers';
 
 export default defineConfig((/* ctx */) => {
   return {
+    htmlVariables: {
+      productName: 'Chatty',
+    },
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [],
+    boot: ['title-meta'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ['app.scss'],
