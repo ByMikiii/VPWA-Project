@@ -6,6 +6,7 @@ services:
     container_name: vpwa-frontend
     ports:
       - "9000:9000"
+    restart: always
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -21,6 +22,7 @@ services:
 #     container_name: vpwa-backend
 #     ports:
 #       - "3333:3333"
+#     restart: always
 #     volumes:
 #       - ./backend:/app
 #       - /app/node_modules
@@ -30,9 +32,9 @@ services:
 #   db:
 #     image: postgres:15
 #     container_name: vpwa-db
-#     restart: always
 #     ports:
 #       - "5432:5432"
+#     restart: always
 #     environment:
 #       POSTGRES_USER: vpwa_user
 #       POSTGRES_PASSWORD: vpwa_pass
