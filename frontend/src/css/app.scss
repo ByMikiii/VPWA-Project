@@ -1,1 +1,173 @@
-// app global css in SCSS form
+body {
+  margin: 0;
+  padding: 0;
+  color: white;
+}
+
+textarea:focus {
+  outline: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+img,
+svg {
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  opacity: 60%;
+}
+
+svg:hover {
+  opacity: 70%;
+}
+
+button {
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+main {
+  border: 2px solid rgba($color: #777777, $alpha: 0.3);
+  height: 90vh;
+  border-radius: 12px;
+}
+
+main section {
+  padding: 1rem;
+}
+
+.q-page-container {
+  margin: 0;
+  height: 90vh;
+}
+
+#chat {
+  border-left: 1px solid rgba($color: #777777, $alpha: 0.3);
+  border-right: 1px solid rgba($color: #777777, $alpha: 0.3);
+}
+
+.side {
+  width: 240px;
+  padding: 0;
+}
+
+.side-header {
+  border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
+  padding: 1rem 0;
+}
+
+#channels-list {
+  height: calc(100% - 212px);
+  overflow-y: auto;
+}
+
+.channel-button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
+  cursor: pointer;
+}
+
+#profile-tab {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0.75rem;
+}
+
+.tab-text {
+  max-width: 108px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#username {
+  font-weight: 600;
+  display: inline-block;
+  max-width: 108px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.settings-button {
+  margin-left: auto;
+  margin-right: 8px;
+  width: 24px;
+  height: 24px;
+}
+
+#owner-picture {
+  width: 44px;
+  height: 44px;
+}
+
+.profile-picture {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+#chat-title {
+  padding-bottom: 1rem;
+}
+
+#messages {
+  height: calc(100% - 104px);
+  overflow-y: auto;
+  // border: 1px solid rgba($color: #FF0000, $alpha: 0.3);
+}
+
+#chat-text {
+  width: 100%;
+  width: calc(100% - 24px);
+  height: 36px;
+  resize: none;
+  border: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0);
+  color: white;
+  font-size: 20px;
+}
+
+.send-button {
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+#chat-area {
+  border: 2px solid rgba($color: #777777, $alpha: 0.3);
+  width: 100%;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+#user-tab {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+}
+
+.role {
+  width: 240px;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0.25rem 1rem;
+  text-align: center;
+}
