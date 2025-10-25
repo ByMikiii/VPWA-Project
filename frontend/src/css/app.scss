@@ -76,7 +76,12 @@ main section {
   padding: 0.75rem;
 }
 
-#profile-picture {
+#owner-picture {
+  width: 44px;
+  height: 44px;
+}
+
+.profile-picture {
   width: 36px;
   height: 36px;
   border-radius: 50%;

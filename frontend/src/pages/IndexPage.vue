@@ -17,7 +17,7 @@
         <button id="join-channel" class="q-btn q-btn-primary">Join Channel</button>
       </div>
       <div id="profile-tag">
-        <img src="profile-picture.webp" alt="profile-picture" id="profile-picture">
+        <ProfilePicture status="online" id="owner-picture"/>
         <div class="">
           <div class="">
             <p id="username">Username</p>
@@ -55,17 +55,17 @@
       <h6 class="role">Owner</h6>
 
       <div id="user-tag">
-        <img src="profile-picture.webp" alt="profile-picture" id="profile-picture">
-            <p id="username">Username</p>
+        <ProfilePicture status="online"/>
+        <p id="username">Username</p>
       </div>
       <h6 class="role">Admin</h6>
       <div id="user-tag">
-        <img src="profile-picture.webp" alt="profile-picture" id="profile-picture">
-            <p id="username">Username</p>
+        <ProfilePicture status="away"/>
+        <p id="username">Username</p>
       </div>
       <div id="user-tag">
-        <img src="profile-picture.webp" alt="profile-picture" id="profile-picture">
-            <p id="username">Username</p>
+        <ProfilePicture status="offline"/>
+        <p id="username">Username</p>
       </div>
 
 
@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
+  import ProfilePicture from 'components/ProfilePicture.vue';
 </script>
 
 <style lang="sass">
