@@ -1,6 +1,6 @@
 <template>
   <q-form @submit.prevent="onSubmit">
-    <q-input v-if="['register', 'login', 'forgottenPassword'].includes(mode)"
+    <q-input v-if="['register', 'login', 'forgottenPassword', 'editProfile'].includes(mode)"
       v-model="email"
       label="Email"
       type="email"
@@ -9,10 +9,11 @@
       text-color="accent"
       outlined
       field-border-color="accent"
+      :placeholder="mode === 'editProfile' ? 'james.brown@gmail.com' : ''"
       required
     />
 
-    <q-input v-if = 'mode === "register"'
+    <q-input v-if="['register', 'editProfile'].includes(mode)"
       v-model="name"
       label="Name"
       type="text"
@@ -21,10 +22,11 @@
       text-color="accent"
       outlined
       field-border-color="accent"
+      :placeholder="mode === 'editProfile' ? 'James' : ''"
       required
     />
 
-    <q-input v-if = 'mode === "register"' 
+    <q-input v-if="['register', 'editProfile'].includes(mode)"
       v-model="surname"
       label="Surname"
       type="text"
@@ -33,10 +35,11 @@
       text-color="accent"
       outlined
       field-border-color="accent"
+      :placeholder="mode === 'editProfile' ? 'Brown' : ''"
       required
     />
 
-    <q-input v-if = 'mode === "register"' 
+    <q-input v-if="['register', 'editProfile'].includes(mode)" 
       v-model="nickname"
       label="Nickame"
       type="text"
@@ -45,6 +48,7 @@
       text-color="accent"
       outlined
       field-border-color="accent"
+      :placeholder="mode === 'editProfile' ? 'JamesBrown2000' : ''"
       required
     />
 
@@ -102,7 +106,7 @@
 <script setup lang="ts">
     import { ref } from 'vue';
 
-    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword'}>();
+    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword' | 'editProfile'}>();
 
     const email = ref('');
     const password = ref('');
