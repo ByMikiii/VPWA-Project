@@ -6,6 +6,8 @@ export interface User {
   id: string
   nickname: string
   email: string
+  name: string
+  surname: string
   status: UserStatus
 }
 
@@ -27,6 +29,8 @@ const currentUser: User = {
   id: '1',
   nickname: 'Username1',
   email: 'user@user.com',
+  name: 'Name1',
+  surname: 'Surname1',
   status: 'Away'
 }
 
