@@ -30,9 +30,20 @@
 
     <section class="col-grow" id="chat">
       <h4 class="text-center" id="chat-title">Welcome to Chatty!</h4>
+
+
       <div id="messages">
 
+        <ChatMessage name="Me" timestamp="7 minute AGO" message="cau ne" :sent="true"></ChatMessage>
+
+        <ChatMessage name="User" timestamp="2 minute AGO" message="povedz ty" :sent="false"></ChatMessage>
+
+        <ChatMessage name="Me" :sent="true" :typing="true"></ChatMessage>
+
+        <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
       </div>
+
+
       <div id="chat-area">
         <textarea name="chat-text" id="chat-text"></textarea>
         <img src="" alt="">
@@ -42,6 +53,7 @@
     <section class="side">
       <h5 class="text-center side-header">Users</h5>
       <h6 class="role">Owner</h6>
+
       <div id="user-tag">
         <img src="profile-picture.webp" alt="profile-picture" id="profile-picture">
             <p id="username">Username</p>
@@ -64,5 +76,9 @@
 </template>
 
 <script setup lang="ts">
-  import {  } from "module";
+  import ChatMessage from 'components/ChatMessage.vue'
 </script>
+
+<style lang="sass">
+
+</style>
