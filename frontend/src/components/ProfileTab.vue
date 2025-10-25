@@ -32,7 +32,7 @@
   import type { ChatState } from '../state/ChatState'
 
   const state = inject('ChatState') as typeof ChatState
-  console.log(state.currentUser.nickname)
+
   function handleSettings() {
     alert("settings clicked")
   }

@@ -61,13 +61,9 @@ main section {
   padding: 0;
 }
 
-.side-header {
-  border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
-  padding: 1rem 0;
-}
 
 #channels-list {
-  height: calc(100% - 212px);
+  height: calc(100% - 252px);
   overflow-y: auto;
 }
 
@@ -76,6 +72,56 @@ main section {
   padding: 0.5rem 1rem;
   border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
   cursor: pointer;
+}
+
+.side-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
+  padding: 1rem 1.5rem;
+}
+
+.center-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.end-btn {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+
+.notification-btn svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.join-btn {
+  margin: 0.25rem 0.5rem;
 }
 
 #profile-tab {
@@ -121,10 +167,6 @@ main section {
   margin-right: 0.75rem;
 }
 
-#chat-title {
-  padding-bottom: 1rem;
-}
-
 #messages {
   height: calc(100% - 104px);
   overflow-y: auto;
@@ -141,6 +183,10 @@ main section {
   background: rgba(255, 255, 255, 0);
   color: white;
   font-size: 20px;
+}
+
+#create-channel {
+  display: flex;
 }
 
 .send-button {
