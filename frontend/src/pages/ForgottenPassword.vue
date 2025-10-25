@@ -8,6 +8,8 @@ import AuthForm from 'components/AuthForm.vue';
 
 interface forgottenPasswordFormData {
   email: string;
+  newPassword: string;
+  repeatPassword: string;
 }
 
 function handleForgottenPassword(formData: forgottenPasswordFormData) {

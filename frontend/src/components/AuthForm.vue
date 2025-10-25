@@ -48,7 +48,7 @@
       required
     />
 
-    <q-input v-if="['register', 'login'].includes(mode)"
+    <q-input v-if="['register', 'login', 'changePassword'].includes(mode)"
       v-model="password"
       label="Password"
       type="password"
@@ -59,10 +59,10 @@
       required
     />
 
-    <q-input v-if = 'mode === "forgottenPassword"' 
+    <q-input v-if="['forgottenPassword', 'changePassword'].includes(mode)" 
       v-model="newPassword"
       label="New Password"
-      type="text"
+      type="password"
       color="accent"
       label-color="accent"  
       text-color="accent"
@@ -71,7 +71,7 @@
       required
     />
 
-    <q-input v-if="['register', 'forgottenPassword'].includes(mode)" 
+    <q-input v-if="['register', 'forgottenPassword', 'changePassword'].includes(mode)" 
       v-model="repeatPassword"
       label="Repeat password"
       type="password"
@@ -102,7 +102,7 @@
 <script setup lang="ts">
     import { ref } from 'vue';
 
-    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' }>();
+    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword'}>();
 
     const email = ref('');
     const password = ref('');
