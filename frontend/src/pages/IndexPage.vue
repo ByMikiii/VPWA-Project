@@ -16,16 +16,9 @@
       <div>
         <button id="join-channel" class="q-btn q-btn-primary">Join Channel</button>
       </div>
-      <div id="profile-tag">
-        <ProfilePicture status="online" id="owner-picture"/>
-        <div class="">
-          <div class="">
-            <p id="username">Username</p>
-            <p id="status">Online</p>
-          </div>
-          <!-- <img src="" alt="Image settings icon" id="settings-icon"> -->
-        </div>
-      </div>
+
+      <ProfileTab/>
+
     </section>
 
     <section class="col-grow" id="chat">
@@ -46,7 +39,22 @@
 
       <div id="chat-area">
         <textarea name="chat-text" id="chat-text"></textarea>
-        <img src="" alt="">
+        <button class="send-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M10 14l11 -11" />
+            <path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" />
+          </svg>
+        </button>
       </div>
     </section>
 
@@ -54,16 +62,16 @@
       <h5 class="text-center side-header">Users</h5>
       <h6 class="role">Owner</h6>
 
-      <div id="user-tag">
+      <div id="user-tab">
         <ProfilePicture status="online"/>
         <p id="username">Username</p>
       </div>
       <h6 class="role">Admin</h6>
-      <div id="user-tag">
+      <div id="user-tab">
         <ProfilePicture status="away"/>
         <p id="username">Username</p>
       </div>
-      <div id="user-tag">
+      <div id="user-tab">
         <ProfilePicture status="offline"/>
         <p id="username">Username</p>
       </div>
@@ -78,6 +86,8 @@
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
   import ProfilePicture from 'components/ProfilePicture.vue';
+  import ProfileTab from 'components/ProfileTab.vue';
+
 </script>
 
 <style lang="sass">

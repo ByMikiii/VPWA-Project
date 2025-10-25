@@ -15,9 +15,18 @@ h4,
 h5,
 h6,
 p,
-img {
+img,
+svg {
   margin: 0;
   padding: 0;
+}
+
+svg {
+  opacity: 60%;
+}
+
+svg:hover {
+  opacity: 70%;
 }
 
 button {
@@ -69,11 +78,35 @@ main section {
   cursor: pointer;
 }
 
-#profile-tag {
+#profile-tab {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 0.75rem;
+  padding: 1.25rem 0.75rem;
+}
+
+.tab-text {
+  max-width: 108px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#username {
+  font-weight: 600;
+  display: inline-block;
+  max-width: 108px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.settings-button {
+  margin-left: auto;
+  margin-right: 8px;
+  width: 24px;
+  height: 24px;
 }
 
 #owner-picture {
@@ -93,14 +126,14 @@ main section {
 }
 
 #messages {
-  height: calc(100% - 108px);
+  height: calc(100% - 104px);
   overflow-y: auto;
   // border: 1px solid rgba($color: #FF0000, $alpha: 0.3);
 }
 
 #chat-text {
   width: 100%;
-  width: calc(100% - 50px);
+  width: calc(100% - 24px);
   height: 36px;
   resize: none;
   border: none;
@@ -108,6 +141,12 @@ main section {
   background: rgba(255, 255, 255, 0);
   color: white;
   font-size: 20px;
+}
+
+.send-button {
+  padding: 0;
+  width: 24px;
+  height: 24px;
 }
 
 #chat-area {
@@ -118,11 +157,7 @@ main section {
   align-items: center;
 }
 
-#chat-area img {
-  width: 50px;
-}
-
-#user-tag {
+#user-tab {
   width: 100%;
   display: flex;
   align-items: center;
