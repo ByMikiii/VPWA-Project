@@ -9,7 +9,6 @@
       text-color="accent"
       outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'james.brown@gmail.com' : ''"
       required
     />
 
@@ -22,7 +21,6 @@
       text-color="accent"
       outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'James' : ''"
       required
     />
 
@@ -35,7 +33,6 @@
       text-color="accent"
       outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'Brown' : ''"
       required
     />
 
@@ -48,7 +45,6 @@
       text-color="accent"
       outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'JamesBrown2000' : ''"
       required
     />
 
@@ -105,6 +101,8 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
+    import { ChatState } from '../state/ChatState';
+
 
     const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword' | 'editProfile'}>();
 
@@ -116,6 +114,14 @@
     const nickname = ref('');
     const repeatPassword = ref('');
     const newPassword = ref('');
+
+    if (mode === 'editProfile') {
+      email.value = ChatState.currentUser.email;
+      name.value = ChatState.currentUser.name;
+      surname.value = ChatState.currentUser.surname;
+      nickname.value = ChatState.currentUser.nickname;
+    }
+
 
     const emit = defineEmits(['submit']);
 

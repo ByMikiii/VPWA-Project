@@ -38,6 +38,12 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/EditProfile.vue') }],
     meta: { title: 'Edit Profile' }
   },
+  {
+    path: '/profile',
+    component: () => import('layouts/BaseLayout.vue'),
+    children: [{ path: '', component: () => import('pages/ProfilePage.vue') }],
+    meta: { title: 'Profile' }
+  },
 
 
 
