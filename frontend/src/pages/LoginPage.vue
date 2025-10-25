@@ -1,6 +1,6 @@
 <template>
     <h1>Login</h1>
-    <AuthForm @submit="handleLogin" />
+    <AuthForm mode="login" @submit="handleLogin" />
 </template>
 
 <script setup lang="ts">
