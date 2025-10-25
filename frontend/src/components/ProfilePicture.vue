@@ -1,5 +1,5 @@
 <template>
-    <img src="profile-picture.webp" alt="profile-picture" class="profile-picture" :class="status">
+    <img src="profile-picture.webp" alt="profile-picture" class="profile-picture" :class="status.trim().toLowerCase().replace(/\s+/g, '-')">
 </template>
 
 <script setup lang="ts">
@@ -19,7 +19,7 @@
   .away {
     border: 3px solid #f79c18;
   }
-  .donotdisturb {
+  .do-not-disturb {
     border: 3px solid red;
   }
   .offline {

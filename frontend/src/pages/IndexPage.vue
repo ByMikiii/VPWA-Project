@@ -3,13 +3,7 @@
 
     <section class="side">
       <h5 class="text-center side-header">Channels</h5>
-      <div id="channels-list">
-        <button class="channel-button text-left">Room #1</button>
-        <button class="channel-button text-left">Room #2</button>
-        <button class="channel-button text-left">Room #3</button>
-        <button class="channel-button text-left">Room #4</button>
-
-      </div>
+      <ServerList/>
       <div>
         <button id="create-channel" class="q-btn q-btn-primary">Create Channel</button>
       </div>
@@ -87,6 +81,7 @@
   import ChatMessage from 'components/ChatMessage.vue'
   import ProfilePicture from 'components/ProfilePicture.vue';
   import ProfileTab from 'components/ProfileTab.vue';
+  import ServerList from 'components/ServerList.vue';
 
 </script>
 

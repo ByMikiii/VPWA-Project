@@ -6,27 +6,27 @@
           no-caps
           color="grey-6"
           text-color="grey-6"
-          :label="currentStatus"
+          :label="state.currentUser.status"
           class="status-dropdown"
           no-ripple
         >
           <q-list class="compact-list">
-            <q-item clickable v-close-popup @click="onItemClick('online')">
+            <q-item clickable v-close-popup @click="handleStatusChange('Online')">
               <q-item-section>
                 <q-item-label class="dropdown-item">Online</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup @click="onItemClick('away')">
+            <q-item clickable v-close-popup @click="handleStatusChange('Away')">
               <q-item-section>
                 <q-item-label class="dropdown-item">Away</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup @click="onItemClick('do-not-disturb')">
+            <q-item clickable v-close-popup @click="handleStatusChange('Do Not Disturb')">
               <q-item-section>
                 <q-item-label class="dropdown-item">Do Not Disturb</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup @click="onItemClick('offline')">
+            <q-item clickable v-close-popup @click="handleStatusChange('Offline')">
               <q-item-section>
                 <q-item-label class="dropdown-item">Offline</q-item-label>
               </q-item-section>
@@ -36,15 +36,13 @@
 </template>
 
 <script setup lang="ts">
-  defineProps({
-    currentStatus: {
-      type: String,
-      required: true
-    }
-  })
+  import { inject } from 'vue'
+  import type { ChatState, UserStatus } from '../state/ChatState'
 
-  function onItemClick (status: string) {
-    console.log(status)
+  const state = inject('ChatState') as typeof ChatState
+
+  function handleStatusChange (status: UserStatus) {
+    state.currentUser.status = status;
   }
 </script>
 

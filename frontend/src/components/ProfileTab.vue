@@ -1,9 +1,9 @@
 <template>
   <div id="profile-tab" class="row">
-    <ProfilePicture status="online" id="owner-picture"/>
+    <ProfilePicture :status="state.currentUser.status" id="owner-picture"/>
       <div class="tab-text">
-        <p id="username">Username</p>
-        <StatusDropdown current-status="Online"/>
+        <p id="username">{{ state.currentUser.nickname }}</p>
+        <StatusDropdown :current-status="state.currentUser.status"/>
       </div>
 
       <button class="settings-button" @click="handleSettings">
@@ -28,7 +28,11 @@
 <script setup lang="ts">
   import ProfilePicture from './ProfilePicture.vue';
   import StatusDropdown from './StatusDropdown.vue';
+  import { inject } from 'vue'
+  import type { ChatState } from '../state/ChatState'
 
+  const state = inject('ChatState') as typeof ChatState
+  console.log(state.currentUser.nickname)
   function handleSettings() {
     alert("settings clicked")
   }
@@ -36,33 +40,5 @@
 
 
 <style lang="scss">
-  #status-dropdown {
-    align-self: flex-start;
-    color: #BBBBBB;
-    font-weight: 400;
-    font-size: 12px;
-    display: inline-block;
-    max-width: 108px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
 
-  .status-dropdown {
-    font-size: 12px;
-    font-weight: 400;
-    padding: 0;
-    min-height: unset;
-  }
-
-  .compact-list .q-item {
-    min-height: 28px !important;
-    padding: 2px 8px !important;
-    background-color: $secondary;
-  }
-
-  .dropdown-item {
-    color: #111111;
-  }
 </style>
