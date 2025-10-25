@@ -1,6 +1,6 @@
 <template>
   <q-form @submit.prevent="onSubmit">
-    <q-input v-if="['register', 'login'].includes(mode)"
+    <q-input v-if="['register', 'login', 'forgottenPassword'].includes(mode)"
       v-model="email"
       label="Email"
       type="email"
@@ -59,7 +59,19 @@
       required
     />
 
-    <q-input v-if = 'mode === "register"' 
+    <q-input v-if = 'mode === "forgottenPassword"' 
+      v-model="newPassword"
+      label="New Password"
+      type="text"
+      color="accent"
+      label-color="accent"  
+      text-color="accent"
+      outlined
+      field-border-color="accent"
+      required
+    />
+
+    <q-input v-if="['register', 'forgottenPassword'].includes(mode)" 
       v-model="repeatPassword"
       label="Repeat password"
       type="password"
@@ -75,6 +87,9 @@
     <p v-if = 'mode === "login"'>
         Don't have an account? 
         <router-link to="/register">Register here</router-link>
+        <br>
+        Forgotten password?
+        <router-link to="/forgottenPassword">Renew password here</router-link>
     </p> 
     <p v-else-if = 'mode === "register"'>
         Already have an account? 
@@ -87,7 +102,7 @@
 <script setup lang="ts">
     import { ref } from 'vue';
 
-    const {mode} = defineProps<{ mode: 'login' | 'register' }>();
+    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' }>();
 
     const email = ref('');
     const password = ref('');
@@ -96,6 +111,7 @@
     const surname = ref('');
     const nickname = ref('');
     const repeatPassword = ref('');
+    const newPassword = ref('');
 
     const emit = defineEmits(['submit']);
 
@@ -106,6 +122,7 @@
             name: name.value,
             surname: surname.value,
             nickname: nickname.value,
+            newPassword: newPassword.value,
             repeatPassword: repeatPassword.value
         });
     }
