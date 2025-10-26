@@ -348,3 +348,9 @@ main section {
   background-color: $secondary;
   font-style: italic;
 }
+
+.channel-dialog {
+  min-width: 300px;
+  max-width: 400px;
+  color: black;
+}

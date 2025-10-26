@@ -29,6 +29,7 @@ export interface UserChannel {
 export interface Channel {
   id: string
   name: string
+  private: boolean
   users: UserChannel[]
 }
 
@@ -63,6 +64,7 @@ export const channels: Channel[] = [
   {
     id: '1',
     name: 'General',
+    private: false,
     users: [
       { id: '1', role: 'Owner' },
       { id: '2', role: 'Admin' },
@@ -82,6 +84,7 @@ export const channels: Channel[] = [
   {
     id: '2',
     name: 'Random',
+    private: true,
     users: [
       { id: '6', role: 'Owner' },
       { id: '7', role: 'Admin' },
@@ -93,6 +96,7 @@ export const channels: Channel[] = [
   {
     id: '3',
     name: 'Development',
+    private: true,
     users: [
       { id: '1', role: 'Owner' },
       { id: '3', role: 'Admin' },
@@ -104,6 +108,7 @@ export const channels: Channel[] = [
   {
     id: '4',
     name: 'Marketing',
+    private: true,
     users: [
       { id: '2', role: 'Owner' },
       { id: '4', role: 'Admin' },
@@ -115,6 +120,7 @@ export const channels: Channel[] = [
   {
     id: '5',
     name: 'Support',
+    private: true,
     users: [
       { id: '1', role: 'Owner' },
       { id: '2', role: 'Admin' },
@@ -223,7 +229,6 @@ export const getUsersFromCurrentChannel = (): string[] => {
     const user = getUserById(userChannel.id)
     return user!.nickname;
   })
-
 }
 
 if (!users[0] || !channels[0]) {

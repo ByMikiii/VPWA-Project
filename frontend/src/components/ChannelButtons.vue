@@ -35,35 +35,11 @@
       </q-btn>
     </div>
 
-    <q-btn
-      color="primary"
-      unelevated
-      class="text-white q-pa-sm join-btn"
-      id="create-btn"
-    >
-      <div class="row items-center justify-center q-gutter-x-sm">
-        <span>Create Channel</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M8 1v14" />
-          <path d="M1 8h14" />
-        </svg>
-      </div>
-    </q-btn>
-
+    <ChannelCreation/>
 </template>
 
 <script setup lang="ts">
-
+  import ChannelCreation from './ChannelCreation.vue'
 </script>
 
 <style>
