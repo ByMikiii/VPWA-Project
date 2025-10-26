@@ -64,7 +64,28 @@
     </div>
 
 
-    <div id="chat-area" class="rounded-borders">
+    <div id="chat-area" class="rounded-borders relative">
+
+      <div
+        v-if="showCommands && filteredCommands.length > 0"
+        class="command-popup absolute"
+      >
+        <ul>
+          <li
+            v-for="(cmd, index) in filteredCommands"
+            :key="cmd.name"
+            @click="applyCommand(cmd)"
+            class="cursor-pointer"
+            :class="[
+              index === selectedIndex ? 'bg-primary' : ''
+            ]"
+          >
+            /{{ cmd.name }} — <span class="opacity-70">{{ cmd.desc }}</span>
+          </li>
+        </ul>
+      </div>
+
+
       <textarea
         type="text"
         name="chat-textfdsfds"
@@ -109,6 +130,12 @@
   console.log(state.currentChannel.id)
   const messagesContainer = ref<HTMLDivElement | null>(null)
 
+  const showCommands = computed(() => chatText.value.startsWith('/'))
+    const filteredCommands = computed(() => {
+      const input = chatText.value.slice(1).toLowerCase()
+      return state.commands.filter(c => c.name.startsWith(input))
+    })
+
 watch(
   () => messages.value.length,
   async () => {
@@ -121,6 +148,7 @@ watch(
 )
 
   const chatText = ref('')
+  const selectedIndex = ref(0)
 
   const handleEnter = (event: KeyboardEvent) => {
     if (!event.shiftKey) {
@@ -168,6 +196,10 @@ watch(
     }else{
       state.showChat = true;
     }
+  }
+
+  function applyCommand(cmd: { name: string }) {
+    chatText.value = `/${cmd.name} `
   }
 </script>
 

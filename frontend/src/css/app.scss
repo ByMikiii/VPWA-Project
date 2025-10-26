@@ -16,7 +16,9 @@ h5,
 h6,
 p,
 img,
-svg {
+svg,
+ul,
+li {
   margin: 0;
   padding: 0;
 }
@@ -288,4 +290,18 @@ main section {
   padding: 0 1rem;
   text-align: center;
   margin-top: 12px;
+}
+
+.command-popup {
+  background-color: $secondary;
+  width: 224px;
+  max-height: 200px;
+  overflow-y: auto;
+  bottom: 104px;
+  font-size: 0.9rem;
+}
+
+.command-popup ul {
+  list-style: none;
+  padding: 0.25rem 0.5rem;
 }

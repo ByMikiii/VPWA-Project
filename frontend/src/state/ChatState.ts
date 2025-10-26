@@ -32,6 +32,11 @@ export interface Channel {
   users: UserChannel[]
 }
 
+export interface Command {
+  name: string
+  desc: string
+}
+
 const users: User[] = [
   { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
   { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
@@ -183,6 +188,11 @@ const messages: Message[] = [
   }
 ]
 
+const commands: Command[] = [
+  { name: 'help', desc: 'shows help information' },
+  { name: 'kick', desc: 'kicks selected user' },
+  { name: 'invite', desc: 'creates invitation code' },
+]
 export function getMessagesByChannelId(channelId: string): Message[] {
   return ChatState.messages.filter(m => m.channelId === channelId)
 }
@@ -203,6 +213,7 @@ export const ChatState = reactive({
   channels: channels,
   currentChannel: currentChannel,
   messages: messages,
+  commands: commands,
   showUsers: true,
   showChannels: true,
   showChat: true
