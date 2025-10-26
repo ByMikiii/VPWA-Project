@@ -1,6 +1,6 @@
 <template>
   <div id="channels-list">
-    <button v-for="channel in state.channels" :key="channel.id" @click="handleChannelChange(channel)" class="channel-button text-left">
+    <button v-for="channel in state.channels" :key="channel.id" @click="handleChannelChange(channel)" class="channel-button text-left" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
       {{ channel.name }}
     </button>
   </div>

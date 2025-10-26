@@ -62,6 +62,7 @@
         name="chat-text"
         v-model="chatText"
         id="chat-text"
+        placeholder="Type a message..."
         @keydown.enter.prevent="handleEnter($event)"
         >
       </textarea>
@@ -87,17 +88,17 @@
 
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
-  import { inject, ref, watch, nextTick  } from 'vue'
-  import type { ChatState } from '../state/ChatState'
-  import { getMessagesByChannelId, getUserById } from '../state/ChatState'
+  import { computed, inject, ref, watch, nextTick  } from 'vue'
+  import type { ChatState, Message } from '../state/ChatState'
+  import { getUserById, getMessagesByChannelId } from '../state/ChatState'
 
   const state = inject('ChatState') as typeof ChatState
-
-  const messages = ref(getMessagesByChannelId(state.currentChannel.id))
+  const messages = computed(() => getMessagesByChannelId(state.currentChannel.id))
+  console.log(state.currentChannel.id)
   const messagesContainer = ref<HTMLDivElement | null>(null)
 
 watch(
-  messages,
+  () => messages.value.length,
   async () => {
     await nextTick()
     if (messagesContainer.value) {
@@ -116,12 +117,13 @@ watch(
   }
   const handleSend = () => {
     console.log("message sent")
-    messages.value.push({
+    const newMessage: Message = {
       channelId: state.currentChannel.id,
       senderId: state.currentUser.id,
       content: chatText.value,
       timestamp: Date.now().toString()
-    })
+    }
+    state.messages.push(newMessage)
     chatText.value = '';
   }
 </script>

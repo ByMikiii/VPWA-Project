@@ -25,7 +25,7 @@
       </div>
 
 
-      <ServerList/>
+      <ChannelList/>
 
       <q-btn
       color="primary"
@@ -83,45 +83,59 @@
 
     <ChatSection/>
 
-    <section class="side">
-      <div class="side-header">
-        <button id="" class="start-btn">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M20 12l-10 0" />
-            <path d="M20 12l-4 4" />
-            <path d="M20 12l-4 -4" />
-            <path d="M4 4l0 16" />
-          </svg>
-        </button>
-        <h5 class="">Users</h5>
-      </div>
+    <transition name="fade">
+      <section class="side" id="users-side" v-show="showUsers">
+        <div class="side-header">
+          <button id="hide-users-btn" class="start-btn" @click="toggleUsers">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 12l-10 0" />
+              <path d="M20 12l-4 4" />
+              <path d="M20 12l-4 -4" />
+              <path d="M4 4l0 16" />
+            </svg>
+          </button>
+          <h5 class="">Users</h5>
+        </div>
 
-      <UsersTab/>
+        <UsersTab/>
 
-    </section>
-
+      </section>
+    </transition>
 
   </main>
 </template>
 
 <script setup lang="ts">
   import ProfileTab from 'components/ProfileTab.vue';
-  import ServerList from 'components/ServerList.vue';
+  import ChannelList from 'components/ChannelList.vue';
   import ChatSection from 'components/ChatSection.vue';
   import UsersTab from 'components/UsersTab.vue';
+  import { ref } from 'vue'
 
+  const showUsers = ref(true)
+
+  const toggleUsers = () => {
+    showUsers.value = !showUsers.value
+  }
 </script>
 
-<style lang="sass">
-
+<style scoped>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

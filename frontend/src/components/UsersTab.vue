@@ -1,15 +1,16 @@
 <template>
+  <div class="users-list">
+    <div v-for="role in roles" :key="role">
+      <h6 v-if="usersByRole(role).length > 0" class="role">{{ role }} ({{ usersByRole(role).length }})</h6>
 
-  <div v-for="role in roles" :key="role">
-    <h6 v-if="usersByRole(role).length > 0" class="role">{{ role }} ({{ usersByRole(role).length }})</h6>
-
-    <div
-      v-for="user in usersByRole(role)"
-      :key="user.id"
-      class="row items-center q-pa-sm q-gutter-x-sm"
-    >
-      <ProfilePicture :status="getUserById(user.id)!.status" />
-      <p id="username">{{ getUserById(user.id)!.nickname }}</p>
+      <div
+        v-for="user in usersByRole(role)"
+        :key="user.id"
+        class="row items-center q-pa-sm q-gutter-x-sm"
+      >
+        <ProfilePicture :status="getUserById(user.id)!.status" />
+        <p id="username">{{ getUserById(user.id)!.nickname }}</p>
+      </div>
     </div>
   </div>
 </template>

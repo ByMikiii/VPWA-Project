@@ -42,7 +42,11 @@ const users: User[] = [
   { id: '7', nickname: 'Grace111', email: 'grace@example.com', name: 'Grace', surname: 'Moore', status: 'Offline' },
   { id: '8', nickname: 'Heidi222', email: 'heidi@example.com', name: 'Heidi', surname: 'Taylor', status: 'Online' },
   { id: '9', nickname: 'Ivan333', email: 'ivan@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
-  { id: '10', nickname: 'Judy444', email: 'judy@example.com', name: 'Judy', surname: 'Thomas', status: 'Online' }]
+  { id: '10', nickname: 'Judy444', email: 'judy@example.com', name: 'Judy', surname: 'Thomas', status: 'Online' },
+  { id: '11', nickname: 'Ivan336', email: 'ivan1@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
+  { id: '12', nickname: 'Ivan334', email: 'ivan2@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
+  { id: '13', nickname: 'Ivan335', email: 'ivan3@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
+]
 
 export const channels: Channel[] = [
   {
@@ -53,7 +57,15 @@ export const channels: Channel[] = [
       { id: '2', role: 'Admin' },
       { id: '3', role: 'Moderator' },
       { id: '4', role: 'Guest' },
-      { id: '5', role: 'Guest' }
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
     ]
   },
   {
@@ -102,7 +114,7 @@ export const channels: Channel[] = [
   }
 ]
 
-export const messages: Message[] = [
+const messages: Message[] = [
   {
     channelId: '1',
     senderId: '1',
@@ -166,7 +178,7 @@ export const messages: Message[] = [
 ]
 
 export function getMessagesByChannelId(channelId: string): Message[] {
-  return messages.filter(msg => msg.channelId === channelId)
+  return ChatState.messages.filter(m => m.channelId === channelId)
 }
 
 export const getUserById = (id: string): User | undefined => {
@@ -184,4 +196,5 @@ export const ChatState = reactive({
   currentUser: currentUser,
   channels: channels,
   currentChannel: currentChannel,
+  messages: messages
 })
