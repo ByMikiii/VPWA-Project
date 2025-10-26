@@ -128,6 +128,174 @@ export const channels: Channel[] = [
       { id: '4', role: 'Moderator' },
       { id: '5', role: 'Guest' }
     ]
+  },
+  {
+    id: '7',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '8',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '9',
+    name: 'Development',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '3', role: 'Admin' },
+      { id: '5', role: 'Moderator' },
+      { id: '7', role: 'Moderator' },
+      { id: '9', role: 'Guest' }
+    ]
+  },
+  {
+    id: '10',
+    name: 'Marketing',
+    private: true,
+    users: [
+      { id: '2', role: 'Owner' },
+      { id: '4', role: 'Admin' },
+      { id: '6', role: 'Moderator' },
+      { id: '8', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '11',
+    name: 'Support',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Moderator' },
+      { id: '5', role: 'Guest' }
+    ]
+  },
+  {
+    id: '12',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '13',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '14',
+    name: 'Development',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '3', role: 'Admin' },
+      { id: '5', role: 'Moderator' },
+      { id: '7', role: 'Moderator' },
+      { id: '9', role: 'Guest' }
+    ]
+  },
+  {
+    id: '15',
+    name: 'Marketing',
+    private: true,
+    users: [
+      { id: '2', role: 'Owner' },
+      { id: '4', role: 'Admin' },
+      { id: '6', role: 'Moderator' },
+      { id: '8', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '16',
+    name: 'Support',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Moderator' },
+      { id: '5', role: 'Guest' }
+    ]
+  },
+  {
+    id: '17',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '18',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
   }
 ]
 
