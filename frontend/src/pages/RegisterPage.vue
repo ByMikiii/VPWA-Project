@@ -6,6 +6,7 @@
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
   import { ChatState } from '../state/ChatState';
+  import { Notify } from 'quasar';
 
   interface RegisterFormData {
     email: string;
@@ -21,22 +22,22 @@
   async function handleRegistration(formData: RegisterFormData) {
     console.log('Register data:', formData); //here is a place to work with data and send them to backend
     if (formData.password.length < 6){
-        alert("The password has to have more than 6 characters");
+        Notify.create("The password has to have more than 6 characters");
     }
     else{
       if (formData.password != formData.repeatPassword){
-        alert("Passwords have to be same");
+        Notify.create("Passwords have to be same");
       }
       else{
         if (!/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.name) || !/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.surname)) {
-          alert("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
+          Notify.create("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
         }
         else{
           if(formData.nickname.length < 6){
-            alert("The nickname has to have more than 6 characters");
+            Notify.create("The nickname has to have more than 6 characters");
           }
           else{
-            alert("Registered successfuly");
+            Notify.create("Registered successfuly");
             ChatState.currentUser.email=formData.email;
             ChatState.currentUser.name=formData.name;
             ChatState.currentUser.surname=formData.surname;

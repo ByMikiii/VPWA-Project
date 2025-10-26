@@ -6,6 +6,7 @@
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
   import { ChatState } from '../state/ChatState';
+  import { Notify } from 'quasar';
 
   interface EditProfileFormData {
     email: string;
@@ -19,14 +20,14 @@
   async function handleEditProfile(formData: EditProfileFormData) {
     console.log('Edit profile form data:', formData); //here is a place to work with data and send them to backend
       if (!/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.name) || !/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.surname)) {
-        alert("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
+        Notify.create("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
       }
       else{
         if(formData.nickname.length < 6){
-          alert("The nickname has to have more than 6 characters");
+          Notify.create("The nickname has to have more than 6 characters");
         }
         else{
-          alert("Profile edited successfuly");
+          Notify.create("Profile edited successfuly");
           ChatState.currentUser.email=formData.email;
           ChatState.currentUser.name=formData.name;
           ChatState.currentUser.surname=formData.surname;

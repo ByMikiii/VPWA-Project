@@ -71,6 +71,7 @@
 <script setup lang="ts">
     import { ChatState } from '../state/ChatState';
     import { useRouter } from 'vue-router';
+    import { Notify } from 'quasar';
 
     import ProfilePicture from '../components/ProfilePicture.vue';
     import StatusDropdown from '../components/StatusDropdown.vue';
@@ -80,7 +81,7 @@
     const router = useRouter();
 
     const logout = async () => {
-      alert("You were logged out successfuly");
+      Notify.create("You were logged out successfuly");
 
       ChatState.currentUser = {
         id: '',

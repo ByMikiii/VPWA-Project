@@ -5,6 +5,7 @@
 <script setup lang="ts">
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
+  import { Notify } from 'quasar';
 
   interface forgottenPasswordFormData {
     email: string;
@@ -17,14 +18,14 @@
   async function handleForgottenPassword(formData: forgottenPasswordFormData) {
     console.log('Forgotten password form data:', formData); //here is a place to work with data and send them to backend
     if (formData.newPassword.length < 6){
-        alert("The password has to have more than 6 characters");
+        Notify.create("The password has to have more than 6 characters");
     }
     else{
       if (formData.newPassword != formData.repeatPassword){
-        alert("Passwords have to be same");
+        Notify.create("Passwords have to be same");
       }
       else{
-        alert("Password renewed successfuly");
+        Notify.create("Password renewed successfuly");
         await router.push('/login');
       }    
     }
