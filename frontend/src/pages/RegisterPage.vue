@@ -5,6 +5,7 @@
 <script setup lang="ts">
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
+  import { ChatState } from '../state/ChatState';
 
   interface RegisterFormData {
     email: string;
@@ -36,6 +37,10 @@
           }
           else{
             alert("Registered successfuly");
+            ChatState.currentUser.email=formData.email;
+            ChatState.currentUser.name=formData.name;
+            ChatState.currentUser.surname=formData.surname;
+            ChatState.currentUser.nickname=formData.nickname;
             await router.push('/');
           }
         }

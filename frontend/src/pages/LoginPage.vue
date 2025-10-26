@@ -5,6 +5,7 @@
 <script setup lang="ts">
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
+  import { ChatState } from '../state/ChatState';
 
   interface LoginFormData {
     email: string;
@@ -20,6 +21,7 @@
     }
     else{
       alert("Logged in successfuly");
+      ChatState.currentUser.email=formData.email;
       await router.push('/');
     }
   }
