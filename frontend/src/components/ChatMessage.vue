@@ -4,8 +4,10 @@
       text-color="white"
       :bg-color="sent ? 'green-6' : 'primary'"
     >
-      <template v-slot:name>{{ name }}</template>
-      <template v-slot:stamp>{{timestamp}}</template>
+      <template v-slot:name>
+        <span class="message-name">{{ name }}</span>
+      </template>
+      <template v-slot:stamp v-if="timestamp">{{formatTimestamp(timestamp)}}</template>
       <template v-slot:avatar>
         <img
           :class="[
@@ -17,12 +19,21 @@
       </template>
 
       <q-spinner-dots v-if="typing" size="1.5rem" />
-      <span v-else>{{ message }}</span>
+      <span v-else class="message-text">{{ message }}</span>
 
     </q-chat-message>
 </template>
 
 <script setup lang="ts">
+
+  function formatTimestamp(timestamp: string): string {
+    const date = new Date(typeof timestamp === 'string' ? parseInt(timestamp) : timestamp)
+    const month = date.toLocaleString('en-US', { month: 'short' })
+    const day = date.getDate()
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}, ${day} ${month}`
+  }
 
   defineProps({
     name: {

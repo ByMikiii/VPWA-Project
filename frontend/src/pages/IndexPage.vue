@@ -1,90 +1,73 @@
 <template>
   <main class="q-ma-xl row">
 
-    <section class="side">
-      <h5 class="text-center side-header">Channels</h5>
-      <ServerList/>
-      <div>
-        <button id="create-channel" class="q-btn q-btn-primary">Create Channel</button>
-      </div>
-      <div>
-        <button id="join-channel" class="q-btn q-btn-primary">Join Channel</button>
-      </div>
+    <ChannelList/>
 
-      <ProfileTab/>
+    <ChatSection/>
 
-    </section>
-
-    <section class="col-grow" id="chat">
-      <h4 class="text-center" id="chat-title">Welcome to Chatty!</h4>
-
-
-      <div id="messages">
-
-        <ChatMessage name="Me" timestamp="7 minute AGO" message="cau ne" :sent="true"></ChatMessage>
-
-        <ChatMessage name="User" timestamp="2 minute AGO" message="povedz ty" :sent="false"></ChatMessage>
-
-        <ChatMessage name="Me" :sent="true" :typing="true"></ChatMessage>
-
-        <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
-      </div>
-
-
-      <div id="chat-area">
-        <textarea name="chat-text" id="chat-text"></textarea>
-        <button class="send-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M10 14l11 -11" />
-            <path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" />
-          </svg>
-        </button>
-      </div>
-    </section>
-
-    <section class="side">
-      <h5 class="text-center side-header">Users</h5>
-      <h6 class="role">Owner</h6>
-
-      <div id="user-tab">
-        <ProfilePicture status="online"/>
-        <p id="username">Username</p>
-      </div>
-      <h6 class="role">Admin</h6>
-      <div id="user-tab">
-        <ProfilePicture status="away"/>
-        <p id="username">Username</p>
-      </div>
-      <div id="user-tab">
-        <ProfilePicture status="offline"/>
-        <p id="username">Username</p>
-      </div>
-
-
-    </section>
-
+    <UsersTab/>
 
   </main>
+
+  <button id="notification-btn">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+      <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+    </svg>
+  </button>
 </template>
 
 <script setup lang="ts">
-  import ChatMessage from 'components/ChatMessage.vue'
-  import ProfilePicture from 'components/ProfilePicture.vue';
-  import ProfileTab from 'components/ProfileTab.vue';
-  import ServerList from 'components/ServerList.vue';
+  import { inject } from 'vue';
+  import ChannelList from 'components/ChannelList.vue';
+  import ChatSection from 'components/ChatSection.vue';
+  import UsersTab from 'components/UsersTab.vue';
+  import { onMounted, onUnmounted } from 'vue';
+  import type { ChatState } from 'src/state/ChatState';
+  const state = inject('ChatState') as typeof ChatState
+
+  const SMALL_WIDTH = 768
+  const MEDIUM_WIDTH = 1024
+  const updateShowUsers = () => {
+    if(state.showChat) {
+      state.showUsers = window.innerWidth > MEDIUM_WIDTH;
+    }
+    if(window.innerWidth > SMALL_WIDTH){
+      state.showChat = true;
+    }
+  }
+  const updateShowChannels = () => {
+    if(state.showChat) {
+      state.showChannels = window.innerWidth > SMALL_WIDTH;
+    }
+    if(window.innerWidth > SMALL_WIDTH){
+      state.showChat = true;
+    }
+  }
+  updateShowUsers()
+  updateShowChannels()
+
+  onMounted(() => {
+    window.addEventListener('resize', updateShowUsers)
+    window.addEventListener('resize', updateShowChannels)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateShowUsers)
+    window.addEventListener('resize', updateShowChannels)
+  })
 
 </script>
 
-<style lang="sass">
-
+<style>
 </style>
