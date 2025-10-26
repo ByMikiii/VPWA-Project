@@ -6,7 +6,7 @@
         <StatusDropdown :current-status="state.currentUser.status"/>
       </div>
 
-      <button class="settings-button" @click="handleSettings">
+      <button class="settings-button" @click="$router.push('/profile')">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -33,9 +33,6 @@
 
   const state = inject('ChatState') as typeof ChatState
 
-  function handleSettings() {
-    alert("settings clicked")
-  }
 </script>
 
 

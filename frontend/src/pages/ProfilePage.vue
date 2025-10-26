@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md flex flex-center">
-    <q-card class="q-pa-lg bg-dark text-accent" style="min-width: 500px;">
+    <q-card class="q-pa-lg bg-dark text-accent" style="max-width: 500px; width: 100%;">
       
       <q-card-section  class="text-right" dark>
         <q-btn 
@@ -16,6 +16,10 @@
           style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"
         />
       </div>
+
+      <div class="flex justify-center"><StatusDropdown></StatusDropdown></div>
+      
+      
 
       <q-card-section>
         <q-list padding class="text-center">
@@ -62,6 +66,8 @@
 <script setup lang="ts">
     import { ChatState } from '../state/ChatState';
     import ProfilePicture from '../components/ProfilePicture.vue';
+    import StatusDropdown from '../components/StatusDropdown.vue';
+
 
     const user = ChatState.currentUser;
 </script>
