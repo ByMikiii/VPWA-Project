@@ -1,6 +1,5 @@
 <template>
-    <h1>Registration</h1>
-    <AuthForm mode="register" @submit="handleRegistration" />
+    <AuthForm mode="register" heading="Registration" @submit="handleRegistration" />
 </template>
 
 <script setup lang="ts">

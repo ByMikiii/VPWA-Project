@@ -1,6 +1,5 @@
 <template>
-    <h1>Change password</h1>
-    <AuthForm mode="changePassword" @submit="handleChangePassword" />
+    <AuthForm mode="changePassword" heading="Change password" @submit="handleChangePassword" />
 </template>
 
 <script setup lang="ts">

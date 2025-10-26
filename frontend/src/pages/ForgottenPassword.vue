@@ -1,6 +1,5 @@
 <template>
-    <h1>Forgotten password</h1>
-    <AuthForm mode="forgottenPassword" @submit="handleForgottenPassword" />
+    <AuthForm mode="forgottenPassword" heading="Renew password" @submit="handleForgottenPassword" />
 </template>
 
 <script setup lang="ts">

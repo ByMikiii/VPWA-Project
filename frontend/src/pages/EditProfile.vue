@@ -1,6 +1,5 @@
 <template>
-    <h1>Edit profile</h1>
-    <AuthForm mode="editProfile" @submit="handleEditProfile" />
+    <AuthForm mode="editProfile" heading="Edit profile" @submit="handleEditProfile" />
 </template>
 
 <script setup lang="ts">
