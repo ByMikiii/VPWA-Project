@@ -1,24 +1,28 @@
 <template>
-  <section class="col-grow" id="chat">
+  <section class="col-grow" id="chat" v-show="state.showChat">
 
     <div class="center-header">
-      <button class="start-btn" @click="toggleChannels">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M4 6l16 0" />
-          <path d="M4 12l16 0" />
-          <path d="M4 18l16 0" />
-        </svg>
-      </button>
+      <div class="end-btn">
+        <transition name="fade">
+          <button class="start-btn" @click="toggleChannels" v-show="!state.showChannels">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6l16 0" />
+              <path d="M4 12l16 0" />
+              <path d="M4 18l16 0" />
+            </svg>
+          </button>
+        </transition>
+      </div>
 
       <h4 class="row items-center" id="chat-title">{{ state.currentChannel.name }}</h4>
 
@@ -60,7 +64,7 @@
     </div>
 
 
-    <div id="chat-area">
+    <div id="chat-area" class="rounded-borders">
       <textarea
         type="text"
         name="chat-textfdsfds"
@@ -137,21 +141,43 @@ watch(
   }
 
   const toggleUsers = () => {
+    console.log(window.innerWidth)
     state.showUsers = !state.showUsers
+    if(state.showUsers === true){
+      if(window.innerWidth <= 1024 && window.innerWidth > 768){
+        state.showChannels = false;
+      }else if(window.innerWidth <= 768){
+        state.showChannels = false;
+        state.showChat = false;
+      }
+    }else{
+      state.showChat = true;
+    }
   }
 
   const toggleChannels = () => {
+    console.log(window.innerWidth)
     state.showChannels = !state.showChannels
+    if(state.showChannels === true){
+      if(window.innerWidth <= 1024 && window.innerWidth > 768){
+        state.showUsers = false;
+      }else if(window.innerWidth <= 768){
+        state.showUsers = false;
+        state.showChat = false;
+      }
+    }else{
+      state.showChat = true;
+    }
   }
 </script>
 
 <style scoped>
-  .fade-enter-active,
+  /* .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.2s ease;
   }
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
-  }
+  } */
 </style>

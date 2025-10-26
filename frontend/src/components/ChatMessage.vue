@@ -4,7 +4,9 @@
       text-color="white"
       :bg-color="sent ? 'green-6' : 'primary'"
     >
-      <template v-slot:name>{{ name }}</template>
+      <template v-slot:name>
+        <span class="message-name">{{ name }}</span>
+      </template>
       <template v-slot:stamp v-if="timestamp">{{formatTimestamp(timestamp)}}</template>
       <template v-slot:avatar>
         <img
@@ -17,7 +19,7 @@
       </template>
 
       <q-spinner-dots v-if="typing" size="1.5rem" />
-      <span v-else>{{ message }}</span>
+      <span v-else class="message-text">{{ message }}</span>
 
     </q-chat-message>
 </template>

@@ -1,6 +1,11 @@
 <template>
   <transition name="fade">
-  <section class="side" id="users-side" v-show="state.showUsers">
+  <section
+    class="side"
+    :class="{ 'full-width': !state.showChannels && !state.showChat }"
+    id="users-side"
+    v-show="state.showUsers"
+  >
     <div class="side-header">
       <button id="hide-users-btn" class="start-btn" @click="toggleUsers">
         <svg
@@ -30,7 +35,7 @@
         <div
           v-for="user in usersByRole(role)"
           :key="user.id"
-          class="row items-center q-pa-sm q-gutter-x-sm"
+          class="row items-center justify-center q-pa-sm q-gutter-x-sm"
         >
           <ProfilePicture :status="getUserById(user.id)!.status" />
           <p id="username">{{ getUserById(user.id)!.nickname }}</p>
@@ -55,17 +60,28 @@
     state.currentChannel.users.filter(user => user.role === role)
 
   const toggleUsers = () => {
+    console.log(window.innerWidth)
     state.showUsers = !state.showUsers
+    if(state.showUsers === true){
+      if(window.innerWidth <= 1024 && window.innerWidth > 768){
+        state.showChannels = false;
+      }else if(window.innerWidth <= 768){
+        state.showChannels = false;
+        state.showChat = false;
+      }
+    }else{
+      state.showChat = true;
+    }
   }
 </script>
 
 <style scoped>
-  .fade-enter-active,
+  /* .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.2s ease;
   }
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
-  }
+  } */
 </style>

@@ -34,7 +34,7 @@ export interface Channel {
 
 const users: User[] = [
   { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
-  { id: '2', nickname: 'Bob456', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
+  { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
   { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline' },
   { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online' },
   { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online' },
@@ -172,7 +172,13 @@ const messages: Message[] = [
   {
     channelId: '1',
     senderId: '2',
-    content: 'super',
+    content: 'superg sdgdsjkjgskj fksdjh kfjsdh jkfsdjkfdj hsdkj hfkjsdh jkfhsdkj fhkjsdh fjksdh kjfhsdkj fhdskjh fkjsdh fkjsdh kjfhksjd hfkjsdh fkjshd kjfhdskj hfkjsd fhkjsdh fkjhsd kj',
+    timestamp: '1767077040000'
+  },
+  {
+    channelId: '1',
+    senderId: '2',
+    content: '.',
     timestamp: '1767077040000'
   }
 ]
@@ -198,5 +204,6 @@ export const ChatState = reactive({
   currentChannel: currentChannel,
   messages: messages,
   showUsers: true,
-  showChannels: true
+  showChannels: true,
+  showChat: true
 })

@@ -65,7 +65,7 @@ main section {
 
 
 #channels-list {
-  height: calc(100% - 252px);
+  height: calc(100% - 240px);
   overflow-y: auto;
 }
 
@@ -81,7 +81,7 @@ main section {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba($color: #777777, $alpha: 0.3);
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
 }
 
 .center-header {
@@ -115,22 +115,67 @@ main section {
   padding: 0;
 }
 
+#notification-btn {
+  position: fixed;
+  top: 95%;
+  right: 0.5%;
+  transform: translate(-50%, -50%);
+  background-color: $primary;
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
 
-.notification-btn svg {
-  width: 28px;
-  height: 28px;
-  display: block;
+#notification-btn::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+#notification-btn svg {
+  width: 24px;
+  height: 24px;
 }
 
 .join-btn {
   margin: 0.25rem 0.5rem;
+  height: 40px;
+}
+
+#create-btn {
+  width: calc(100% - 16px);
+}
+
+#channel-code {
+  width: calc(100% - 86px);
+  height: 100%;
+  resize: none;
+  border: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0);
+  border-bottom: 1px solid white;
+  color: white;
+  padding: 0 0.25rem;
+  padding-top: 12px;
 }
 
 #profile-tab {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 1.25rem 0.75rem;
+  padding: 1rem 0.75rem;
 }
 
 .tab-text {
@@ -144,6 +189,7 @@ main section {
   font-weight: 600;
   display: inline-block;
   max-width: 108px;
+  margin-left: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,6 +222,13 @@ main section {
   // border: 1px solid rgba($color: #FF0000, $alpha: 0.3);
 }
 
+.message-text {
+  display: inline-block;
+  max-width: 224px;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
 #chat-text {
   width: 100%;
   width: calc(100% - 24px);
@@ -185,7 +238,8 @@ main section {
   margin: 0;
   background: rgba(255, 255, 255, 0);
   color: white;
-  font-size: 20px;
+  font-size: 18px;
+  padding-top: 4px;
 }
 
 #create-channel {
@@ -198,15 +252,23 @@ main section {
   height: 24px;
 }
 
+.message-name {
+  display: inline-block;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .users-list {
-  max-height: calc(100% - 81px);
+  max-height: calc(100% - 74px);
   overflow-y: auto;
 }
 
 #chat-area {
   border: 2px solid rgba($color: #777777, $alpha: 0.3);
   width: 100%;
-  padding: 4px 8px;
+  padding: 0.25rem 0.75rem;
   display: flex;
   align-items: center;
 }
@@ -219,9 +281,11 @@ main section {
 }
 
 .role {
-  width: 240px;
+  width: 100%;
+  color: $secondary;
   font-size: 16px;
   font-weight: bold;
-  padding: 0.25rem 1rem;
+  padding: 0 1rem;
   text-align: center;
+  margin-top: 12px;
 }
