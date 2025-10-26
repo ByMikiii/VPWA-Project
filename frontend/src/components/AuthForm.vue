@@ -108,7 +108,19 @@
       class = "q-mt-md"
       required
     />
-    <q-btn type="submit" label="Submit" class="q-mt-lg full-width" rounded outlined/>
+    <q-card-section class="q-mt-lg flex justify-center">
+      <q-btn 
+        type="submit" 
+        label="Submit" 
+        rounded 
+        outlined 
+        color="accent" 
+        text-color="primary"
+        size="md"
+        class="q-px-lg"
+      />
+    </q-card-section>
+
 
     <p v-if = 'mode === "login"' class = "q-mt-md full-width text-center">
         Don't have an account? 

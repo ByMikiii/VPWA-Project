@@ -1,20 +1,57 @@
 <template>
   <div class="q-pa-md flex flex-center">
-    <q-card class="q-pa-lg bg-dark text-white" style="min-width: 400px;">
-        <ProfilePicture :status="user.status"></ProfilePicture>
-      <q-card-section>
-        <div class="text-h6 text-accent">My Profile</div>
+    <q-card class="q-pa-lg bg-dark text-accent" style="min-width: 500px;">
+      
+      <q-card-section  class="text-right" dark>
+        <q-btn 
+        rounded outlined
+        color="accent"
+        text-color="primary" 
+        class="q-px-lg">Log out</q-btn>
       </q-card-section>
 
-      <q-card-section text-accent>
-        <div><strong>Name:</strong> {{ user.name }}</div>
-        <div><strong>Surname:</strong> {{ user.surname }}</div>
-        <div><strong>Nickname:</strong> {{ user.nickname }}</div>
-        <div><strong>Email:</strong> {{ user.email }}</div>
+      <ProfilePicture :status="user.status"></ProfilePicture>
+
+      <q-card-section>
+        <div class="text-h6 text-accent text-center">My Profile</div>
       </q-card-section>
-      <q-btn>Edit profile</q-btn>
-      <q-btn>Change password</q-btn>
-      <q-btn>Log out</q-btn>
+
+      <q-card-section>
+        <q-list padding class="text-center">
+          <q-item>
+            <q-item-section class="text-h5"><strong>Name:</strong> {{ user.name }}</q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section class="text-h5"><strong>Surname:</strong> {{ user.surname }}</q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section class="text-h5"><strong>Nickname:</strong> {{ user.nickname }}</q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section class="text-h5"><strong>Email:</strong> {{ user.email }}</q-item-section>
+          </q-item>
+        </q-list>
+      </q-card-section>
+
+
+
+
+      <q-card-section class="row justify-between">
+        <q-btn 
+          rounded 
+          outlined 
+          color="accent" 
+          text-color="primary" 
+          label="Edit profile" 
+        />
+        <q-btn 
+          rounded 
+          outlined 
+          color="accent" 
+          text-color="primary" 
+          label="Change password" 
+        />
+      </q-card-section>
     </q-card>
   </div>
 </template>
@@ -31,9 +68,6 @@
 
 
 <style scoped>
-    /* .q-card {
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-} */
+    
 
 </style>
