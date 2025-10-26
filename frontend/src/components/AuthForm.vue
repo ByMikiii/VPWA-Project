@@ -7,9 +7,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'james.brown@gmail.com' : ''"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -20,9 +21,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'James' : ''"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -33,9 +35,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'Brown' : ''"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -46,9 +49,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
-      :placeholder="mode === 'editProfile' ? 'JamesBrown2000' : ''"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -59,7 +63,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
+      field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -70,8 +77,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -82,29 +91,32 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
-    <q-btn type="submit" label="Submit" />
+    <q-btn type="submit" label="Submit" class="q-mt-md" rounded outlined/>
 
-    <p v-if = 'mode === "login"'>
+    <p v-if = 'mode === "login"' class = "q-mt-md">
         Don't have an account? 
-        <router-link to="/register">Register here</router-link>
+        <router-link to="/register" class="custom-link">Register here</router-link>
         <br>
         Forgotten password?
-        <router-link to="/forgottenPassword">Renew password here</router-link>
+        <router-link to="/forgottenPassword" class="custom-link">Renew password here</router-link>
     </p> 
-    <p v-else-if = 'mode === "register"'>
+    <p v-else-if = 'mode === "register"' class = "q-mt-md">
         Already have an account? 
-        <router-link to="/login">Login here</router-link>
+        <router-link to="/login" class="custom-link">Login here</router-link>
     </p>
-
   </q-form>
 </template>
 
 <script setup lang="ts">
     import { ref } from 'vue';
+    import { ChatState } from '../state/ChatState';
+
 
     const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword' | 'editProfile'}>();
 
@@ -116,6 +128,14 @@
     const nickname = ref('');
     const repeatPassword = ref('');
     const newPassword = ref('');
+
+    if (mode === 'editProfile') {
+      email.value = ChatState.currentUser.email;
+      name.value = ChatState.currentUser.name;
+      surname.value = ChatState.currentUser.surname;
+      nickname.value = ChatState.currentUser.nickname;
+    }
+
 
     const emit = defineEmits(['submit']);
 
@@ -133,6 +153,13 @@
 
 </script>
 
-<style lang="scss">
-       
+<style scoped lang="scss">
+
+  .custom-link {
+    color: $positive ;
+  }
+  .custom-link:visited{
+    color:$secondary;
+  }
+
 </style>
