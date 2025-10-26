@@ -10,11 +10,12 @@
         class="q-px-lg">Log out</q-btn>
       </q-card-section>
 
-      <ProfilePicture :status="user.status"></ProfilePicture>
-
-      <q-card-section>
-        <div class="text-h6 text-accent text-center">My Profile</div>
-      </q-card-section>
+      <div class="flex justify-center q-mb-md">
+        <ProfilePicture 
+          :status="user.status"
+          style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"
+        />
+      </div>
 
       <q-card-section>
         <q-list padding class="text-center">
@@ -68,6 +69,5 @@
 
 
 <style scoped>
-    
 
 </style>
