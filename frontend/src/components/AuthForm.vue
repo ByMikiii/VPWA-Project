@@ -1,5 +1,16 @@
 <template>
-  <q-form @submit.prevent="onSubmit">
+  <h1 class="text-center q-mt-lg q-mb-lg"
+    :class="{
+      'text-h4': $q.screen.width < $q.screen.sizes.sm,
+      'text-h3': $q.screen.width >= $q.screen.sizes.sm && $q.screen.width < $q.screen.sizes.md,
+      'text-h2': $q.screen.width >= $q.screen.sizes.md && $q.screen.width < $q.screen.sizes.lg,
+      'text-h1': $q.screen.width >= $q.screen.sizes.lg
+    }">
+  {{ heading }}
+</h1>
+
+  <q-form @submit.prevent="onSubmit" class="q-mx-auto q-pa-md"
+  style="max-width: 400px;">
     <q-input v-if="['register', 'login', 'forgottenPassword', 'editProfile'].includes(mode)"
       v-model="email"
       label="Email"
@@ -97,16 +108,28 @@
       class = "q-mt-md"
       required
     />
-    <q-btn type="submit" label="Submit" class="q-mt-md" rounded outlined/>
+    <q-card-section class="q-mt-lg flex justify-center">
+      <q-btn 
+        type="submit" 
+        label="Submit" 
+        rounded 
+        outlined 
+        color="accent" 
+        text-color="primary"
+        size="md"
+        class="q-px-lg"
+      />
+    </q-card-section>
 
-    <p v-if = 'mode === "login"' class = "q-mt-md">
+
+    <p v-if = 'mode === "login"' class = "q-mt-md full-width text-center">
         Don't have an account? 
         <router-link to="/register" class="custom-link">Register here</router-link>
         <br>
         Forgotten password?
         <router-link to="/forgottenPassword" class="custom-link">Renew password here</router-link>
     </p> 
-    <p v-else-if = 'mode === "register"' class = "q-mt-md">
+    <p v-else-if = 'mode === "register"' class = "q-mt-md full-width text-center">
         Already have an account? 
         <router-link to="/login" class="custom-link">Login here</router-link>
     </p>
@@ -118,7 +141,10 @@
     import { ChatState } from '../state/ChatState';
 
 
-    const {mode} = defineProps<{ mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword' | 'editProfile'}>();
+    const { mode, heading } = defineProps<{
+      mode: 'login' | 'register' | 'forgottenPassword' | 'changePassword' | 'editProfile',
+      heading: string
+    }>();
 
     const email = ref('');
     const password = ref('');
@@ -156,10 +182,14 @@
 <style scoped lang="scss">
 
   .custom-link {
-    color: $positive ;
+    color: $positive;
   }
   .custom-link:visited{
     color:$secondary;
+  }
+
+  #auth-form{
+    max-width: 400px;
   }
 
 </style>

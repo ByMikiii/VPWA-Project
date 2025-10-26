@@ -1,17 +1,28 @@
 <template>
-    <h1>Login</h1>
-    <AuthForm mode="login" @submit="handleLogin" />
+    <AuthForm mode="login" heading="Login" @submit="handleLogin" />
 </template>
 
 <script setup lang="ts">
-import AuthForm from 'components/AuthForm.vue';
+  import AuthForm from 'components/AuthForm.vue';
+  import { useRouter } from 'vue-router';
+  import { ChatState } from '../state/ChatState';
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+  interface LoginFormData {
+    email: string;
+    password: string;
+  }
 
-function handleLogin(formData: LoginFormData) {
-  console.log('Login data:', formData); //here is a place to work with data and send them to backend
-}
+  const router = useRouter();
+
+  async function handleLogin(formData: LoginFormData) {
+    console.log('Login data:', formData); //here is a place to work with data and send them to backend
+    if (formData.password.length < 6){
+      alert("The password has to have more than 6 characters");
+    }
+    else{
+      alert("Logged in successfuly");
+      ChatState.currentUser.email=formData.email;
+      await router.push('/');
+    }
+  }
 </script>
