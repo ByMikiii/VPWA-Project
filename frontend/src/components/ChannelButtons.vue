@@ -5,12 +5,15 @@
         name="channel-code"
         id="channel-code"
         placeholder="#CHANNEL_CODE"
-        ></textarea>
+        maxlength="12"
+        ref="channelCodeRef"
+      ></textarea>
       <q-btn
       color="primary"
       unelevated
       class="text-white q-pa-sm"
       no-wrap
+      @click="joinChannel"
       >
         <div class="row items-center justify-center no-wrap q-gutter-x-sm">
           <span>Join</span>
@@ -40,6 +43,15 @@
 
 <script setup lang="ts">
   import ChannelCreation from './ChannelCreation.vue'
+  import { ref } from 'vue'
+  import { Notify } from 'quasar';
+
+  const channelCodeRef = ref<HTMLTextAreaElement | null>(null)
+
+
+  const joinChannel = () => {
+    Notify.create({message: `Invite code "${channelCodeRef.value?.value}" does not exist`, color: 'negative'})
+  }
 </script>
 
 <style>
