@@ -82,6 +82,15 @@
     const logout = async () => {
       alert("You were logged out successfuly");
 
+      ChatState.currentUser = {
+        id: '',
+        nickname: '',
+        email: '',
+        name: '',
+        surname: '',
+        status: 'Offline'
+      };
+
       await router.push('/login');
     }
 
