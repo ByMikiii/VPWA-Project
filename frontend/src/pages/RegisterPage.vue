@@ -3,18 +3,43 @@
 </template>
 
 <script setup lang="ts">
-import AuthForm from 'components/AuthForm.vue';
+  import AuthForm from 'components/AuthForm.vue';
+  import { useRouter } from 'vue-router';
 
-interface RegisterFormData {
-  email: string;
-  name: string;
-  surname: string;
-  nickname: string;
-  password: string;
-  repeatPassword: string;
-}
+  interface RegisterFormData {
+    email: string;
+    name: string;
+    surname: string;
+    nickname: string;
+    password: string;
+    repeatPassword: string;
+  }
 
-function handleRegistration(formData: RegisterFormData) {
-  console.log('Register data:', formData); //here is a place to work with data and send them to backend
-}
+  const router = useRouter();
+
+  async function handleRegistration(formData: RegisterFormData) {
+    console.log('Register data:', formData); //here is a place to work with data and send them to backend
+    if (formData.password.length < 6){
+        alert("The password has to have more than 6 characters");
+    }
+    else{
+      if (formData.password != formData.repeatPassword){
+        alert("Passwords have to be same");
+      }
+      else{
+        if (!/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.name) || !/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.surname)) {
+          alert("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
+        }
+        else{
+          if(formData.nickname.length < 6){
+            alert("The nickname has to have more than 6 characters");
+          }
+          else{
+            alert("Registered successfuly");
+            await router.push('/');
+          }
+        }
+      }
+    }
+  }
 </script>
