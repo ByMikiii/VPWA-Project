@@ -7,7 +7,10 @@
         rounded outlined
         color="accent"
         text-color="primary" 
-        class="q-px-lg">Log out</q-btn>
+        class="q-px-lg"
+        @click=logout>
+        Log out
+        </q-btn>
       </q-card-section>
 
       <div class="flex justify-center q-mb-md">
@@ -47,14 +50,16 @@
           outlined 
           color="accent" 
           text-color="primary" 
-          label="Edit profile" 
+          label="Edit profile"
+          @click="$router.push('/editProfile')" 
         />
         <q-btn 
           rounded 
           outlined 
           color="accent" 
           text-color="primary" 
-          label="Change password" 
+          label="Change password"
+          @click="$router.push('/changePassword')"
         />
       </q-card-section>
     </q-card>
@@ -65,11 +70,21 @@
 
 <script setup lang="ts">
     import { ChatState } from '../state/ChatState';
+    import { useRouter } from 'vue-router';
+
     import ProfilePicture from '../components/ProfilePicture.vue';
     import StatusDropdown from '../components/StatusDropdown.vue';
 
-
     const user = ChatState.currentUser;
+
+    const router = useRouter();
+
+    const logout = async () => {
+      alert("You were logged out successfuly");
+
+      await router.push('/login');
+    }
+
 </script>
 
 
