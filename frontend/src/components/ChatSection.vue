@@ -2,7 +2,7 @@
   <section class="col-grow" id="chat">
 
     <div class="center-header">
-      <button class="start-btn">
+      <button class="start-btn" @click="toggleChannels">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -22,24 +22,28 @@
 
       <h4 class="row items-center" id="chat-title">{{ state.currentChannel.name }}</h4>
 
-      <button class="end-btn">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-          <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-        </svg>
-      </button>
+      <div class="end-btn">
+        <transition name="fade">
+          <button class="end-btn" @click="toggleUsers" v-show="!state.showUsers">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+              <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+            </svg>
+          </button>
+        </transition>
+      </div>
     </div>
 
 
@@ -59,10 +63,14 @@
     <div id="chat-area">
       <textarea
         type="text"
-        name="chat-text"
+        name="chat-textfdsfds"
         v-model="chatText"
         id="chat-text"
         placeholder="Type a message..."
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
         @keydown.enter.prevent="handleEnter($event)"
         >
       </textarea>
@@ -110,11 +118,12 @@ watch(
 
   const chatText = ref('')
 
-  function handleEnter(event: KeyboardEvent) {
+  const handleEnter = (event: KeyboardEvent) => {
     if (!event.shiftKey) {
       handleSend()
     }
   }
+
   const handleSend = () => {
     console.log("message sent")
     const newMessage: Message = {
@@ -126,8 +135,23 @@ watch(
     state.messages.push(newMessage)
     chatText.value = '';
   }
+
+  const toggleUsers = () => {
+    state.showUsers = !state.showUsers
+  }
+
+  const toggleChannels = () => {
+    state.showChannels = !state.showChannels
+  }
 </script>
 
-<style>
-
+<style scoped>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

@@ -196,5 +196,7 @@ export const ChatState = reactive({
   currentUser: currentUser,
   channels: channels,
   currentChannel: currentChannel,
-  messages: messages
+  messages: messages,
+  showUsers: true,
+  showChannels: true
 })
