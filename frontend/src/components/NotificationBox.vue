@@ -58,11 +58,9 @@
 
   const state = inject('ChatState') as typeof ChatState
 
-  const showList = ref(true)
+  const showList = ref(false)
   const toggleList = () => {
     showList.value = !showList.value
-    console.log(showList.value)
-    console.log(state.notifications)
   }
 
   const removeNotification = (index: number) => {

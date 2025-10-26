@@ -2,7 +2,7 @@
     <q-chat-message
       :sent="sent"
       text-color="white"
-      :bg-color="sent ? 'green-6' : 'primary'"
+      :bg-color="sent ? 'primary' : 'secondary'"
     >
       <template v-slot:name>
         <span class="message-name">{{ name }}</span>

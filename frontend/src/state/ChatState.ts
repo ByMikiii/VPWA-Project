@@ -218,6 +218,14 @@ export const getUserById = (id: string): User | undefined => {
   return users.find(user => user.id === id)
 }
 
+export const getUsersFromCurrentChannel = (): string[] => {
+  return currentChannel.users.map(userChannel => {
+    const user = getUserById(userChannel.id)
+    return user!.nickname;
+  })
+
+}
+
 if (!users[0] || !channels[0]) {
   throw new Error('cfkdsjf')
 }
