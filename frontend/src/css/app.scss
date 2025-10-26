@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   color: white;
+  font-family: 'Inter', 'Courier New', Courier, monospace;
 }
 
 textarea:focus {
@@ -16,7 +17,9 @@ h5,
 h6,
 p,
 img,
-svg {
+svg,
+ul,
+li {
   margin: 0;
   padding: 0;
 }
@@ -76,6 +79,10 @@ main section {
   cursor: pointer;
 }
 
+.private-icon {
+  margin-right: 4px;
+}
+
 .side-header {
   display: flex;
   justify-content: space-between;
@@ -132,7 +139,7 @@ main section {
   color: white;
 }
 
-#notification-btn::after {
+#notification-btn.has-notification::after {
   content: '';
   position: absolute;
   top: 8px;
@@ -288,4 +295,69 @@ main section {
   padding: 0 1rem;
   text-align: center;
   margin-top: 12px;
+}
+
+.command-popup {
+  background-color: $secondary;
+  width: 224px;
+  max-height: 200px;
+  overflow-y: auto;
+  bottom: 104px;
+  font-size: 0.9rem;
+}
+
+.command-popup ul {
+  list-style: none;
+  padding: 0.25rem 0.5rem;
+}
+
+
+.notif-remove {
+  right: 4px;
+  top: 8px;
+}
+
+.notif-message {
+  color: #333333;
+  margin-left: 6px;
+}
+
+.notif-user {
+  font-weight: 700;
+}
+
+.notif-header {
+  font-size: 15px;
+}
+
+.user-tab {
+  padding-left: 0.75rem;
+}
+
+.notification-list {
+  position: fixed;
+  bottom: 72px;
+  right: 38px;
+  width: 250px;
+  background-color: $primary;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  max-height: 320px;
+  overflow-y: auto;
+  color: black;
+}
+
+.notification-item {
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 2px;
+  background-color: $secondary;
+  font-style: italic;
+}
+
+.channel-dialog {
+  min-width: 300px;
+  max-width: 400px;
+  color: black;
 }

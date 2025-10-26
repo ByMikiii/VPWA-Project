@@ -29,7 +29,19 @@ export interface UserChannel {
 export interface Channel {
   id: string
   name: string
+  private: boolean
   users: UserChannel[]
+}
+
+export interface Command {
+  name: string
+  desc: string
+}
+
+export interface Notification {
+  user: string
+  channel: string
+  message: string
 }
 
 const users: User[] = [
@@ -52,6 +64,7 @@ export const channels: Channel[] = [
   {
     id: '1',
     name: 'General',
+    private: false,
     users: [
       { id: '1', role: 'Owner' },
       { id: '2', role: 'Admin' },
@@ -71,6 +84,7 @@ export const channels: Channel[] = [
   {
     id: '2',
     name: 'Random',
+    private: true,
     users: [
       { id: '6', role: 'Owner' },
       { id: '7', role: 'Admin' },
@@ -82,6 +96,7 @@ export const channels: Channel[] = [
   {
     id: '3',
     name: 'Development',
+    private: true,
     users: [
       { id: '1', role: 'Owner' },
       { id: '3', role: 'Admin' },
@@ -93,6 +108,7 @@ export const channels: Channel[] = [
   {
     id: '4',
     name: 'Marketing',
+    private: true,
     users: [
       { id: '2', role: 'Owner' },
       { id: '4', role: 'Admin' },
@@ -104,12 +120,181 @@ export const channels: Channel[] = [
   {
     id: '5',
     name: 'Support',
+    private: true,
     users: [
       { id: '1', role: 'Owner' },
       { id: '2', role: 'Admin' },
       { id: '3', role: 'Moderator' },
       { id: '4', role: 'Moderator' },
       { id: '5', role: 'Guest' }
+    ]
+  },
+  {
+    id: '7',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '8',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '9',
+    name: 'Development',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '3', role: 'Admin' },
+      { id: '5', role: 'Moderator' },
+      { id: '7', role: 'Moderator' },
+      { id: '9', role: 'Guest' }
+    ]
+  },
+  {
+    id: '10',
+    name: 'Marketing',
+    private: true,
+    users: [
+      { id: '2', role: 'Owner' },
+      { id: '4', role: 'Admin' },
+      { id: '6', role: 'Moderator' },
+      { id: '8', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '11',
+    name: 'Support',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Moderator' },
+      { id: '5', role: 'Guest' }
+    ]
+  },
+  {
+    id: '12',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '13',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '14',
+    name: 'Development',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '3', role: 'Admin' },
+      { id: '5', role: 'Moderator' },
+      { id: '7', role: 'Moderator' },
+      { id: '9', role: 'Guest' }
+    ]
+  },
+  {
+    id: '15',
+    name: 'Marketing',
+    private: true,
+    users: [
+      { id: '2', role: 'Owner' },
+      { id: '4', role: 'Admin' },
+      { id: '6', role: 'Moderator' },
+      { id: '8', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
+    ]
+  },
+  {
+    id: '16',
+    name: 'Support',
+    private: true,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Moderator' },
+      { id: '5', role: 'Guest' }
+    ]
+  },
+  {
+    id: '17',
+    name: 'General',
+    private: false,
+    users: [
+      { id: '1', role: 'Owner' },
+      { id: '2', role: 'Admin' },
+      { id: '3', role: 'Moderator' },
+      { id: '4', role: 'Guest' },
+      { id: '5', role: 'Guest' },
+      { id: '6', role: 'Guest' },
+      { id: '7', role: 'Guest' },
+      { id: '8', role: 'Guest' },
+      { id: '9', role: 'Guest' },
+      { id: '10', role: 'Guest' },
+      { id: '11', role: 'Guest' },
+      { id: '12', role: 'Guest' },
+      { id: '13', role: 'Guest' },
+    ]
+  },
+  {
+    id: '18',
+    name: 'Random',
+    private: true,
+    users: [
+      { id: '6', role: 'Owner' },
+      { id: '7', role: 'Admin' },
+      { id: '8', role: 'Moderator' },
+      { id: '9', role: 'Moderator' },
+      { id: '10', role: 'Guest' }
     ]
   }
 ]
@@ -183,12 +368,35 @@ const messages: Message[] = [
   }
 ]
 
+const commands: Command[] = [
+  { name: 'help', desc: 'shows help information' },
+  { name: 'invite', desc: 'invites certain user' },
+  { name: 'revoke', desc: 'kicks selected user' },
+  { name: 'quit', desc: 'leave/delete channel' },
+  { name: 'cancel', desc: 'deletes channel' },
+  { name: 'list', desc: 'list all users of current channel' },
+]
+
+const notifications: Notification[] = [
+  { user: 'Miki', channel: 'general', message: 'cau ne' },
+  { user: 'Anna', channel: 'dev-chat', message: 'ahoj' },
+  { user: 'John', channel: 'random', message: 'ffdksjfkds kfdsj flksdj klfjsdkl fjsldkjf lksdj flksdjfsklj fkldsjl kfjdslk fjsdlkjf klsdjf lkdsjlkf jsdkl fjdsklj fkldsjklf jsdlkjf lksdj flk' },
+]
+
+
 export function getMessagesByChannelId(channelId: string): Message[] {
   return ChatState.messages.filter(m => m.channelId === channelId)
 }
 
 export const getUserById = (id: string): User | undefined => {
   return users.find(user => user.id === id)
+}
+
+export const getUsersFromCurrentChannel = (): string[] => {
+  return currentChannel.users.map(userChannel => {
+    const user = getUserById(userChannel.id)
+    return user!.nickname;
+  })
 }
 
 if (!users[0] || !channels[0]) {
@@ -203,6 +411,8 @@ export const ChatState = reactive({
   channels: channels,
   currentChannel: currentChannel,
   messages: messages,
+  commands: commands,
+  notifications: notifications,
   showUsers: true,
   showChannels: true,
   showChat: true

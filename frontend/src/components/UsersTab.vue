@@ -1,49 +1,50 @@
 <template>
   <transition name="fade">
-  <section
-    class="side"
-    :class="{ 'full-width': !state.showChannels && !state.showChat }"
-    id="users-side"
-    v-show="state.showUsers"
-  >
-    <div class="side-header">
-      <button id="hide-users-btn" class="start-btn" @click="toggleUsers">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M20 12l-10 0" />
-          <path d="M20 12l-4 4" />
-          <path d="M20 12l-4 -4" />
-          <path d="M4 4l0 16" />
-        </svg>
-      </button>
-      <h5 class="">Users</h5>
-    </div>
+    <section
+      class="side"
+      :class="{ 'full-width': !state.showChannels && !state.showChat }"
+      id="users-side"
+      v-show="state.showUsers"
+    >
+      <div class="side-header">
+        <button id="hide-users-btn" class="start-btn" @click="toggleUsers">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 12l-10 0" />
+            <path d="M20 12l-4 4" />
+            <path d="M20 12l-4 -4" />
+            <path d="M4 4l0 16" />
+          </svg>
+        </button>
+        <h5 class="">Users</h5>
+      </div>
 
-    <div class="users-list">
-      <div v-for="role in roles" :key="role">
-        <h6 v-if="usersByRole(role).length > 0" class="role">{{ role }} ({{ usersByRole(role).length }})</h6>
+      <div class="users-list">
+        <div v-for="role in roles" :key="role">
+          <h6 v-if="usersByRole(role).length > 0" class="role">{{ role }} ({{ usersByRole(role).length }})</h6>
 
-        <div
-          v-for="user in usersByRole(role)"
-          :key="user.id"
-          class="row items-center justify-center q-pa-sm q-gutter-x-sm"
-        >
-          <ProfilePicture :status="getUserById(user.id)!.status" />
-          <p id="username">{{ getUserById(user.id)!.nickname }}</p>
+          <div
+            v-for="user in usersByRole(role)"
+            :key="user.id"
+            class="row items-center q-pa-sm q-gutter-x-sm user-tab"
+            :class="{ 'justify-center': !state.showChannels && !state.showChat }"
+          >
+            <ProfilePicture :status="getUserById(user.id)!.status" />
+            <p id="username">{{ getUserById(user.id)!.nickname }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-  </section>
+    </section>
   </transition>
 </template>
 

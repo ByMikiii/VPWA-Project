@@ -64,7 +64,47 @@
     </div>
 
 
-    <div id="chat-area" class="rounded-borders">
+    <div id="chat-area" class="rounded-borders relative">
+
+      <div
+        v-if="showCommands && filteredCommands.length > 0"
+        class="command-popup absolute"
+      >
+        <ul>
+          <li
+            v-for="(cmd, index) in filteredCommands"
+            :key="cmd.name"
+            @click="applyCommand(cmd.name, '/')"
+            class="cursor-pointer"
+            :class="[
+              index === selectedIndex ? 'bg-primary' : ''
+            ]"
+          >
+            /{{ cmd.name }} — <span class="opacity-70">{{ cmd.desc }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        v-if="showUsers && filteredUsers.length > 0"
+        class="command-popup absolute"
+      >
+        <ul>
+          <li
+            v-for="(username, index) in filteredUsers"
+            :key="username"
+            @click="applyCommand(username, '@')"
+            class="cursor-pointer"
+            :class="[
+              index === selectedIndex ? 'bg-primary' : ''
+            ]"
+          >
+            @{{ username }}
+          </li>
+        </ul>
+      </div>
+
+
       <textarea
         type="text"
         name="chat-textfdsfds"
@@ -75,6 +115,7 @@
         autocorrect="off"
         autocapitalize="off"
         spellcheck="false"
+        maxlength="200"
         @keydown.enter.prevent="handleEnter($event)"
         >
       </textarea>
@@ -102,12 +143,25 @@
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
   import type { ChatState, Message } from '../state/ChatState'
-  import { getUserById, getMessagesByChannelId } from '../state/ChatState'
+  import { getUserById, getMessagesByChannelId, getUsersFromCurrentChannel } from '../state/ChatState'
 
   const state = inject('ChatState') as typeof ChatState
   const messages = computed(() => getMessagesByChannelId(state.currentChannel.id))
   console.log(state.currentChannel.id)
   const messagesContainer = ref<HTMLDivElement | null>(null)
+
+  const showCommands = computed(() => chatText.value.startsWith('/'))
+    const filteredCommands = computed(() => {
+      const input = chatText.value.slice(1).toLowerCase()
+      return state.commands.filter(c => c.name.startsWith(input))
+  })
+  const users = getUsersFromCurrentChannel();
+  const showUsers = computed(() => chatText.value.startsWith('@'))
+    const filteredUsers = computed(() => {
+      console.log()
+      const input = chatText.value.slice(1).toLowerCase()
+      return users.filter(u => u.toLowerCase().startsWith(input))
+  })
 
 watch(
   () => messages.value.length,
@@ -121,6 +175,8 @@ watch(
 )
 
   const chatText = ref('')
+  const selectedIndex = ref(0)
+
 
   const handleEnter = (event: KeyboardEvent) => {
     if (!event.shiftKey) {
@@ -168,6 +224,10 @@ watch(
     }else{
       state.showChat = true;
     }
+  }
+
+  function applyCommand(cmd: string, prefix: string) {
+    chatText.value = `${prefix}${cmd} `
   }
 </script>
 
