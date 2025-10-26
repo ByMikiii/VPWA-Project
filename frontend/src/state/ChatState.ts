@@ -15,7 +15,7 @@ export interface User {
 }
 
 export interface Message {
-  id: string
+  channelId: string
   senderId: string
   content: string
   timestamp: string
@@ -102,7 +102,72 @@ export const channels: Channel[] = [
   }
 ]
 
+export const messages: Message[] = [
+  {
+    channelId: '1',
+    senderId: '1',
+    content: 'ahoj',
+    timestamp: '1767076500000'
+  },
+  {
+    channelId: '1',
+    senderId: '2',
+    content: 'ako sa mas',
+    timestamp: '1767076560000'
+  },
+  {
+    channelId: '1',
+    senderId: '1',
+    content: 'dobrze',
+    timestamp: '1767076620000'
+  },
+  {
+    channelId: '1',
+    senderId: '3',
+    content: 'co robis',
+    timestamp: '1767076680000'
+  },
+  {
+    channelId: '2',
+    senderId: '4',
+    content: 'ahoj vsetci',
+    timestamp: '1767076740000'
+  },
+  {
+    channelId: '2',
+    senderId: '5',
+    content: 'ideme von',
+    timestamp: '1767076800000'
+  },
+  {
+    channelId: '3',
+    senderId: '6',
+    content: 'dnes pekne pocasie',
+    timestamp: '1767076860000'
+  },
+  {
+    channelId: '3',
+    senderId: '7',
+    content: 'mam hlad',
+    timestamp: '1767076920000'
+  },
+  {
+    channelId: '3',
+    senderId: '6',
+    content: 'pojdem jest',
+    timestamp: '1767076980000'
+  },
+  {
+    channelId: '1',
+    senderId: '2',
+    content: 'super',
+    timestamp: '1767077040000'
+  }
+]
 
+export function getMessagesByChannelId(channelId: string): Message[] {
+  return messages.filter(msg => msg.channelId === channelId)
+}
 
 export const getUserById = (id: string): User | undefined => {
   return users.find(user => user.id === id)

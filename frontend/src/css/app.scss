@@ -54,6 +54,7 @@ main section {
 #chat {
   border-left: 1px solid rgba($color: #777777, $alpha: 0.3);
   border-right: 1px solid rgba($color: #777777, $alpha: 0.3);
+  max-height: 100%;
 }
 
 .side {
@@ -170,6 +171,7 @@ main section {
 #messages {
   height: calc(100% - 104px);
   overflow-y: auto;
+  padding: 0 1.25rem;
   // border: 1px solid rgba($color: #FF0000, $alpha: 0.3);
 }
 

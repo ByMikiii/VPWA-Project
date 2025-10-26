@@ -43,21 +43,29 @@
     </div>
 
 
-    <div id="messages">
-
-      <ChatMessage name="Me" timestamp="7 minute AGO" message="cau ne" :sent="true"></ChatMessage>
-
-      <ChatMessage name="User" timestamp="2 minute AGO" message="povedz ty" :sent="false"></ChatMessage>
-
-      <ChatMessage name="Me" :sent="true" :typing="true"></ChatMessage>
+    <div id="messages" ref="messagesContainer">
+      <ChatMessage v-for="message in messages"
+        :name="getUserById(message.senderId)!.nickname"
+        :key="message.timestamp"
+        :timestamp="message.timestamp"
+        :message="message.content"
+        :sent="message.senderId === state.currentUser.id"
+      />
 
       <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
     </div>
 
 
     <div id="chat-area">
-      <textarea name="chat-text" id="chat-text"></textarea>
-      <button class="send-button">
+      <textarea
+        type="text"
+        name="chat-text"
+        v-model="chatText"
+        id="chat-text"
+        @keydown.enter.prevent="handleEnter($event)"
+        >
+      </textarea>
+      <button class="send-button" @click="handleSend">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -79,11 +87,43 @@
 
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
-  import { inject } from 'vue'
+  import { inject, ref, watch, nextTick  } from 'vue'
   import type { ChatState } from '../state/ChatState'
+  import { getMessagesByChannelId, getUserById } from '../state/ChatState'
 
   const state = inject('ChatState') as typeof ChatState
 
+  const messages = ref(getMessagesByChannelId(state.currentChannel.id))
+  const messagesContainer = ref<HTMLDivElement | null>(null)
+
+watch(
+  messages,
+  async () => {
+    await nextTick()
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+    }
+  },
+  { deep: true }
+)
+
+  const chatText = ref('')
+
+  function handleEnter(event: KeyboardEvent) {
+    if (!event.shiftKey) {
+      handleSend()
+    }
+  }
+  const handleSend = () => {
+    console.log("message sent")
+    messages.value.push({
+      channelId: state.currentChannel.id,
+      senderId: state.currentUser.id,
+      content: chatText.value,
+      timestamp: Date.now().toString()
+    })
+    chatText.value = '';
+  }
 </script>
 
 <style>
