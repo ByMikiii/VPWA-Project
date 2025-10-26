@@ -7,8 +7,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -19,8 +21,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -31,8 +35,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -43,8 +49,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -55,7 +63,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
+      field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -66,8 +77,10 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
 
@@ -78,24 +91,27 @@
       color="accent"
       label-color="accent"  
       text-color="accent"
-      outlined
+      rounded outlined
       field-border-color="accent"
+      dark
+      class = "q-mt-md"
       required
     />
-    <q-btn type="submit" label="Submit" />
+    <q-btn type="submit" label="Submit" class="q-mt-md" rounded outlined/>
 
-    <p v-if = 'mode === "login"'>
+    <p v-if = 'mode === "login"' class = "q-mt-md">
         Don't have an account? 
         <router-link to="/register">Register here</router-link>
         <br>
         Forgotten password?
         <router-link to="/forgottenPassword">Renew password here</router-link>
     </p> 
-    <p v-else-if = 'mode === "register"'>
+    <p v-else-if = 'mode === "register"' class = "q-mt-md">
         Already have an account? 
         <router-link to="/login">Login here</router-link>
     </p>
-
+    <p><router-link to="/error">Main page</router-link> </p>
+    
   </q-form>
 </template>
 
@@ -139,6 +155,10 @@
 
 </script>
 
-<style lang="scss">
-       
+<style scoped>
+
+  :deep(.router-link-active) {
+    color: yellow;
+  }
+
 </style>
