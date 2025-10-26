@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
     meta: { title: 'Home' },
     beforeEnter: () => {
-      if (!ChatState.currentUser?.id) {
+      if (!ChatState.currentUser?.email) {
         return { path: '/login' };
       }
       return true;
@@ -42,7 +42,7 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/ChangePassword.vue') }],
     meta: { title: 'Change Password' },
     beforeEnter: () => {
-      if (!ChatState.currentUser?.id) {
+      if (!ChatState.currentUser?.email) {
         return { path: '/login' };
       }
       return true;
@@ -55,7 +55,7 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/EditProfile.vue') }],
     meta: { title: 'Edit Profile' },
     beforeEnter: () => {
-      if (!ChatState.currentUser?.id) {
+      if (!ChatState.currentUser?.email) {
         return { path: '/login' };
       }
       return true;
@@ -68,7 +68,7 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/ProfilePage.vue') }],
     meta: { title: 'Profile' },
     beforeEnter: () => {
-      if (!ChatState.currentUser?.id) {
+      if (!ChatState.currentUser?.email) {
         return { path: '/login' };
       }
       return true;
