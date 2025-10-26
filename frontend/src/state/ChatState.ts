@@ -37,6 +37,12 @@ export interface Command {
   desc: string
 }
 
+export interface Notification {
+  user: string
+  channel: string
+  message: string
+}
+
 const users: User[] = [
   { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
   { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
@@ -190,9 +196,20 @@ const messages: Message[] = [
 
 const commands: Command[] = [
   { name: 'help', desc: 'shows help information' },
-  { name: 'kick', desc: 'kicks selected user' },
-  { name: 'invite', desc: 'creates invitation code' },
+  { name: 'invite', desc: 'invites certain user' },
+  { name: 'revoke', desc: 'kicks selected user' },
+  { name: 'quit', desc: 'leave/delete channel' },
+  { name: 'cancel', desc: 'deletes channel' },
+  { name: 'list', desc: 'list all users of current channel' },
 ]
+
+const notifications: Notification[] = [
+  { user: 'Miki', channel: 'general', message: 'cau ne' },
+  { user: 'Anna', channel: 'dev-chat', message: 'ahoj' },
+  { user: 'John', channel: 'random', message: 'ffdksjfkds kfdsj flksdj klfjsdkl fjsldkjf lksdj flksdjfsklj fkldsjl kfjdslk fjsdlkjf klsdjf lkdsjlkf jsdkl fjdsklj fkldsjklf jsdlkjf lksdj flk' },
+]
+
+
 export function getMessagesByChannelId(channelId: string): Message[] {
   return ChatState.messages.filter(m => m.channelId === channelId)
 }
@@ -214,6 +231,7 @@ export const ChatState = reactive({
   currentChannel: currentChannel,
   messages: messages,
   commands: commands,
+  notifications: notifications,
   showUsers: true,
   showChannels: true,
   showChat: true

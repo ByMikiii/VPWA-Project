@@ -96,6 +96,7 @@
         autocorrect="off"
         autocapitalize="off"
         spellcheck="false"
+        maxlength="200"
         @keydown.enter.prevent="handleEnter($event)"
         >
       </textarea>

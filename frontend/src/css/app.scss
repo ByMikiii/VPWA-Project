@@ -134,7 +134,7 @@ main section {
   color: white;
 }
 
-#notification-btn::after {
+#notification-btn.has-notification::after {
   content: '';
   position: absolute;
   top: 8px;
@@ -304,4 +304,43 @@ main section {
 .command-popup ul {
   list-style: none;
   padding: 0.25rem 0.5rem;
+}
+
+
+.notif-remove {
+  right: 4px;
+  top: 8px;
+}
+
+.notif-message {
+  color: #333333;
+  margin-left: 6px;
+}
+
+.notif-user {
+  font-weight: 700;
+}
+
+.notif-header {
+  font-size: 15px;
+}
+
+.notification-list {
+  position: fixed;
+  bottom: 72px;
+  right: 38px;
+  width: 250px;
+  background-color: $primary;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  color: black;
+}
+
+.notification-item {
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 2px;
+  background-color: $secondary;
+  font-style: italic;
 }
