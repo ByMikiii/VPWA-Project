@@ -101,17 +101,15 @@
 
     <p v-if = 'mode === "login"' class = "q-mt-md">
         Don't have an account? 
-        <router-link to="/register">Register here</router-link>
+        <router-link to="/register" class="custom-link">Register here</router-link>
         <br>
         Forgotten password?
-        <router-link to="/forgottenPassword">Renew password here</router-link>
+        <router-link to="/forgottenPassword" class="custom-link">Renew password here</router-link>
     </p> 
     <p v-else-if = 'mode === "register"' class = "q-mt-md">
         Already have an account? 
-        <router-link to="/login">Login here</router-link>
+        <router-link to="/login" class="custom-link">Login here</router-link>
     </p>
-    <p><router-link to="/error">Main page</router-link> </p>
-    
   </q-form>
 </template>
 
@@ -155,10 +153,13 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
-  :deep(.router-link-active) {
-    color: yellow;
+  .custom-link {
+    color: $positive ;
+  }
+  .custom-link:visited{
+    color:$secondary;
   }
 
 </style>
