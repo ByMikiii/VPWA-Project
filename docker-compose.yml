@@ -12,35 +12,35 @@ services:
       - /app/node_modules
     environment:
       - VITE_API_URL=http://backend:3333
-#     depends_on:
-#       - backend
-#
-#   backend:
-#     build:
-#       context: ./backend
-#       dockerfile: Dockerfile
-#     container_name: vpwa-backend
-#     ports:
-#       - "3333:3333"
-#     restart: always
-#     volumes:
-#       - ./backend:/app
-#       - /app/node_modules
-#     depends_on:
-#       - db
-#
-#   db:
-#     image: postgres:15
-#     container_name: vpwa-db
-#     ports:
-#       - "5432:5432"
-#     restart: always
-#     environment:
-#       POSTGRES_USER: vpwa_user
-#       POSTGRES_PASSWORD: vpwa_pass
-#       POSTGRES_DB: vpwa_db
-#     volumes:
-#       - db_data:/var/lib/postgresql/data
-#
-# volumes:
-#   db_data:
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vpwa-backend
+    ports:
+      - "3333:3333"
+    restart: always
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: vpwa-db
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: vpwa_user
+      POSTGRES_PASSWORD: vpwa_pass
+      POSTGRES_DB: vpwa_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

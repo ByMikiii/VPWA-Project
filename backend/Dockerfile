@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN node ace add @adonisjs/cors
+# RUN node ace add @adonisjs/cors
 
 EXPOSE 3333
 
