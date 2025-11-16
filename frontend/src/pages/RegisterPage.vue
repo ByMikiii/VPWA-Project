@@ -7,6 +7,13 @@
   import { useRouter } from 'vue-router';
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
+  import axios from 'axios';
+  import type { AxiosError } from 'axios';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
+
 
   interface RegisterFormData {
     email: string;
@@ -37,12 +44,27 @@
             Notify.create("The nickname has to have more than 6 characters");
           }
           else{
-            Notify.create("Registered successfuly");
-            ChatState.currentUser.email=formData.email;
-            ChatState.currentUser.name=formData.name;
-            ChatState.currentUser.surname=formData.surname;
-            ChatState.currentUser.nickname=formData.nickname;
-            await router.push('/');
+            try {
+              const response = await api.post('/register', formData);
+              Notify.create(response.data.message);
+
+              if (response.data.message === 'Registered successfully') {
+                ChatState.currentUser.email = formData.email;
+                ChatState.currentUser.name = formData.name;
+                ChatState.currentUser.surname = formData.surname;
+                ChatState.currentUser.nickname = formData.nickname;
+                ChatState.currentUser.status = 'Online';
+                await router.push('/');
+              }
+            } catch (error) {
+              const axiosError = error as AxiosError<{ message: string }>;
+              if (axiosError.response?.data?.message) {
+                Notify.create(axiosError.response.data.message);
+              } else {
+                Notify.create("An unexpected error occurred");
+              }
+              console.error(error);
+            }
           }
         }
       }
