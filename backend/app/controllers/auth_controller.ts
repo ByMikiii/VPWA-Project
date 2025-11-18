@@ -1,14 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
-import logger from '@adonisjs/core/services/logger'
 
 export default class AuthController {
   public async register({ request, response }: HttpContext) {
     const payload = request.body() // alebo request.all()
-    const users = await User.all()
-    logger.info('### USERS IN DB: %o ###', users)
-    console.log('### USERS IN DB: ###')
 
     // Jednoduchá server-side validácia
     if (!payload.email || !payload.password || !payload.name || !payload.surname || !payload.nickname) {
@@ -43,10 +39,6 @@ export default class AuthController {
     user.password = await hash.make(payload.password)
     user.activity_status = 'online'
     await user.save()
-
-    logger.info('### USERS IN DB: %o ###', users)
-    console.log('### USERS IN DB: ###')
-
 
     return response.ok({ message: 'Registered successfully', user: user })
   }
