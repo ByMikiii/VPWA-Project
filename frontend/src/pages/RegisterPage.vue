@@ -8,7 +8,7 @@
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
-  type AxiosError = axios.AxiosError;
+  // import type { AxiosError } from 'axios';
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
@@ -44,7 +44,11 @@
     }
 
     try {
-        const response = await api.post('/register', formData);
+        interface RegisterResponse {
+          message: string;
+        }
+        const response = await api.post<RegisterResponse>('/register', formData);
+
         Notify.create(response.data.message);
 
         if (response.data.message === 'Registered successfully') {
@@ -56,13 +60,14 @@
           await router.push('/');
         }
       } catch (error) {
-        const axiosError = error as AxiosError<{ message: string }>;
-        if (axiosError.response?.data?.message) {
-          Notify.create(axiosError.response.data.message);
-        } else {
-          Notify.create("An unexpected error occurred");
-        }
-        console.error(error);
+        // const axiosError = error as AxiosError<{ message: string }>;
+        // if (axiosError.response?.data?.message) {
+        //   Notify.create(axiosError.response.data.message);
+        // } else {
+        console.log(error);
+        Notify.create("An unexpected error occurred");
+        // }
+        // console.error(error);
     }
   }
 </script>
