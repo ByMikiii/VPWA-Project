@@ -23,7 +23,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare nickname: string
 
   @column()
-  declare activity_status: 'online' | 'away' | 'offline' | 'dnd'
+  declare activity_status: 'Online' | 'Away' | 'Offline' | 'Do Not Disturb'
 
   @column()
   declare email: string

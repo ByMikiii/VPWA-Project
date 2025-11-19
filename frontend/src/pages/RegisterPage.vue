@@ -8,7 +8,7 @@
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
-  // import type { AxiosError } from 'axios';
+  
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
@@ -43,31 +43,28 @@
       return
     }
 
-    try {
-        interface RegisterResponse {
-          message: string;
+    const success = await api.post('/register', formData)
+      .then(res =>  { 
+        Notify.create(res.data.message);
+        ChatState.currentUser.email = formData.email;
+        ChatState.currentUser.name = formData.name;
+        ChatState.currentUser.surname = formData.surname;
+        ChatState.currentUser.nickname = formData.nickname;
+        ChatState.currentUser.status = 'Online';
+        return true;
+       }) 
+      .catch(err => {
+        if (err.response.status === 422) {
+          Notify.create(err.response.data.errors);
         }
-        const response = await api.post<RegisterResponse>('/register', formData);
-
-        Notify.create(response.data.message);
-
-        if (response.data.message === 'Registered successfully') {
-          ChatState.currentUser.email = formData.email;
-          ChatState.currentUser.name = formData.name;
-          ChatState.currentUser.surname = formData.surname;
-          ChatState.currentUser.nickname = formData.nickname;
-          ChatState.currentUser.status = 'Online';
-          await router.push('/');
+        else if (err.response.status === 409) {
+          Notify.create(err.response.data.message);
         }
-      } catch (error) {
-        // const axiosError = error as AxiosError<{ message: string }>;
-        // if (axiosError.response?.data?.message) {
-        //   Notify.create(axiosError.response.data.message);
-        // } else {
-        console.log(error);
-        Notify.create("An unexpected error occurred");
-        // }
-        // console.error(error);
-    }
+        return false;
+      })
+
+      if (success){
+        await router.push('/');
+      }
   }
 </script>
