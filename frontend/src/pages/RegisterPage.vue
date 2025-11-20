@@ -47,6 +47,7 @@
       .then(res =>  { 
         Notify.create(res.data.message);
         ChatState.currentUser.email = formData.email;
+        ChatState.currentUser.id = res.data.user.id;
         ChatState.currentUser.name = formData.name;
         ChatState.currentUser.surname = formData.surname;
         ChatState.currentUser.nickname = formData.nickname;

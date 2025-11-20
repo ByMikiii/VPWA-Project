@@ -43,6 +43,7 @@ export default class AuthController {
     return response.ok({ message: 'Registered successfully', user: user })
   }
 
+
   public async login({ request, response }: HttpContext){
     const payload = request.body()
 
@@ -63,5 +64,22 @@ export default class AuthController {
     await user.save()
     
     return response.ok({ message: 'Logged in successfully', user: user })
+  }
+
+
+  public async logout ({ request, response }: HttpContext){
+    const payload = request.body()
+
+    const user = await User.findBy('id', payload.id)
+
+    if (user){
+      user.activity_status = 'Offline'
+      await user.save()
+    }
+    else{
+      return response.noContent()
+    }
+
+    return response.ok({ message: 'Logged out successfully'})
   }
 }
