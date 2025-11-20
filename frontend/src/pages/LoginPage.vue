@@ -9,7 +9,7 @@
   import { Notify } from 'quasar';
 
   import axios from 'axios';
-  
+
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
@@ -21,13 +21,22 @@
 
   const router = useRouter();
 
+  interface LoginResponse {
+    message: string;
+    user: {
+      id: string;
+      name: string;
+      surname: string;
+      nickname: string;
+    };
+  }
   async function handleLogin(formData: LoginFormData) {
     if (formData.password.length < 6){
       Notify.create("The password has to have more than 6 characters");
     }
     else{
-      const success = await api.post('/login', formData)
-        .then(res =>  { 
+      const success = await api.post<LoginResponse>('/login', formData)
+        .then(res =>  {
           Notify.create(res.data.message);
           ChatState.currentUser.email = formData.email;
           ChatState.currentUser.id = res.data.user.id;
@@ -36,7 +45,7 @@
           ChatState.currentUser.nickname = res.data.user.nickname;
           ChatState.currentUser.status = 'Online';
           return true;
-        }) 
+        })
         .catch(err => {
           if (err.response.status === 422) {
             Notify.create(err.response.data.errors);

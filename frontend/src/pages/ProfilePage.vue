@@ -103,7 +103,7 @@
     import StatusDropdown from '../components/StatusDropdown.vue';
 
     import axios from 'axios';
-  
+
     const api = axios.create({
       baseURL: 'http://localhost:3333'
     });
@@ -112,9 +112,13 @@
 
     const router = useRouter();
 
+
+    interface LogoutResponse {
+      message: string;
+    }
     const logout = async () => {
-      await api.post('/logout', ChatState.currentUser)
-        .then(res =>  { 
+      await api.post<LogoutResponse>('/logout', { id: ChatState.currentUser.id })
+        .then(res =>  {
           Notify.create(res.data.message);
           ChatState.currentUser = {
             id: '',
@@ -124,7 +128,7 @@
             surname: '',
             status: 'Offline'
           };
-        }) 
+        })
 
       await router.push('/login');
     }

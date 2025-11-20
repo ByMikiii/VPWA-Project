@@ -44,42 +44,43 @@ export default class AuthController {
   }
 
 
-  public async login({ request, response }: HttpContext){
+  public async login({ request, response }: HttpContext) {
     const payload = request.body()
 
     const user = await User.findBy('email', payload.email)
 
     //unathorized vracia statuscode 401
-    if (!user){
+    if (!user) {
       return response.unauthorized({ message: 'User with such e-mail does not exist' })
     }
 
     const isValid = await hash.verify(user.password, payload.password)
 
-    if (!isValid){
+    if (!isValid) {
       return response.unauthorized({ message: 'The password is not correct' })
     }
 
     user.activity_status = 'Online'
     await user.save()
-    
+
     return response.ok({ message: 'Logged in successfully', user: user })
   }
 
 
-  public async logout ({ request, response }: HttpContext){
+  public async logout({ request, response }: HttpContext) {
     const payload = request.body()
+    console.log(payload, "fdksfksdhjfkl jsdklhjf klsdhkl fsdkl")
 
     const user = await User.findBy('id', payload.id)
 
-    if (user){
+    if (user) {
       user.activity_status = 'Offline'
       await user.save()
     }
-    else{
+    else {
       return response.noContent()
     }
 
-    return response.ok({ message: 'Logged out successfully'})
+    return response.ok({ message: 'Logged out successfully' })
   }
 }

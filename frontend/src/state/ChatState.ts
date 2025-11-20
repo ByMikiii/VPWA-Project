@@ -402,7 +402,7 @@ export const getUsersFromCurrentChannel = (): string[] => {
 if (!users[0] || !channels[0]) {
   throw new Error('cfkdsjf')
 }
-const currentUser: User = users[0];
+const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
 const currentChannel: Channel = channels[0];
 
 

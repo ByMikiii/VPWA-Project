@@ -8,7 +8,7 @@
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
-  
+
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
@@ -42,9 +42,17 @@
       Notify.create("The nickname has to have more than 6 characters");
       return
     }
-
-    const success = await api.post('/register', formData)
-      .then(res =>  { 
+    interface RegisterResponse {
+      message: string;
+      user: {
+        id: string;
+        name: string;
+        surname: string;
+        nickname: string;
+      };
+    }
+    const success = await api.post<RegisterResponse>('/register', formData)
+      .then(res =>  {
         Notify.create(res.data.message);
         ChatState.currentUser.email = formData.email;
         ChatState.currentUser.id = res.data.user.id;
@@ -52,8 +60,10 @@
         ChatState.currentUser.surname = formData.surname;
         ChatState.currentUser.nickname = formData.nickname;
         ChatState.currentUser.status = 'Online';
+        console.log(ChatState.currentUser.id)
+        console.log(res.data.user.id)
         return true;
-       }) 
+      })
       .catch(err => {
         if (err.response.status === 422) {
           Notify.create(err.response.data.errors);
