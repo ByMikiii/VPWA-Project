@@ -1,4 +1,10 @@
 import { reactive } from 'vue'
+import { Notify } from 'quasar';
+import axios from 'axios';
+const api = axios.create({
+  baseURL: 'http://localhost:3333'
+});
+
 
 export type UserStatus = 'Online' | 'Offline' | 'Away' | 'Do Not Disturb'
 
@@ -402,9 +408,21 @@ export const getUsersFromCurrentChannel = (): string[] => {
 if (!users[0] || !channels[0]) {
   throw new Error('cfkdsjf')
 }
-const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+// const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+const currentUser = users[0];
 const currentChannel: Channel = channels[0];
 
+console.log("usr: ", currentUser.id)
+let newChannels: Channel[] = [];
+await api.post<Channel[]>('/getchannels', { user_id: currentUser.id })
+  .then(res => {
+    newChannels = res.data
+  })
+  .catch(err => {
+    Notify.create(err.response.data.message);
+  })
+
+console.log(newChannels)
 
 export const ChatState = reactive({
   currentUser: currentUser,
