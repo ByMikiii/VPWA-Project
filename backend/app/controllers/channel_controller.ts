@@ -38,15 +38,8 @@ export default class ChannelController {
     return response.ok(channel)
   }
 
-  public async invite({ request, response }: HttpContext) {
-    const payload = request.body()
-    console.log(payload, "fdksfksdhjfkl jsdklhjf klsdhkl fsdkl")
-
-    return response.ok({ message: 'Logged out successfully' })
-  }
-
   public async fetchChannels({ request, response }: HttpContext) {
-    const user_id = request.body().user_id
+    const user_id = request.qs().user_id
     console.log(user_id)
     if (!user_id) {
       return response.badRequest({ error: 'user_id is required' })
