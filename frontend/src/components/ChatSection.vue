@@ -229,6 +229,10 @@ watch(
   function applyCommand(cmd: string, prefix: string) {
     chatText.value = `${prefix}${cmd} `
   }
+
+  // const handleInvite = (userId: string, channelId: string) => {
+
+  // }
 </script>
 
 <style scoped>

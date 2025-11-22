@@ -50,6 +50,18 @@ export interface Notification {
   message: string
 }
 
+export interface Invitation {
+  id: number
+  accepted: boolean
+  string_code: string | null
+  channel_id: number
+  invited_by: number
+  receiver_id: number
+  valid_till: Date | null
+  createdAt: Date
+  updatedAt: Date | null
+}
+
 const users: User[] = [
   { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
   { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
@@ -414,7 +426,9 @@ const currentChannel: Channel = channels[0];
 
 console.log("usr: ", currentUser.id)
 let newChannels: Channel[] = [];
-await api.post<Channel[]>('/getchannels', { user_id: currentUser.id })
+await api.get<Channel[]>('/channels', {
+  params: { user_id: currentUser.id }
+})
   .then(res => {
     newChannels = res.data
   })
@@ -422,7 +436,19 @@ await api.post<Channel[]>('/getchannels', { user_id: currentUser.id })
     Notify.create(err.response.data.message);
   })
 
-console.log(newChannels)
+let newInvitations: Invitation[] = [];
+await api.get<Invitation[]>('/invitations', {
+  params: { user_id: currentUser.id }
+})
+  .then(res => {
+    newInvitations = res.data
+  })
+  .catch(err => {
+    Notify.create(err.response.data.message);
+  })
+
+console.log('channels: ', newChannels)
+console.log('invit: ', newInvitations)
 
 export const ChatState = reactive({
   currentUser: currentUser,

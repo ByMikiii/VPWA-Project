@@ -48,13 +48,45 @@
       </button>
     </li>
 
+    <li class="notification-item relative-position">
+      <div class="notif-info">
+
+        <div class="notif-header">
+          <span class="notif-user">Bymikiii</span>
+          <span> invited you to </span>
+          <span class="notif-user">#Kanal</span>
+        </div>
+
+        <p class="notif-message">
+          Valid till: 22.11.2025 18:52
+        </p>
+
+      <div class="inv-actions">
+        <button class="notif-accept" @click="acceptInvitation(true, '1', '2')">
+          Accept
+        </button>
+
+        <button class="notif-decline" @click="acceptInvitation(false, '1', '2')">
+          Decline
+        </button>
+      </div>
+      </div>
+    </li>
+
     <p v-if="state.notifications.length === 0" class="no-notif">No notifications</p>
   </ul>
 </template>
 
 <script setup lang="ts">
   import { inject, ref } from 'vue';
-  import type { ChatState } from 'src/state/ChatState';
+  import type { ChatState, Channel } from 'src/state/ChatState';
+  import axios from 'axios';
+  import { Notify } from 'quasar';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
+
 
   const state = inject('ChatState') as typeof ChatState
 
@@ -65,5 +97,22 @@
 
   const removeNotification = (index: number) => {
     state.notifications.splice(index, 1)
+  }
+
+  const acceptInvitation = async (isAccepted: boolean, invitedBy: string, channelId: string) => {
+    await api.post<Channel>('/accept', {
+      receiver_id: state.currentUser.id,
+      invited_by: invitedBy,
+      channel_id: channelId,
+      is_accepted: isAccepted
+    })
+        .then(res =>  {
+          Notify.create("accepted");
+          console.log(res)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.errors);
+        })
   }
 </script>
