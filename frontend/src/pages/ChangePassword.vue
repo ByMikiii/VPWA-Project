@@ -23,7 +23,7 @@
   const router = useRouter();
 
   async function handleChangePassword(formData: changePasswordFormData) {
-    console.log('Change password form data:', formData); //here is a place to work with data and send them to backend
+    console.log('Change password form data:', formData); 
     if (formData.newPassword.length < 6){
         Notify.create("The new password has to have more than 6 characters");
     }
@@ -51,6 +51,9 @@
                 Notify.create(err.response.data.errors);
               }
               else if (err.response.status === 401) {
+                Notify.create(err.response.data.message);
+              }
+              else if (err.response.status === 404) {
                 Notify.create(err.response.data.message);
               }
               return false;

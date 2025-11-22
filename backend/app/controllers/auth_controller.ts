@@ -117,4 +117,28 @@ export default class AuthController {
 
     return response.ok({ message: 'Password changed successfully' })
   }
+
+
+  public async forgotten_password({ request, response }: HttpContext) {
+    const payload = request.body()
+
+    const user = await User.findBy('email', payload.email)
+
+    if(!user) {
+      return response.notFound({ message: 'User with such e-mail does not exist' })
+    }
+
+    if (payload.newPassword.length < 6) {
+      return response.badRequest({ message: 'Password must be at least 6 characters' })
+    }
+
+    if (payload.newPassword != payload.repeatPassword) {
+      return response.badRequest({ message: 'Passwords have to be same' })
+    }
+
+    user.password = payload.newPassword
+    await user.save()
+
+    return response.ok({ message: 'Password renewed successfully' })
+  }
 }

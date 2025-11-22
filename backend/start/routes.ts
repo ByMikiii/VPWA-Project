@@ -25,3 +25,4 @@ router.post('/logout', [AuthController, 'logout'])
 
 router.post('/change_password', [AuthController, 'change_password'])
 
+router.post('/forgotten_password', [AuthController, 'forgotten_password'])
