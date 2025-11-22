@@ -141,4 +141,47 @@ export default class AuthController {
 
     return response.ok({ message: 'Password renewed successfully' })
   }
+
+
+  public async edit_profile({ request, response }: HttpContext) {
+    const payload = request.body()
+
+    const user = await User.findBy('id', payload.id)
+
+    if(!user) {
+      return response.notFound({ message: 'User with such e-mail does not exist' })
+    }
+
+    if (payload.nickname.length < 6) {
+      return response.badRequest({ message: 'Nickname must be at least 6 characters' })
+    }
+
+    const existing_email = await User
+      .query()
+      .where('email', payload.email)
+      .whereNot('id', payload.id)
+      .first()
+
+    if (existing_email) {
+      return response.conflict({ message: 'Email already in use' })
+    }
+
+    const existing_nickname = await User
+      .query()
+      .where('nickname', payload.nickname)
+      .whereNot('id', payload.id)
+      .first()
+
+    if (existing_nickname) {
+      return response.conflict({ message: 'Nickname already in use' })
+    }
+
+    user.email = payload.email
+    user.name = payload.name
+    user.surname = payload.surname
+    user.nickname = payload.nickname
+    await user.save()
+
+    return response.ok({ message: 'Profile edited successfully' })
+  }
 }
