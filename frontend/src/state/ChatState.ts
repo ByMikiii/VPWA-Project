@@ -62,9 +62,17 @@ export interface Invitation {
   updatedAt: Date | null
 }
 
+export interface InvitationData {
+  id: number
+  string_code: string
+  valid_till: Date
+  invited_by_username: string
+  channel_name: string
+}
+
 const users: User[] = [
-  { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
-  { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
+  { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
+  { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
   { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline' },
   { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online' },
   { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online' },
@@ -424,31 +432,33 @@ if (!users[0] || !channels[0]) {
 const currentUser = users[0];
 const currentChannel: Channel = channels[0];
 
-console.log("usr: ", currentUser.id)
-let newChannels: Channel[] = [];
-await api.get<Channel[]>('/channels', {
-  params: { user_id: currentUser.id }
-})
-  .then(res => {
-    newChannels = res.data
+let newInvitations: InvitationData[] = [];
+if (currentUser.id !== '') {
+  console.log("usr: ", currentUser.id)
+  let newChannels: Channel[] = [];
+  await api.get<Channel[]>('/channels', {
+    params: { user_id: currentUser.id }
   })
-  .catch(err => {
-    Notify.create(err.response.data.message);
-  })
+    .then(res => {
+      newChannels = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
 
-let newInvitations: Invitation[] = [];
-await api.get<Invitation[]>('/invitations', {
-  params: { user_id: currentUser.id }
-})
-  .then(res => {
-    newInvitations = res.data
+  await api.get<InvitationData[]>('/invitations', {
+    params: { user_id: currentUser.id }
   })
-  .catch(err => {
-    Notify.create(err.response.data.message);
-  })
+    .then(res => {
+      newInvitations = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+  console.log('channels: ', newChannels)
+  console.log('invit: ', newInvitations)
+}
 
-console.log('channels: ', newChannels)
-console.log('invit: ', newInvitations)
 
 export const ChatState = reactive({
   currentUser: currentUser,
@@ -459,5 +469,6 @@ export const ChatState = reactive({
   notifications: notifications,
   showUsers: true,
   showChannels: true,
-  showChat: true
+  showChat: true,
+  newInvitations: newInvitations
 })

@@ -5,16 +5,14 @@ import Member from '#models/member'
 import User from '#models/user'
 import Invitation from '#models/invitation'
 
-
 export default class InvitationController {
 
   public async createInvitation({ request, response }: HttpContext) {
     const payload = request.body()
-    console.log(payload.name)
-
+    console.log(payload)
     const user = await User
       .query()
-      .where('username', payload.username)
+      .where('nickname', payload.username)
       .first()
 
     if (!user) {
@@ -24,7 +22,7 @@ export default class InvitationController {
     const existingMember = await Member
       .query()
       .where('user_id', user.id)
-      .andWhere('channel_id', payload.channel_id)
+      .andWhere('channel_id', payload.channelId)
       .first()
 
     if (existingMember) {
@@ -36,7 +34,8 @@ export default class InvitationController {
     invitation.invited_by = payload.invitedBy;
     invitation.receiver_id = user.id;
     invitation.channel_id = payload.channelId;
-    invitation.string_code = [...Array(8)].map(() => (~~(Math.random() * 36)).toString(36)).join('');
+    invitation.string_code = [...Array(8)].map(() => (~~(Math.random() * 36)).toString(36)).join('').toUpperCase();
+    invitation.valid_till = DateTime.now().plus({ days: 7 })
     await invitation.save()
 
     return response.ok({ message: 'Invitation has beed sent!' })
@@ -92,11 +91,27 @@ export default class InvitationController {
       return response.badRequest({ error: 'user_id is required' })
     }
 
-    const invitations = await Invitation
+    const invitationsTemp = await Invitation
       .query()
       .where('receiver_id', user_id)
       .andWhere('valid_till', '>', DateTime.now().toJSDate())
+      .join('users', 'invitations.invited_by', 'users.id')
+      .join('channels', 'invitations.channel_id', 'channels.id')
+      .select(
+        'invitations.id',
+        'invitations.string_code',
+        'invitations.valid_till',
+        'users.nickname as invited_by_username',
+        'channels.name as channel_name'
+      )
 
+    const invitations = invitationsTemp.map((inv) => ({
+      id: inv.id,
+      string_code: inv.string_code,
+      valid_till: inv.valid_till?.toISO(),
+      invited_by_username: inv.$extras.invited_by_username,
+      channel_name: inv.$extras.channel_name,
+    }));
     return invitations;
   }
 }

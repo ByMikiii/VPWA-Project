@@ -144,6 +144,12 @@
   import { computed, inject, ref, watch, nextTick  } from 'vue'
   import type { ChatState, Message } from '../state/ChatState'
   import { getUserById, getMessagesByChannelId, getUsersFromCurrentChannel } from '../state/ChatState'
+  import { Notify } from 'quasar'
+  import axios from 'axios';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
 
   const state = inject('ChatState') as typeof ChatState
   const messages = computed(() => getMessagesByChannelId(state.currentChannel.id))
@@ -185,11 +191,19 @@ watch(
   }
 
   const handleSend = () => {
+    const text = chatText.value.trim()
+
+    if (!text) return
     console.log("message sent")
+    if (text.startsWith('/')) {
+      handleCommand(text)
+      chatText.value = ''
+      return
+    }
     const newMessage: Message = {
       channelId: state.currentChannel.id,
       senderId: state.currentUser.id,
-      content: chatText.value,
+      content: text,
       timestamp: Date.now().toString()
     }
     state.messages.push(newMessage)
@@ -230,9 +244,43 @@ watch(
     chatText.value = `${prefix}${cmd} `
   }
 
-  // const handleInvite = (userId: string, channelId: string) => {
+  const handleCommand = (text: string) => {
+    const parts = text.trim().split(' ')
+    if(parts[0] == null || parts [1] == null){
+      Notify.create("Missing argument or command!");
+      return
+    }
+    const command = parts[0].toLowerCase()
+    const arg = parts[1]
 
-  // }
+  switch (command) {
+    case '/invite':
+      handleInvite(arg).catch(console.error)
+      break
+    case '/kick':
+      console.log('kick')
+      break
+    default:
+      Notify.create(`Unknown command:, ${command}`)
+  }
+  }
+
+  const handleInvite = async (username: string) => {
+    console.log(state.currentUser.id, ' invited ', username, ' to ', state.currentChannel.id)
+    await api.post<string>('/invite', {
+      invitedBy: state.currentUser.id,
+      username: username,
+      channelId: state.currentChannel.id
+    })
+      .then(res =>  {
+        Notify.create('Invitation has been sent!');
+        console.log(res)
+      })
+      .catch(err => {
+        Notify.create(err)
+        console.error(err)
+      })
+  }
 </script>
 
 <style scoped>
