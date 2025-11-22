@@ -83,4 +83,38 @@ export default class AuthController {
 
     return response.ok({ message: 'Logged out successfully' })
   }
+
+
+  public async change_password({ request, response }: HttpContext) {
+    const payload = request.body()
+
+    const user = await User.findBy('id', payload.id)
+
+    if(!user) {
+      return response.notFound({ message: 'Not found' })
+    }
+
+    if (payload.newPassword.length < 6) {
+      return response.badRequest({ message: 'Password must be at least 6 characters' })
+    }
+
+    if (payload.newPassword != payload.repeatPassword) {
+      return response.badRequest({ message: 'Passwords have to be same' })
+    }
+
+    if(payload.password == payload.newPassword) {
+      return response.badRequest({ message: 'New password and old password have to be different' })
+    }
+
+    const isValid = await hash.verify(user.password, payload.password)
+
+    if (!isValid) {
+      return response.unauthorized({ message: 'The old password is not correct' }) //401
+    }
+
+    user.password = payload.newPassword
+    await user.save()
+
+    return response.ok({ message: 'Password changed successfully' })
+  }
 }

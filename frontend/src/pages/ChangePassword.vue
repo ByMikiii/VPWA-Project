@@ -6,11 +6,18 @@
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
   import { Notify } from 'quasar';
+  import axios from 'axios';
+  import { ChatState } from '../state/ChatState';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
 
   interface changePasswordFormData {
     password: string;
     newPassword: string;
     repeatPassword: string;
+    id: string;
   }
 
   const router = useRouter();
@@ -29,8 +36,29 @@
           Notify.create("New password and old password have to be different");
         }
         else{
-          Notify.create("Password changed successfuly");
-          await router.push('/profile');
+          interface ChangePasswordResponse {
+            message: string;
+          }
+
+          formData.id = ChatState.currentUser.id;
+          const success = await api.post<ChangePasswordResponse>('/change_password', formData)
+            .then(res =>  {
+              Notify.create(res.data.message);
+              return true;
+            })
+            .catch(err => {
+              if (err.response.status === 422) {
+                Notify.create(err.response.data.errors);
+              }
+              else if (err.response.status === 401) {
+                Notify.create(err.response.data.message);
+              }
+              return false;
+            })
+
+            if (success){
+              await router.push('/profile');
+            }
         }
       }    
     }
