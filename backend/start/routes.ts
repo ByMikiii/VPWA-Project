@@ -15,6 +15,7 @@ import Invitation from '#models/invitation'
 import AuthController from '#controllers/auth_controller'
 import ChannelController from '#controllers/channel_controller'
 import InvitationController from '#controllers/invitation_controller'
+import UserController from '#controllers/user_controller'
 
 router.get('/', async () => {
   const users = await User.all()
@@ -51,3 +52,5 @@ router.get('/channels', [ChannelController, 'fetchChannels'])
 router.post('/invite', [InvitationController, 'createInvitation'])
 router.post('/accept', [InvitationController, 'acceptInvitation'])
 router.get('/invitations', [InvitationController, 'fetchInvitations'])
+
+router.post('/status', [UserController, 'setStatus'])
