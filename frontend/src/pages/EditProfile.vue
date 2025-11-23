@@ -7,18 +7,24 @@
   import { useRouter } from 'vue-router';
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
+  import axios from 'axios';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
 
   interface EditProfileFormData {
     email: string;
     name: string;
     surname: string;
     nickname: string;
+    id: string;
   }
 
   const router = useRouter();
 
   async function handleEditProfile(formData: EditProfileFormData) {
-    console.log('Edit profile form data:', formData); //here is a place to work with data and send them to backend
+    console.log('Edit profile form data:', formData); 
       if (!/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.name) || !/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.surname)) {
         Notify.create("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
       }
@@ -27,12 +33,35 @@
           Notify.create("The nickname has to have more than 6 characters");
         }
         else{
-          Notify.create("Profile edited successfuly");
-          ChatState.currentUser.email=formData.email;
-          ChatState.currentUser.name=formData.name;
-          ChatState.currentUser.surname=formData.surname;
-          ChatState.currentUser.nickname=formData.nickname;
-          await router.push('/profile');
+          formData.id = ChatState.currentUser.id;
+          interface EditProfileResponse {
+            message: string;
+          }
+          const success = await api.post<EditProfileResponse>('/edit_profile', formData)
+            .then(res =>  {
+              Notify.create(res.data.message);
+              ChatState.currentUser.email = formData.email;
+              ChatState.currentUser.name = formData.name;
+              ChatState.currentUser.surname = formData.surname;
+              ChatState.currentUser.nickname = formData.nickname;
+              return true;
+            })
+            .catch(err => {
+              if (err.response.status === 422) {
+                Notify.create(err.response.data.errors);
+              }
+              else if (err.response.status === 409) {
+                Notify.create(err.response.data.message);
+              }
+              else if (err.response.status === 404) {
+                Notify.create(err.response.data.message);
+              }
+              return false;
+            })
+
+          if (success){
+            await router.push('/profile');
+          }
         }
       }
   }

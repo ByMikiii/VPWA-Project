@@ -60,3 +60,8 @@ router.post('/messages', [MessageController, 'sendMessage'])
 router.get('/messages', [MessageController, 'fetchMessages'])
 
 router.get('/users', [UserController, 'fetchUsers'])
+router.post('/change_password', [AuthController, 'change_password'])
+
+router.post('/forgotten_password', [AuthController, 'forgotten_password'])
+
+router.post('/edit_profile', [AuthController, 'edit_profile'])
