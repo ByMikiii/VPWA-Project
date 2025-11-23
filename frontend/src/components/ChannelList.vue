@@ -32,7 +32,7 @@
     <div id="channels-list">
       <button v-for="channel in state.channels" :key="channel.id" @click="handleChannelChange(channel)" class="channel-button text-left row items-center" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
         <svg
-          v-if="!channel.private"
+          v-if="!channel.isPrivate"
           xmlns="http://www.w3.org/2000/svg"
           width="20"
           height="20"
@@ -50,7 +50,7 @@
         </svg>
 
         <svg
-          v-if="channel.private"
+          v-if="channel.isPrivate"
           xmlns="http://www.w3.org/2000/svg"
           width="20"
           height="20"
@@ -82,14 +82,44 @@
   import ChannelButtons from './ChannelButtons.vue';
   import { inject } from 'vue'
   import type { Channel, ChatState} from '../state/ChatState'
+  import type { ChannelUsers, MessageData } from '../state/ChatState';
+  import { Notify } from 'quasar';
+  import axios from 'axios';
 
   const state = inject('ChatState') as typeof ChatState
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
 
-  function handleChannelChange(channel: Channel) {
-    state.currentChannel = channel
+  const handleChannelChange = async (channel: Channel) => {
+    state.currentChannel = {
+      ...channel,
+      users: []
+    }
+    await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: state.currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      state.currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: { channel_id: state.currentChannel.id }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      state.messages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
   }
 
-  const toggleChannels = () => {
+const toggleChannels = () => {
     console.log(window.innerWidth)
     state.showChannels = !state.showChannels
     if(state.showChannels === true){

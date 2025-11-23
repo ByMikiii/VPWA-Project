@@ -32,13 +32,12 @@
           Valid till: {{ inv.valid_till.toLocaleString() }}
         </p>
         <p>Code: {{ inv.string_code }}</p>
-
       <div class="inv-actions">
-        <button class="notif-accept" @click="acceptInvitation(true, '1', '2')">
+        <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
           Accept
         </button>
 
-        <button class="notif-decline" @click="acceptInvitation(false, '1', '2')">
+        <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
           Decline
         </button>
       </div>

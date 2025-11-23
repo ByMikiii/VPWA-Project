@@ -102,7 +102,9 @@ export default class InvitationController {
         'invitations.string_code',
         'invitations.valid_till',
         'users.nickname as invited_by_username',
-        'channels.name as channel_name'
+        'channels.name as channel_name',
+        'invitations.channel_id',
+        'invitations.invited_by'
       )
 
     const invitations = invitationsTemp.map((inv) => ({
@@ -111,6 +113,8 @@ export default class InvitationController {
       valid_till: inv.valid_till?.toISO(),
       invited_by_username: inv.$extras.invited_by_username,
       channel_name: inv.$extras.channel_name,
+      channel_id: inv.channel_id,
+      invited_by: inv.invited_by
     }));
     return invitations;
   }

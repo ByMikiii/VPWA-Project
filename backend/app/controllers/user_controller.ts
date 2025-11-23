@@ -24,17 +24,24 @@ export default class UserController {
     if (!channel_id) {
       return response.badRequest('channel_id is required')
     }
-    const users = await Member
+    const usersTemp = await Member
       .query()
       .where('channel_id', channel_id)
       .andWhere('members.is_kicked', false)
       .join('users', 'members.user_id', 'users.id')
       .select(
         'users.id as id',
-        'users.name as username',
-        'members.role as role',
+        'users.nickname as username',
+        'members.role',
         'users.activity_status as status'
       )
+
+    const users = usersTemp.map(u => ({
+      id: u.id,
+      username: u.$extras.username,
+      role: u.role,
+      status: u.$extras.status
+    }))
     return users
   }
 

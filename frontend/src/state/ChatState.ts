@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { Notify } from 'quasar';
 import axios from 'axios';
+
 const api = axios.create({
   baseURL: 'http://localhost:3333'
 });
@@ -30,7 +31,13 @@ export interface Message {
 export interface Channel {
   id: string
   name: string
-  private: boolean
+  description: string | null
+  isPrivate: boolean
+  isDeleted: boolean
+  ownerId: number
+  latestActivity: string
+  createdAt: string
+  updatedAt: string
   users: ChannelUsers[]
 }
 
@@ -63,6 +70,8 @@ export interface InvitationData {
   valid_till: Date
   invited_by_username: string
   channel_name: string
+  invited_by: string
+  channel_id: string
 }
 
 export interface MessageData {
@@ -445,39 +454,59 @@ if (!users[0]) {
 // const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
 const currentUser = users[0];
 let currentChannel: Channel = {
-  id: '1',
-  name: 'General',
-  private: false,
-  users: [
-  ]
-};
+  id: "1",
+  name: "General",
+  description: "Default general chat channel",
+  isPrivate: false,
+  isDeleted: false,
+  ownerId: 1,
+  latestActivity: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  users: []
+}
 let newInvitations: InvitationData[] = [];
 let newChannels: Channel[] = [];
 let newMessages: MessageData[] = [];
+export const fetchChannelData = async () => {
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: { channel_id: currentChannel.id }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      newMessages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}
 if (currentUser.id !== '') {
   console.log("usr: ", currentUser.id)
   await api.get<Channel[]>('/channels', {
     params: { user_id: currentUser.id }
   })
     .then(res => {
+      console.log('jsdfjk', res.data)
       newChannels = res.data
+      console.log('new; ', newChannels)
       if (newChannels[0]) {
-        currentChannel = newChannels[0]!
+        currentChannel = newChannels[2]!
         currentChannel.users = []
       }
     })
     .catch(err => {
       Notify.create(err.response.data.message);
-    })
-
-  await api.get<ChannelUsers[]>('/users', {
-    params: { channel_id: 4 }
-  })
-    .then(res => {
-      currentChannel.users = res.data
-    })
-    .catch(err => {
-      Notify.create(err.response.data.error);
     })
 
   await api.get<InvitationData[]>('/invitations', {
@@ -490,25 +519,13 @@ if (currentUser.id !== '') {
       Notify.create(err.response.data.message);
     })
 
-  if (currentChannel) {
-    await api.get<MessageData[]>('/messages', {
-      params: { channel_id: currentChannel.id }
-    })
-      .then(res => {
-        console.log("test: ", res.data)
-        newMessages = res.data
-      })
-      .catch(err => {
-        Notify.create(err.response.data.message);
-      })
-  }
+  await fetchChannelData()
 
   console.log('channels: ', newChannels)
   console.log('invit: ', newInvitations)
   console.log('messages: ', newMessages)
   console.log('currentUsers: ', currentChannel.users)
 }
-
 
 export const ChatState = reactive({
   currentUser: currentUser,
