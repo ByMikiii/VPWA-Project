@@ -62,7 +62,7 @@
         ChatState.currentUser.nickname = formData.nickname;
         ChatState.currentUser.status = 'Online';
         localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
-        localStorage.setItem('token', JSON.stringify(res.data.token));
+        localStorage.setItem('token', res.data.token);
         console.log(ChatState.currentUser.id);
         console.log(res.data.user.id);
         return true;

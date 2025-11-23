@@ -87,16 +87,20 @@ export default class AuthController {
       return response.noContent()
     }
 
-    const token = payload.replace('Bearer ', '')
+    const token = payload?.replace(/^Bearer\s+/, '')
 
     interface JwtUserPayload {
-      id: string
+      id: number
+      iat?: number
+      exp?: number
     }
 
     let decoded: JwtUserPayload
     try {
       decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+      console.log('Decoded token:', decoded)
     } catch (err) {
+      console.error('JWT verify error:', err)
       return response.noContent()
     }
 
