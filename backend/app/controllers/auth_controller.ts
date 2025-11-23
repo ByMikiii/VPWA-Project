@@ -81,21 +81,35 @@ export default class AuthController {
 
 
   public async logout({ request, response }: HttpContext) {
-    const payload = request.body()
-    console.log(payload, "fdksfksdhjfkl jsdklhjf klsdhkl fsdkl")
+    const payload = request.header('authorization')
 
-    const user = await User.findBy('id', payload.id)
+    if (!payload){
+      return response.noContent()
+    }
+
+    const token = payload.replace('Bearer ', '')
+
+    interface JwtUserPayload {
+      id: string
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.noContent()
+    }
+
+    const user = await User.find(decoded.id)
 
     if (user) {
       user.activity_status = 'Offline'
       await user.save()
     }
-    else {
-      return response.noContent()
-    }
 
     return response.ok({ message: 'Logged out successfully' })
   }
+
 
 
   public async change_password({ request, response }: HttpContext) {

@@ -102,11 +102,7 @@
     import ProfilePicture from '../components/ProfilePicture.vue';
     import StatusDropdown from '../components/StatusDropdown.vue';
 
-    import axios from 'axios';
-
-    const api = axios.create({
-      baseURL: 'http://localhost:3333'
-    });
+    import { api } from 'boot/axios';
 
     const user = ChatState.currentUser;
 
@@ -117,7 +113,7 @@
       message: string;
     }
     const logout = async () => {
-      await api.post<LogoutResponse>('/logout', { id: ChatState.currentUser.id })
+      await api.post<LogoutResponse>('/logout')
         .then(res =>  {
           Notify.create(res.data.message);
           ChatState.currentUser = {
