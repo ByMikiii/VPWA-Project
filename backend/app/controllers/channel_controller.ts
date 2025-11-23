@@ -12,6 +12,7 @@ export default class ChannelController {
 
     const user = await User.find(payload.user_id)
     if (!payload.name || payload.private === undefined || !payload.user_id || !user) {
+
       return response.badRequest({ message: 'All fields are required' })
     }
 
@@ -55,6 +56,7 @@ export default class ChannelController {
     const channels = await Channel
       .query()
       .whereIn('id', channelIds)
+      .andWhere('is_deleted', 0)
 
     return channels
   }
