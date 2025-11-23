@@ -23,6 +23,7 @@
 
   interface LoginResponse {
     message: string;
+    token: string;
     user: {
       id: string;
       name: string;
@@ -45,6 +46,7 @@
           ChatState.currentUser.nickname = res.data.user.nickname;
           ChatState.currentUser.status = 'Online';
           localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
+          localStorage.setItem('token', JSON.stringify(res.data.token));
           return true;
         })
         .catch(err => {

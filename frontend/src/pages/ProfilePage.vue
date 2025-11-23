@@ -129,6 +129,7 @@
             status: 'Offline'
           };
           localStorage.removeItem('currentUser');
+          localStorage.removeItem('token');
         })
 
       await router.push('/login');

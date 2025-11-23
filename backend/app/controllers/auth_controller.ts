@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
+import Jwt from 'jsonwebtoken'
 
 export default class AuthController {
   public async register({ request, response }: HttpContext) {
@@ -40,7 +41,13 @@ export default class AuthController {
     user.activity_status = 'Online'
     await user.save()
 
-    return response.ok({ message: 'Registered successfully', user: user })
+    const token = Jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
+    )
+
+    return response.ok({ message: 'Registered successfully', user: user, token: token })
   }
 
 
@@ -63,7 +70,13 @@ export default class AuthController {
     user.activity_status = 'Online'
     await user.save()
 
-    return response.ok({ message: 'Logged in successfully', user: user })
+    const token = Jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
+    )
+
+    return response.ok({ message: 'Logged in successfully', user: user, token: token })
   }
 
 

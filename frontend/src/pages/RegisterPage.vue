@@ -44,6 +44,7 @@
     }
     interface RegisterResponse {
       message: string;
+      token: string;
       user: {
         id: string;
         name: string;
@@ -61,8 +62,9 @@
         ChatState.currentUser.nickname = formData.nickname;
         ChatState.currentUser.status = 'Online';
         localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
-        console.log(ChatState.currentUser.id)
-        console.log(res.data.user.id)
+        localStorage.setItem('token', JSON.stringify(res.data.token));
+        console.log(ChatState.currentUser.id);
+        console.log(res.data.user.id);
         return true;
       })
       .catch(err => {
