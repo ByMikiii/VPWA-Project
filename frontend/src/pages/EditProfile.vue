@@ -44,6 +44,7 @@
               ChatState.currentUser.name = formData.name;
               ChatState.currentUser.surname = formData.surname;
               ChatState.currentUser.nickname = formData.nickname;
+              localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
               return true;
             })
             .catch(err => {

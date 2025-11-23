@@ -451,8 +451,14 @@ if (!users[0]) {
 
 
 
-// const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
-const currentUser = users[0];
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+//let currentUser = users[0];
+
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) {
+  currentUser = JSON.parse(savedUser);
+}
+
 let currentChannel: Channel = {
   id: "1",
   name: "General",

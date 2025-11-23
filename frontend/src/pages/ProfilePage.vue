@@ -128,6 +128,7 @@
             surname: '',
             status: 'Offline'
           };
+          localStorage.removeItem('currentUser');
         })
 
       await router.push('/login');

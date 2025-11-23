@@ -44,6 +44,7 @@
           ChatState.currentUser.surname = res.data.user.surname;
           ChatState.currentUser.nickname = res.data.user.nickname;
           ChatState.currentUser.status = 'Online';
+          localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
           return true;
         })
         .catch(err => {

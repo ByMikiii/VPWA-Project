@@ -60,6 +60,7 @@
         ChatState.currentUser.surname = formData.surname;
         ChatState.currentUser.nickname = formData.nickname;
         ChatState.currentUser.status = 'Online';
+        localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
         console.log(ChatState.currentUser.id)
         console.log(res.data.user.id)
         return true;
