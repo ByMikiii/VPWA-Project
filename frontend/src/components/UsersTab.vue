@@ -38,8 +38,8 @@
             class="row items-center q-pa-sm q-gutter-x-sm user-tab"
             :class="{ 'justify-center': !state.showChannels && !state.showChat }"
           >
-            <ProfilePicture :status="getUserById(user.id)!.status" />
-            <p id="username">{{ getUserById(user.id)!.nickname }}</p>
+            <ProfilePicture :status="user.status" />
+            <p id="username">{{ user.username }}</p>
           </div>
         </div>
       </div>
@@ -51,13 +51,12 @@
 <script setup lang="ts">
   import ProfilePicture from 'components/ProfilePicture.vue';
   import { inject } from 'vue'
-  import type {ChannelRole, ChatState, UserChannel} from '../state/ChatState'
-  import { getUserById } from '../state/ChatState'
+  import type {ChannelRole, ChatState, ChannelUsers} from '../state/ChatState'
 
   const state = inject('ChatState') as typeof ChatState
   const roles: ChannelRole[] = ['Owner', 'Admin', 'Moderator', 'Guest']
 
-  const usersByRole = (role: UserChannel['role']) =>
+  const usersByRole = (role: ChannelUsers['role']) =>
     state.currentChannel.users.filter(user => user.role === role)
 
   const toggleUsers = () => {

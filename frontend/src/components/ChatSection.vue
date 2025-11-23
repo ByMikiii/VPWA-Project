@@ -52,12 +52,13 @@
 
 
     <div id="messages" ref="messagesContainer">
-      <ChatMessage v-for="message in messages"
-        :name="getUserById(message.senderId)!.nickname"
+      <ChatMessage
+        v-for="message in state.messages"
+        :name="message.sender_name || 'Unknown'"
         :key="message.timestamp"
-        :timestamp="message.timestamp"
-        :message="message.content"
-        :sent="message.senderId === state.currentUser.id"
+        :timestamp="message.timestamp || ''"
+        :message="message.content || ''"
+        :sent="message.sender_id === state.currentUser.id"
       />
 
       <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
@@ -92,8 +93,8 @@
         <ul>
           <li
             v-for="(username, index) in filteredUsers"
-            :key="username"
-            @click="applyCommand(username, '@')"
+            :key="username.username"
+            @click="applyCommand(username.username, '@')"
             class="cursor-pointer"
             :class="[
               index === selectedIndex ? 'bg-primary' : ''
@@ -142,8 +143,7 @@
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { ChatState, Message } from '../state/ChatState'
-  import { getUserById, getMessagesByChannelId, getUsersFromCurrentChannel } from '../state/ChatState'
+  import type { ChatState, MessageData } from '../state/ChatState'
   import { Notify } from 'quasar'
   import axios from 'axios';
 
@@ -152,7 +152,6 @@
   });
 
   const state = inject('ChatState') as typeof ChatState
-  const messages = computed(() => getMessagesByChannelId(state.currentChannel.id))
   console.log(state.currentChannel.id)
   const messagesContainer = ref<HTMLDivElement | null>(null)
 
@@ -161,16 +160,15 @@
       const input = chatText.value.slice(1).toLowerCase()
       return state.commands.filter(c => c.name.startsWith(input))
   })
-  const users = getUsersFromCurrentChannel();
   const showUsers = computed(() => chatText.value.startsWith('@'))
     const filteredUsers = computed(() => {
       console.log()
       const input = chatText.value.slice(1).toLowerCase()
-      return users.filter(u => u.toLowerCase().startsWith(input))
+      return state.currentChannel.users.filter(u => u.username.toLowerCase().startsWith(input))
   })
 
 watch(
-  () => messages.value.length,
+  () => state.messages.values.length,
   async () => {
     await nextTick()
     if (messagesContainer.value) {
@@ -186,11 +184,11 @@ watch(
 
   const handleEnter = (event: KeyboardEvent) => {
     if (!event.shiftKey) {
-      handleSend()
+      handleSend().catch(console.error)
     }
   }
 
-  const handleSend = () => {
+  const handleSend = async() => {
     const text = chatText.value.trim()
 
     if (!text) return
@@ -200,14 +198,37 @@ watch(
       chatText.value = ''
       return
     }
-    const newMessage: Message = {
-      channelId: state.currentChannel.id,
-      senderId: state.currentUser.id,
-      content: text,
-      timestamp: Date.now().toString()
+    interface MessageResponse {
+      message: string
+      sender_id: string
+      sender_name: string
+      receiver_id: string | null
+      timestamp: string
     }
-    state.messages.push(newMessage)
-    chatText.value = '';
+    await api.post<MessageResponse>('/messages', {
+      message: text,
+      receiver_id: "",
+      sender_id: state.currentUser.id,
+      channel_id: state.currentChannel.id
+    })
+      .then(res =>  {
+        Notify.create('Message has been sent!');
+        const newMessage: MessageData = {
+          channel_id: state.currentChannel.id,
+          sender_id: res.data.sender_id,
+          sender_name: res.data.sender_name,
+          receiver_id: res.data.receiver_id,
+          content: res.data.message,
+          timestamp: res.data.timestamp
+        }
+        state.messages.push(newMessage)
+        chatText.value = '';
+        console.log(res.data.message)
+      })
+      .catch(err => {
+        Notify.create(err)
+        console.error(err)
+      })
   }
 
   const toggleUsers = () => {
