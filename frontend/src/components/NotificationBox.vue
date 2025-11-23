@@ -17,6 +17,33 @@
   </button>
 
   <ul v-if="showList" class="notification-list">
+    <li v-for="(inv, index) in state.newInvitations"
+      :key="index"
+      class="notification-item relative-position">
+      <div class="notif-info">
+
+        <div class="notif-header">
+          <span class="notif-user">{{ inv.invited_by_username }}</span>
+          <span> invited you to </span>
+          <span class="notif-user">#{{ inv.channel_name }}</span>
+        </div>
+
+        <p class="notif-message">
+          Valid till: {{ inv.valid_till.toLocaleString() }}
+        </p>
+        <p>Code: {{ inv.string_code }}</p>
+      <div class="inv-actions">
+        <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
+          Accept
+        </button>
+
+        <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
+          Decline
+        </button>
+      </div>
+      </div>
+    </li>
+
     <li
       v-for="(notif, index) in state.notifications"
       :key="index"
@@ -54,7 +81,14 @@
 
 <script setup lang="ts">
   import { inject, ref } from 'vue';
-  import type { ChatState } from 'src/state/ChatState';
+  import type { ChatState, Channel } from 'src/state/ChatState';
+  import axios from 'axios';
+  import { Notify } from 'quasar';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
+
 
   const state = inject('ChatState') as typeof ChatState
 
@@ -65,5 +99,22 @@
 
   const removeNotification = (index: number) => {
     state.notifications.splice(index, 1)
+  }
+
+  const acceptInvitation = async (isAccepted: boolean, invitedBy: string, channelId: string) => {
+    await api.post<Channel>('/accept', {
+      receiver_id: state.currentUser.id,
+      invited_by: invitedBy,
+      channel_id: channelId,
+      is_accepted: isAccepted
+    })
+        .then(res =>  {
+          Notify.create("accepted");
+          console.log(res)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
   }
 </script>

@@ -1,4 +1,11 @@
 import { reactive } from 'vue'
+import { Notify } from 'quasar';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3333'
+});
+
 
 export type UserStatus = 'Online' | 'Offline' | 'Away' | 'Do Not Disturb'
 
@@ -21,16 +28,17 @@ export interface Message {
   timestamp: string
 }
 
-export interface UserChannel {
-  id: string,
-  role: ChannelRole
-}
-
 export interface Channel {
   id: string
   name: string
-  private: boolean
-  users: UserChannel[]
+  description: string | null
+  isPrivate: boolean
+  isDeleted: boolean
+  ownerId: number
+  latestActivity: string
+  createdAt: string
+  updatedAt: string
+  users: ChannelUsers[]
 }
 
 export interface Command {
@@ -44,9 +52,47 @@ export interface Notification {
   message: string
 }
 
+export interface Invitation {
+  id: number
+  accepted: boolean
+  string_code: string | null
+  channel_id: number
+  invited_by: number
+  receiver_id: number
+  valid_till: Date | null
+  createdAt: Date
+  updatedAt: Date | null
+}
+
+export interface InvitationData {
+  id: number
+  string_code: string
+  valid_till: Date
+  invited_by_username: string
+  channel_name: string
+  invited_by: string
+  channel_id: string
+}
+
+export interface MessageData {
+  channel_id: string
+  sender_name: string
+  sender_id: string
+  receiver_id: string | null
+  content: string
+  timestamp: string
+}
+
+export interface ChannelUsers {
+  id: number
+  username: string
+  role: ChannelRole
+  status: UserStatus
+}
+
 const users: User[] = [
-  { id: '1', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
-  { id: '2', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
+  { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
+  { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
   { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline' },
   { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online' },
   { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online' },
@@ -60,313 +106,313 @@ const users: User[] = [
   { id: '13', nickname: 'Ivan335', email: 'ivan3@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
 ]
 
-export const channels: Channel[] = [
-  {
-    id: '1',
-    name: 'General',
-    private: false,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Guest' },
-      { id: '5', role: 'Guest' },
-      { id: '6', role: 'Guest' },
-      { id: '7', role: 'Guest' },
-      { id: '8', role: 'Guest' },
-      { id: '9', role: 'Guest' },
-      { id: '10', role: 'Guest' },
-      { id: '11', role: 'Guest' },
-      { id: '12', role: 'Guest' },
-      { id: '13', role: 'Guest' },
-    ]
-  },
-  {
-    id: '2',
-    name: 'Random',
-    private: true,
-    users: [
-      { id: '6', role: 'Owner' },
-      { id: '7', role: 'Admin' },
-      { id: '8', role: 'Moderator' },
-      { id: '9', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '3',
-    name: 'Development',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '3', role: 'Admin' },
-      { id: '5', role: 'Moderator' },
-      { id: '7', role: 'Moderator' },
-      { id: '9', role: 'Guest' }
-    ]
-  },
-  {
-    id: '4',
-    name: 'Marketing',
-    private: true,
-    users: [
-      { id: '2', role: 'Owner' },
-      { id: '4', role: 'Admin' },
-      { id: '6', role: 'Moderator' },
-      { id: '8', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '5',
-    name: 'Support',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Moderator' },
-      { id: '5', role: 'Guest' }
-    ]
-  },
-  {
-    id: '7',
-    name: 'General',
-    private: false,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Guest' },
-      { id: '5', role: 'Guest' },
-      { id: '6', role: 'Guest' },
-      { id: '7', role: 'Guest' },
-      { id: '8', role: 'Guest' },
-      { id: '9', role: 'Guest' },
-      { id: '10', role: 'Guest' },
-      { id: '11', role: 'Guest' },
-      { id: '12', role: 'Guest' },
-      { id: '13', role: 'Guest' },
-    ]
-  },
-  {
-    id: '8',
-    name: 'Random',
-    private: true,
-    users: [
-      { id: '6', role: 'Owner' },
-      { id: '7', role: 'Admin' },
-      { id: '8', role: 'Moderator' },
-      { id: '9', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '9',
-    name: 'Development',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '3', role: 'Admin' },
-      { id: '5', role: 'Moderator' },
-      { id: '7', role: 'Moderator' },
-      { id: '9', role: 'Guest' }
-    ]
-  },
-  {
-    id: '10',
-    name: 'Marketing',
-    private: true,
-    users: [
-      { id: '2', role: 'Owner' },
-      { id: '4', role: 'Admin' },
-      { id: '6', role: 'Moderator' },
-      { id: '8', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '11',
-    name: 'Support',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Moderator' },
-      { id: '5', role: 'Guest' }
-    ]
-  },
-  {
-    id: '12',
-    name: 'General',
-    private: false,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Guest' },
-      { id: '5', role: 'Guest' },
-      { id: '6', role: 'Guest' },
-      { id: '7', role: 'Guest' },
-      { id: '8', role: 'Guest' },
-      { id: '9', role: 'Guest' },
-      { id: '10', role: 'Guest' },
-      { id: '11', role: 'Guest' },
-      { id: '12', role: 'Guest' },
-      { id: '13', role: 'Guest' },
-    ]
-  },
-  {
-    id: '13',
-    name: 'Random',
-    private: true,
-    users: [
-      { id: '6', role: 'Owner' },
-      { id: '7', role: 'Admin' },
-      { id: '8', role: 'Moderator' },
-      { id: '9', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '14',
-    name: 'Development',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '3', role: 'Admin' },
-      { id: '5', role: 'Moderator' },
-      { id: '7', role: 'Moderator' },
-      { id: '9', role: 'Guest' }
-    ]
-  },
-  {
-    id: '15',
-    name: 'Marketing',
-    private: true,
-    users: [
-      { id: '2', role: 'Owner' },
-      { id: '4', role: 'Admin' },
-      { id: '6', role: 'Moderator' },
-      { id: '8', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  },
-  {
-    id: '16',
-    name: 'Support',
-    private: true,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Moderator' },
-      { id: '5', role: 'Guest' }
-    ]
-  },
-  {
-    id: '17',
-    name: 'General',
-    private: false,
-    users: [
-      { id: '1', role: 'Owner' },
-      { id: '2', role: 'Admin' },
-      { id: '3', role: 'Moderator' },
-      { id: '4', role: 'Guest' },
-      { id: '5', role: 'Guest' },
-      { id: '6', role: 'Guest' },
-      { id: '7', role: 'Guest' },
-      { id: '8', role: 'Guest' },
-      { id: '9', role: 'Guest' },
-      { id: '10', role: 'Guest' },
-      { id: '11', role: 'Guest' },
-      { id: '12', role: 'Guest' },
-      { id: '13', role: 'Guest' },
-    ]
-  },
-  {
-    id: '18',
-    name: 'Random',
-    private: true,
-    users: [
-      { id: '6', role: 'Owner' },
-      { id: '7', role: 'Admin' },
-      { id: '8', role: 'Moderator' },
-      { id: '9', role: 'Moderator' },
-      { id: '10', role: 'Guest' }
-    ]
-  }
-]
+// export const channels: Channel[] = [
+// {
+//   id: '1',
+//   name: 'General',
+//   private: false,
+//   users: [
+//     { id: '1', role: 'Owner' },
+//     { id: '2', role: 'Admin' },
+//     { id: '3', role: 'Moderator' },
+//     { id: '4', role: 'Guest' },
+//     { id: '5', role: 'Guest' },
+//     { id: '6', role: 'Guest' },
+//     { id: '7', role: 'Guest' },
+//     { id: '8', role: 'Guest' },
+//     { id: '9', role: 'Guest' },
+//     { id: '10', role: 'Guest' },
+//     { id: '11', role: 'Guest' },
+//     { id: '12', role: 'Guest' },
+//     { id: '13', role: 'Guest' },
+//   ]
+// },
+//   {
+//     id: '2',
+//     name: 'Random',
+//     private: true,
+//     users: [
+//       { id: '6', role: 'Owner' },
+//       { id: '7', role: 'Admin' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '9', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '3',
+//     name: 'Development',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '3', role: 'Admin' },
+//       { id: '5', role: 'Moderator' },
+//       { id: '7', role: 'Moderator' },
+//       { id: '9', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '4',
+//     name: 'Marketing',
+//     private: true,
+//     users: [
+//       { id: '2', role: 'Owner' },
+//       { id: '4', role: 'Admin' },
+//       { id: '6', role: 'Moderator' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '5',
+//     name: 'Support',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Moderator' },
+//       { id: '5', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '7',
+//     name: 'General',
+//     private: false,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Guest' },
+//       { id: '5', role: 'Guest' },
+//       { id: '6', role: 'Guest' },
+//       { id: '7', role: 'Guest' },
+//       { id: '8', role: 'Guest' },
+//       { id: '9', role: 'Guest' },
+//       { id: '10', role: 'Guest' },
+//       { id: '11', role: 'Guest' },
+//       { id: '12', role: 'Guest' },
+//       { id: '13', role: 'Guest' },
+//     ]
+//   },
+//   {
+//     id: '8',
+//     name: 'Random',
+//     private: true,
+//     users: [
+//       { id: '6', role: 'Owner' },
+//       { id: '7', role: 'Admin' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '9', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '9',
+//     name: 'Development',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '3', role: 'Admin' },
+//       { id: '5', role: 'Moderator' },
+//       { id: '7', role: 'Moderator' },
+//       { id: '9', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '10',
+//     name: 'Marketing',
+//     private: true,
+//     users: [
+//       { id: '2', role: 'Owner' },
+//       { id: '4', role: 'Admin' },
+//       { id: '6', role: 'Moderator' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '11',
+//     name: 'Support',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Moderator' },
+//       { id: '5', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '12',
+//     name: 'General',
+//     private: false,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Guest' },
+//       { id: '5', role: 'Guest' },
+//       { id: '6', role: 'Guest' },
+//       { id: '7', role: 'Guest' },
+//       { id: '8', role: 'Guest' },
+//       { id: '9', role: 'Guest' },
+//       { id: '10', role: 'Guest' },
+//       { id: '11', role: 'Guest' },
+//       { id: '12', role: 'Guest' },
+//       { id: '13', role: 'Guest' },
+//     ]
+//   },
+//   {
+//     id: '13',
+//     name: 'Random',
+//     private: true,
+//     users: [
+//       { id: '6', role: 'Owner' },
+//       { id: '7', role: 'Admin' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '9', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '14',
+//     name: 'Development',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '3', role: 'Admin' },
+//       { id: '5', role: 'Moderator' },
+//       { id: '7', role: 'Moderator' },
+//       { id: '9', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '15',
+//     name: 'Marketing',
+//     private: true,
+//     users: [
+//       { id: '2', role: 'Owner' },
+//       { id: '4', role: 'Admin' },
+//       { id: '6', role: 'Moderator' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '16',
+//     name: 'Support',
+//     private: true,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Moderator' },
+//       { id: '5', role: 'Guest' }
+//     ]
+//   },
+//   {
+//     id: '17',
+//     name: 'General',
+//     private: false,
+//     users: [
+//       { id: '1', role: 'Owner' },
+//       { id: '2', role: 'Admin' },
+//       { id: '3', role: 'Moderator' },
+//       { id: '4', role: 'Guest' },
+//       { id: '5', role: 'Guest' },
+//       { id: '6', role: 'Guest' },
+//       { id: '7', role: 'Guest' },
+//       { id: '8', role: 'Guest' },
+//       { id: '9', role: 'Guest' },
+//       { id: '10', role: 'Guest' },
+//       { id: '11', role: 'Guest' },
+//       { id: '12', role: 'Guest' },
+//       { id: '13', role: 'Guest' },
+//     ]
+//   },
+//   {
+//     id: '18',
+//     name: 'Random',
+//     private: true,
+//     users: [
+//       { id: '6', role: 'Owner' },
+//       { id: '7', role: 'Admin' },
+//       { id: '8', role: 'Moderator' },
+//       { id: '9', role: 'Moderator' },
+//       { id: '10', role: 'Guest' }
+//     ]
+//   }
+// ]
 
-const messages: Message[] = [
-  {
-    channelId: '1',
-    senderId: '1',
-    content: 'ahoj',
-    timestamp: '1767076500000'
-  },
-  {
-    channelId: '1',
-    senderId: '2',
-    content: 'ako sa mas',
-    timestamp: '1767076560000'
-  },
-  {
-    channelId: '1',
-    senderId: '1',
-    content: 'dobrze',
-    timestamp: '1767076620000'
-  },
-  {
-    channelId: '1',
-    senderId: '3',
-    content: 'co robis',
-    timestamp: '1767076680000'
-  },
-  {
-    channelId: '2',
-    senderId: '4',
-    content: 'ahoj vsetci',
-    timestamp: '1767076740000'
-  },
-  {
-    channelId: '2',
-    senderId: '5',
-    content: 'ideme von',
-    timestamp: '1767076800000'
-  },
-  {
-    channelId: '3',
-    senderId: '6',
-    content: 'dnes pekne pocasie',
-    timestamp: '1767076860000'
-  },
-  {
-    channelId: '3',
-    senderId: '7',
-    content: 'mam hlad',
-    timestamp: '1767076920000'
-  },
-  {
-    channelId: '3',
-    senderId: '6',
-    content: 'pojdem jest',
-    timestamp: '1767076980000'
-  },
-  {
-    channelId: '1',
-    senderId: '2',
-    content: 'superg sdgdsjkjgskj fksdjh kfjsdh jkfsdjkfdj hsdkj hfkjsdh jkfhsdkj fhkjsdh fjksdh kjfhsdkj fhdskjh fkjsdh fkjsdh kjfhksjd hfkjsdh fkjshd kjfhdskj hfkjsd fhkjsdh fkjhsd kj',
-    timestamp: '1767077040000'
-  },
-  {
-    channelId: '1',
-    senderId: '2',
-    content: '.',
-    timestamp: '1767077040000'
-  }
-]
+// const messages: Message[] = [
+//   {
+//     channelId: '1',
+//     senderId: '1',
+//     content: 'ahoj',
+//     timestamp: '1767076500000'
+//   },
+//   {
+//     channelId: '1',
+//     senderId: '2',
+//     content: 'ako sa mas',
+//     timestamp: '1767076560000'
+//   },
+//   {
+//     channelId: '1',
+//     senderId: '1',
+//     content: 'dobrze',
+//     timestamp: '1767076620000'
+//   },
+//   {
+//     channelId: '1',
+//     senderId: '3',
+//     content: 'co robis',
+//     timestamp: '1767076680000'
+//   },
+//   {
+//     channelId: '2',
+//     senderId: '4',
+//     content: 'ahoj vsetci',
+//     timestamp: '1767076740000'
+//   },
+//   {
+//     channelId: '2',
+//     senderId: '5',
+//     content: 'ideme von',
+//     timestamp: '1767076800000'
+//   },
+//   {
+//     channelId: '3',
+//     senderId: '6',
+//     content: 'dnes pekne pocasie',
+//     timestamp: '1767076860000'
+//   },
+//   {
+//     channelId: '3',
+//     senderId: '7',
+//     content: 'mam hlad',
+//     timestamp: '1767076920000'
+//   },
+//   {
+//     channelId: '3',
+//     senderId: '6',
+//     content: 'pojdem jest',
+//     timestamp: '1767076980000'
+//   },
+//   {
+//     channelId: '1',
+//     senderId: '2',
+//     content: 'superg sdgdsjkjgskj fksdjh kfjsdh jkfsdjkfdj hsdkj hfkjsdh jkfhsdkj fhkjsdh fjksdh kjfhsdkj fhdskjh fkjsdh fkjsdh kjfhksjd hfkjsdh fkjshd kjfhdskj hfkjsd fhkjsdh fkjhsd kj',
+//     timestamp: '1767077040000'
+//   },
+//   {
+//     channelId: '1',
+//     senderId: '2',
+//     content: '.',
+//     timestamp: '1767077040000'
+//   }
+// ]
 
 const commands: Command[] = [
   { name: 'help', desc: 'shows help information' },
@@ -384,36 +430,112 @@ const notifications: Notification[] = [
 ]
 
 
-export function getMessagesByChannelId(channelId: string): Message[] {
-  return ChatState.messages.filter(m => m.channelId === channelId)
-}
+// export function getMessagesByChannelId(channelId: string): Message[] {
+//   return ChatState.messages.filter(m => m.channelId === channelId)
+// }
 
-export const getUserById = (id: string): User | undefined => {
-  return users.find(user => user.id === id)
-}
+// export const getUserById = (id: string): User | undefined => {
+//   return users.find(user => user.id === id)
+// }
 
-export const getUsersFromCurrentChannel = (): string[] => {
-  return currentChannel.users.map(userChannel => {
-    const user = getUserById(userChannel.id)
-    return user!.nickname;
-  })
-}
+// export const getUsersFromCurrentChannel = (): string[] => {
+//   return currentChannel.users.map(userChannel => {
+//     const user = getUserById(userChannel.id)
+//     return user!.nickname;
+//   })
+// }
 
-if (!users[0] || !channels[0]) {
+if (!users[0]) {
   throw new Error('cfkdsjf')
 }
-const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
-const currentChannel: Channel = channels[0];
 
+
+
+// const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+const currentUser = users[0];
+let currentChannel: Channel = {
+  id: "1",
+  name: "General",
+  description: "Default general chat channel",
+  isPrivate: false,
+  isDeleted: false,
+  ownerId: 1,
+  latestActivity: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  users: []
+}
+let newInvitations: InvitationData[] = [];
+let newChannels: Channel[] = [];
+let newMessages: MessageData[] = [];
+export const fetchChannelData = async () => {
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: { channel_id: currentChannel.id }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      newMessages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}
+if (currentUser.id !== '') {
+  console.log("usr: ", currentUser.id)
+  await api.get<Channel[]>('/channels', {
+    params: { user_id: currentUser.id }
+  })
+    .then(res => {
+      console.log('jsdfjk', res.data)
+      newChannels = res.data
+      console.log('new; ', newChannels)
+      if (newChannels[0]) {
+        currentChannel = newChannels[2]!
+        currentChannel.users = []
+      }
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+
+  await api.get<InvitationData[]>('/invitations', {
+    params: { user_id: currentUser.id }
+  })
+    .then(res => {
+      newInvitations = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+
+  await fetchChannelData()
+
+  console.log('channels: ', newChannels)
+  console.log('invit: ', newInvitations)
+  console.log('messages: ', newMessages)
+  console.log('currentUsers: ', currentChannel.users)
+}
 
 export const ChatState = reactive({
   currentUser: currentUser,
-  channels: channels,
+  channels: newChannels,
   currentChannel: currentChannel,
-  messages: messages,
+  messages: newMessages,
   commands: commands,
   notifications: notifications,
   showUsers: true,
   showChannels: true,
-  showChat: true
+  showChat: true,
+  newInvitations: newInvitations
 })

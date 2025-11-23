@@ -59,31 +59,53 @@
 <script setup lang="ts">
   import type { Channel, ChatState } from 'src/state/ChatState'
   import { ref, inject } from 'vue'
+  import { Notify } from 'quasar';
+  import axios from 'axios';
   const state = inject('ChatState') as typeof ChatState
   const showDialog = ref(false)
   const channelName = ref('')
   const isPrivate = ref(false)
 
-  const createChannelBox = () => {
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
+
+  interface CreateChannelData {
+    name: string;
+    private: boolean;
+    user_id: string;
+  }
+
+  const createChannelBox = async () => {
     if (!channelName.value.trim()) {
-      console.warn('Channel name is required')
+      Notify.create('Channel name is required')
       return
     }
 
-    const newChannel: Channel= {
-      id: '6',
+    const newChannel: CreateChannelData= {
       name: channelName.value.trim(),
       private: isPrivate.value,
-      users: [{id: state.currentUser.id , role: 'Owner'}]
+      user_id: state.currentUser.id
     }
-    state.channels.push(newChannel);
 
-    channelName.value = ''
-    isPrivate.value = false
-    showDialog.value = false
+    await api.post<Channel>('/channels', newChannel)
+      .then(res =>  {
+        state.channels.push(res.data)
+        Notify.create("Channel has been created!");
+      })
+      .catch(err => {
+        Notify.create(err.response.data.message);
+      })
+
+
+    nullData();
   }
 
   const cancelCreation = () => {
+    nullData();
+  }
+
+  const nullData = () => {
     channelName.value = ''
     isPrivate.value = false
     showDialog.value = false

@@ -38,10 +38,25 @@
 <script setup lang="ts">
   import { inject } from 'vue'
   import type { ChatState, UserStatus } from '../state/ChatState'
+  import { Notify } from 'quasar'
+  import axios from 'axios';
 
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
   const state = inject('ChatState') as typeof ChatState
 
-  function handleStatusChange (status: UserStatus) {
+  const handleStatusChange = async (status: UserStatus) => {
+    await api.post<string>('/status', {
+      user_id: state.currentUser.id,
+      status: status
+    })
+      .then(res =>  {
+        Notify.create(res.data);
+      })
+      .catch(err => {
+        Notify.create(err)
+      })
     state.currentUser.status = status;
   }
 </script>

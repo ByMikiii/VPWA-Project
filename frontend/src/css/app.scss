@@ -361,3 +361,38 @@ main section {
   max-width: 400px;
   color: black;
 }
+
+.inv-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.notif-accept,
+.notif-decline {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.notif-accept {
+  background-color: #4caf50;
+  color: white;
+}
+
+.notif-accept:hover {
+  background-color: #45a049;
+}
+
+.notif-decline {
+  background-color: #e53935;
+  color: white;
+}
+
+.notif-decline:hover {
+  background-color: #d32f2f;
+}

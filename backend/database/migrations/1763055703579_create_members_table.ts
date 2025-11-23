@@ -8,7 +8,9 @@ export default class extends BaseSchema {
       table.increments('id')
       table.boolean('is_kicked').defaultTo('false').notNullable()
       table.integer('kick_count').defaultTo(0).notNullable()
-      table.enum('role', []).notNullable()
+      table.integer('user_id').references('id').inTable('users')
+      table.integer('channel_id').references('id').inTable('channels')
+      table.enum('role', ['Owner', 'Admin', 'Moderator', 'Guest']).notNullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
