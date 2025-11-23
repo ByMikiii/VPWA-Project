@@ -501,7 +501,7 @@ if (currentUser.id !== '') {
       newChannels = res.data
       console.log('new; ', newChannels)
       if (newChannels[0]) {
-        currentChannel = newChannels[2]!
+        currentChannel = newChannels[0]!
         currentChannel.users = []
       }
     })

@@ -298,8 +298,9 @@ watch(
         console.log(res)
       })
       .catch(err => {
-        Notify.create(err)
+        Notify.create(err.message)
         console.error(err)
+        console.log(err.message)
       })
   }
 </script>
