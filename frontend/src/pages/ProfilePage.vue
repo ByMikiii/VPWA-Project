@@ -102,21 +102,33 @@
     import ProfilePicture from '../components/ProfilePicture.vue';
     import StatusDropdown from '../components/StatusDropdown.vue';
 
+    import axios from 'axios';
+
+    const api = axios.create({
+      baseURL: 'http://localhost:3333'
+    });
+
     const user = ChatState.currentUser;
 
     const router = useRouter();
 
-    const logout = async () => {
-      Notify.create("You were logged out successfuly");
 
-      ChatState.currentUser = {
-        id: '',
-        nickname: '',
-        email: '',
-        name: '',
-        surname: '',
-        status: 'Offline'
-      };
+    interface LogoutResponse {
+      message: string;
+    }
+    const logout = async () => {
+      await api.post<LogoutResponse>('/logout', { id: ChatState.currentUser.id })
+        .then(res =>  {
+          Notify.create(res.data.message);
+          ChatState.currentUser = {
+            id: '',
+            nickname: '',
+            email: '',
+            name: '',
+            surname: '',
+            status: 'Offline'
+          };
+        })
 
       await router.push('/login');
     }

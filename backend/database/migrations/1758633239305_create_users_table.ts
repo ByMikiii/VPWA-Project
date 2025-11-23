@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.string('nickname').nullable()
       table.string('email', 254).notNullable().unique()
       table.string('password').notNullable()
-      table.enum('activity_status', ['online', 'away', 'offline', 'dnd']).notNullable()
+      table.enum('activity_status', ['Online', 'Away', 'Offline', 'Do Not Disturb']).notNullable()
       table.boolean('is_deleted').defaultTo(false).notNullable()
 
       table.timestamp('created_at').notNullable()

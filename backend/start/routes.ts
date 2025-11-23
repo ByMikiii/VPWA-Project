@@ -19,3 +19,12 @@ router.get('/', async () => {
 
 router.post('/register', [AuthController, 'register'])
 
+router.post('/login', [AuthController, 'login'])
+
+router.post('/logout', [AuthController, 'logout'])
+
+router.post('/change_password', [AuthController, 'change_password'])
+
+router.post('/forgotten_password', [AuthController, 'forgotten_password'])
+
+router.post('/edit_profile', [AuthController, 'edit_profile'])
