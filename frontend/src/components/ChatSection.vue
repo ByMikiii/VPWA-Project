@@ -1,6 +1,35 @@
 <template>
-  <section class="col-grow" id="chat" v-show="state.showChat">
+<q-dialog v-model="showUsersWin" persistent>
+  <q-card class="users-list-main q-pa-md bg-secondary relative-position">
+    <q-btn
+      flat
+      round
+      icon="close"
+      size="xs"
+      class="absolute-top-right"
+      style="top: 8px; right: 8px;"
+      @click="showUsersWin = false"
+    />
+    <div class="q-mt-sm">
+      <div v-for="role in roles" :key="role">
+        <h6 v-if="usersByRole(role).length > 0" class="role text-black">
+          {{ role }} ({{ usersByRole(role).length }})
+        </h6>
 
+        <div
+          v-for="user in usersByRole(role)"
+          :key="user.id"
+          class="row items-center q-pa-sm q-gutter-x-sm user-tab"
+        >
+          <ProfilePicture :status="user.status" />
+          <p id="username">{{ user.username }}</p>
+        </div>
+      </div>
+    </div>
+  </q-card>
+</q-dialog>
+
+  <section class="col-grow" id="chat" v-show="state.showChat">
     <div class="center-header">
       <div class="end-btn">
         <transition name="fade">
@@ -141,25 +170,47 @@
 </template>
 
 <script setup lang="ts">
+  import ProfilePicture from 'components/ProfilePicture.vue';
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { ChatState, MessageData, Channel } from '../state/ChatState'
+  import type { UserStatus, ChannelRole, ChannelUsers, ChatState, MessageData, Channel } from '../state/ChatState'
   import { Notify } from 'quasar'
   import axios from 'axios';
+
+  const state = inject('ChatState') as typeof ChatState
+  const roles: ChannelRole[] = ['Owner', 'Admin', 'Moderator', 'Guest']
+
+  const usersByRole = (role: ChannelUsers['role']) =>
+    state.currentChannel.users.filter(user => user.role === role)
+
 
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
 
-  const state = inject('ChatState') as typeof ChatState
   console.log(state.currentChannel.id)
+  const showUsersWin = ref(false)
   const messagesContainer = ref<HTMLDivElement | null>(null)
-
   const showCommands = computed(() => chatText.value.startsWith('/'))
     const filteredCommands = computed(() => {
       const input = chatText.value.slice(1).toLowerCase()
       return state.commands.filter(c => c.name.startsWith(input))
   })
+
+  // edge case
+  for (let index = 0; index < 30; index++) {
+    const userCopy = {
+      ...state.currentChannel.users[0],
+      id: state.currentChannel.users.length + 1
+    } as {
+      id: number
+      username: string
+      role: ChannelRole
+      status: UserStatus
+    }
+    state.currentChannel.users.push(userCopy)
+  }
+
   const showUsers = computed(() => chatText.value.startsWith('@'))
     const filteredUsers = computed(() => {
       console.log()
@@ -267,10 +318,15 @@ watch(
 
   const handleCommand = (text: string) => {
     const parts = text.trim().split(' ')
-    if(parts[0] == null || parts [1] == null){
-      Notify.create("Missing argument or command!");
+    if(parts[0] == null){
+        Notify.create("Missing  command!");
+        return
+    }
+    if(parts[1] == null && parts[0] != '/list'){
+      Notify.create("Missing argument");
       return
     }
+
     const command = parts[0].toLowerCase()
     const arg = parts[1]
     let arg2 = '';
@@ -280,17 +336,26 @@ watch(
 
   switch (command) {
     case '/invite':
-      handleInvite(arg).catch(console.error)
+      handleInvite(arg!).catch(console.error)
       break
     case '/kick':
       console.log('kick')
       break
     case '/join':
       console.log('join')
-      handleCreate(arg, arg2).catch(console.error)
+      handleCreate(arg!, arg2).catch(console.error)
       break
     case '/revoke':
       console.log('revoke')
+      handleRevoke(arg!).catch(console.error)
+      break
+    case '/kick':
+      console.log('kick')
+      handleRevoke(arg!).catch(console.error)
+      break
+    case '/list':
+      console.log('list')
+      showUsersWin.value = true
       break
     default:
       Notify.create(`Unknown command:, ${command}`)
@@ -348,9 +413,30 @@ watch(
         Notify.create(err.response.data.message);
       })
   }
+
+  const handleRevoke = async(username: string) => {
+    console.log("revoking...", username)
+    await api.post<string>('/revoke', {
+      current_id: state.currentUser.id,
+      username: username,
+      channel_id: state.currentChannel.id,
+    })
+        .then(res =>  {
+          Notify.create(res.data);
+          console.log(res.data)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+  }
 </script>
 
 <style scoped>
+  .users-list-main {
+    width: 320px;
+    height: 70%;
+  }
   /* .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.2s ease;

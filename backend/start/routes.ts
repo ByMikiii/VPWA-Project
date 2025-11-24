@@ -68,3 +68,4 @@ router.post('/forgotten_password', [AuthController, 'forgotten_password'])
 router.post('/edit_profile', [AuthController, 'edit_profile'])
 
 router.post('/members', [MemberController, 'leaveChannel'])
+router.post('/revoke', [MemberController, 'kickFromChannel'])
