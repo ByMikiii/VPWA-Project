@@ -90,6 +90,12 @@ export interface ChannelUsers {
   status: UserStatus
 }
 
+const socket = new WebSocket("ws://localhost:8082");
+
+socket.onmessage = (event) => {
+  console.log('Received:', event.data)
+};
+
 const users: User[] = [
   { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
   { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
