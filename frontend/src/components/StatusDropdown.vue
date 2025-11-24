@@ -58,6 +58,10 @@
         Notify.create(err)
       })
     state.currentUser.status = status;
+    const user = state.currentChannel.users.find(user => user.id == Number(state.currentUser.id));
+    if(user){
+      user.status = status;
+    }
   }
 </script>
 

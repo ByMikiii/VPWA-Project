@@ -20,7 +20,7 @@ export default class UserController {
 
     wss.clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
-        client.send(JSON.stringify({ message: "Status changed successfully" }))
+        client.send(JSON.stringify({ type: "status_changed", user_id: user.id, activity_status: user.activity_status }))
       }
     })
     return response.ok(`Status has been set to ${user.activity_status}!`)

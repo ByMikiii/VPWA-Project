@@ -94,7 +94,25 @@ const socket = new WebSocket("ws://localhost:8082");
 
 socket.onmessage = (event) => {
   console.log('Received:', event.data)
+  const data = (event.data);
+  handleMessage(data);
 };
+
+function handleMessage(message: string) {
+  const data = JSON.parse(message);
+
+  switch (data.type) {
+    case 'status_changed':{
+      const user = currentChannel.users.find(user => user.id == Number(data.user_id));
+      console.log(user);
+      if (user){
+        user.status = data.activity_status;
+      }
+      console.log(user);
+      break;
+    }
+  }
+}
 
 const users: User[] = [
   { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
