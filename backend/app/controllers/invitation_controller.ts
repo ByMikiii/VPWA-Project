@@ -35,6 +35,12 @@ export default class InvitationController {
       .first()
 
     if (existingMember) {
+      if (existingMember?.is_kicked === true) {
+        existingMember.is_kicked = false
+        existingMember.kick_count = 0
+        existingMember.save()
+        return response.ok({ message: 'User has been unbanned!' })
+      }
       return response.conflict('Cannot invite this user')
     }
 

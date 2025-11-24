@@ -59,8 +59,8 @@
         :timestamp="message.timestamp || ''"
         :message="message.content || ''"
         :sent="message.sender_id === state.currentUser.id"
+        :highlighted="message.receiver_id == state.currentUser.id"
       />
-
       <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
     </div>
 
@@ -100,7 +100,7 @@
               index === selectedIndex ? 'bg-primary' : ''
             ]"
           >
-            @{{ username }}
+            @{{ username.username }}
           </li>
         </ul>
       </div>
@@ -143,7 +143,7 @@
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { ChatState, MessageData } from '../state/ChatState'
+  import type { ChatState, MessageData, Channel } from '../state/ChatState'
   import { Notify } from 'quasar'
   import axios from 'axios';
 
@@ -273,6 +273,10 @@ watch(
     }
     const command = parts[0].toLowerCase()
     const arg = parts[1]
+    let arg2 = '';
+    if(parts[2]){
+      arg2 = parts[2]
+    }
 
   switch (command) {
     case '/invite':
@@ -280,6 +284,13 @@ watch(
       break
     case '/kick':
       console.log('kick')
+      break
+    case '/join':
+      console.log('join')
+      handleCreate(arg, arg2).catch(console.error)
+      break
+    case '/revoke':
+      console.log('revoke')
       break
     default:
       Notify.create(`Unknown command:, ${command}`)
@@ -298,9 +309,43 @@ watch(
         console.log(res)
       })
       .catch(err => {
-        Notify.create(err.message)
+        Notify.create(err.response.data)
         console.error(err)
-        console.log(err.message)
+      })
+  }
+
+  const handleCreate = async (channelName: string, privateChannel: string) => {
+    if (!channelName) {
+      Notify.create('Channel name is required')
+      return
+    }else if (channelName.length > 16){
+      Notify.create('Channel name is too long')
+      return
+    }
+    let isPrivate = false
+    if(privateChannel === 'private'){
+      isPrivate = true
+    }
+    interface CreateChannelData {
+    name: string;
+    private: boolean;
+    user_id: string;
+    }
+
+    const newChannel: CreateChannelData= {
+      name: channelName,
+      private: isPrivate,
+      user_id: state.currentUser.id
+    }
+
+    await api.post<Channel>('/channels', newChannel)
+      .then(res =>  {
+        state.channels.push(res.data)
+        console.log('isprivate: ', `${isPrivate}, ${privateChannel}`,);
+        Notify.create("Channel has been created!");
+      })
+      .catch(err => {
+        Notify.create(err.response.data.message);
       })
   }
 </script>

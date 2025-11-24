@@ -4,9 +4,18 @@ import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
 
+const deleteInactive = async () => {
+  const cutoffDate = DateTime.now().minus({ days: 30 }).toJSDate();
+  await Channel
+    .query()
+    .where('latest_activity', '<', cutoffDate)
+    .update({ is_deleted: true });
+}
+
 
 export default class ChannelController {
   public async createChannel({ request, response }: HttpContext) {
+    await deleteInactive()
     const payload = request.body()
     console.log(payload.name)
 
@@ -40,6 +49,7 @@ export default class ChannelController {
   }
 
   public async fetchChannels({ request, response }: HttpContext) {
+    await deleteInactive()
     const user_id = request.qs().user_id
     console.log(user_id)
     if (!user_id) {
@@ -57,6 +67,7 @@ export default class ChannelController {
       .query()
       .whereIn('id', channelIds)
       .andWhere('is_deleted', 0)
+      .orderBy('latest_activity', "desc")
 
     return channels
   }
