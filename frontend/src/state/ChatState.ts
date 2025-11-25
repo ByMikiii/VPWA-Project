@@ -520,11 +520,12 @@ const users: User[] = [
 // ]
 
 const commands: Command[] = [
-  { name: 'help', desc: 'shows help information' },
   { name: 'invite', desc: 'invites certain user' },
-  { name: 'revoke', desc: 'kicks selected user' },
-  { name: 'quit', desc: 'leave/delete channel' },
-  { name: 'cancel', desc: 'deletes channel' },
+  { name: 'join', desc: 'joins or creates channel (/join name [private])' },
+  { name: 'revoke', desc: 'owner kicks selected user' },
+  { name: 'kick', desc: 'vote to kick' },
+  { name: 'quit', desc: 'deletes channel' },
+  { name: 'cancel', desc: 'leave or if owner delete channel' },
   { name: 'list', desc: 'list all users of current channel' },
 ]
 

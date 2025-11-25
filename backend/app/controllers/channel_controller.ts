@@ -21,12 +21,21 @@ export default class ChannelController {
 
     const user = await User.find(payload.user_id)
     if (!payload.name || payload.private === undefined || !payload.user_id || !user) {
-
       return response.badRequest({ message: 'All fields are required' })
     }
 
     const existingChannel = await Channel.findBy('name', payload.name)
     if (existingChannel) {
+      if (existingChannel.is_private === false && payload.private === false) {
+        const member = new Member()
+        member.is_kicked = false;
+        member.kick_count = 0;
+        member.user_id = user.id;
+        member.channel_id = existingChannel.id;
+        member.role = "Guest"
+        await member.save()
+        return response.ok(existingChannel)
+      }
       return response.conflict({ message: 'Channel name already exists' })
     }
 

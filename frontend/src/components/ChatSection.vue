@@ -320,7 +320,7 @@ watch(
         Notify.create("Missing  command!");
         return
     }
-    if(parts[1] == null && parts[0] != '/list'){
+    if(parts[1] == null && parts[0] in ['/list', '/cancel', '/quit']){
       Notify.create("Missing argument");
       return
     }
@@ -351,6 +351,14 @@ watch(
     case '/list':
       console.log('list')
       showUsersWin.value = true
+      break
+    case '/quit':
+      console.log('quit')
+      handleQuit().catch(console.error)
+      break
+    case '/cancel':
+      console.log('cancel')
+      handleCancel().catch(console.error)
       break
     default:
       Notify.create(`Unknown command:, ${command}`)
@@ -402,7 +410,11 @@ watch(
       .then(res =>  {
         state.channels.push(res.data)
         console.log('isprivate: ', `${isPrivate}, ${privateChannel}`,);
-        Notify.create("Channel has been created!");
+        if(res.data.ownerId != Number(state.currentUser.id)){
+          Notify.create("Successfully joined public channel!");
+        }else{
+          Notify.create("Channel has been created!");
+        }
       })
       .catch(err => {
         Notify.create(err.response.data.message);
@@ -425,6 +437,29 @@ watch(
           Notify.create(err.response.data.message);
         })
   }
+
+  const handleQuit = async () => {
+    if(state.currentChannel.ownerId != Number(state.currentUser.id)){
+      Notify.create("You are not owner of this channel!")
+      return
+    }
+    await handleCancel().catch(console.error)
+  }
+
+  const handleCancel = async () => {
+    await api.post<string>('/members', {
+      user_id: state.currentUser.id,
+      channel_id: state.currentChannel.id,
+    })
+        .then(res =>  {
+          Notify.create(res.data);
+          console.log(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+  }
+
 </script>
 
 <style scoped>
