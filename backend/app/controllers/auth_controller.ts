@@ -2,7 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 import Jwt from 'jsonwebtoken'
-import { connectedUsers } from '../../start/websocket.js'
 
 export default class AuthController {
   public async register({ request, response }: HttpContext) {
