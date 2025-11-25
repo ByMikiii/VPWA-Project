@@ -17,7 +17,7 @@
       >
         <div class="row items-center justify-center no-wrap q-gutter-x-sm">
           <span>Join</span>
-          <svg
+          <!-- <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -33,7 +33,7 @@
             <path d="M3 21h18" />
             <path d="M5 21V5a2 2 0 0 1 2-2h6m4 10.5v7.5" />
             <path d="M21 7h-7m3-3-3 3 3 3" />
-          </svg>
+          </svg> -->
         </div>
       </q-btn>
     </div>

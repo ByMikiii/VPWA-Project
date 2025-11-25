@@ -17,33 +17,6 @@
   </button>
 
   <ul v-if="showList" class="notification-list">
-    <li v-for="(inv, index) in state.newInvitations"
-      :key="index"
-      class="notification-item relative-position">
-      <div class="notif-info">
-
-        <div class="notif-header">
-          <span class="notif-user">{{ inv.invited_by_username }}</span>
-          <span> invited you to </span>
-          <span class="notif-user">#{{ inv.channel_name }}</span>
-        </div>
-
-        <p class="notif-message">
-          Valid till: {{ inv.valid_till.toLocaleString() }}
-        </p>
-        <p>Code: {{ inv.string_code }}</p>
-      <div class="inv-actions">
-        <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
-          Accept
-        </button>
-
-        <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
-          Decline
-        </button>
-      </div>
-      </div>
-    </li>
-
     <li
       v-for="(notif, index) in state.notifications"
       :key="index"
@@ -51,13 +24,13 @@
     >
       <div class="notif-info">
         <div class="notif-header">
-          <span class="notif-user">{{ notif.user }}</span>
+          <span class="notif-user">{{ notif.sender_name }}</span>
           <span> in </span>
-          <span class="notif-user">#{{ notif.channel }}</span>
+          <span class="notif-user">#{{ notif.channel_name }}</span>
         </div>
-        <p class="notif-message">{{ notif.message }}</p>
+        <p class="notif-message">{{ notif.content }}</p>
       </div>
-      <button class="notif-remove absolute" @click.stop="removeNotification(index)">
+      <button class="notif-remove absolute" @click.stop="removeNotification(notif.notification_id)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
@@ -81,14 +54,13 @@
 
 <script setup lang="ts">
   import { inject, ref } from 'vue';
-  import type { ChatState, Channel } from 'src/state/ChatState';
-  import axios from 'axios';
+  import type { ChatState } from 'src/state/ChatState';
   import { Notify } from 'quasar';
+  import axios from 'axios';
 
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
-
 
   const state = inject('ChatState') as typeof ChatState
 
@@ -97,24 +69,18 @@
     showList.value = !showList.value
   }
 
-  const removeNotification = (index: number) => {
-    state.notifications.splice(index, 1)
-  }
-
-  const acceptInvitation = async (isAccepted: boolean, invitedBy: string, channelId: string) => {
-    await api.post<Channel>('/accept', {
-      receiver_id: state.currentUser.id,
-      invited_by: invitedBy,
-      channel_id: channelId,
-      is_accepted: isAccepted
+  const removeNotification = async (index: string) => {
+    await api.post<string>('/readNotification', {
+      notification_id: index
     })
         .then(res =>  {
-          Notify.create("accepted");
-          console.log(res)
+          // Notify.create(res.data);
+          console.log(res.data)
           // state.channels.push(res.data)
         })
         .catch(err => {
           Notify.create(err.response.data.message);
         })
+    // state.notifications.splice(index, 1)
   }
 </script>

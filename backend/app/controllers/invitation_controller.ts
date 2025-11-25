@@ -16,8 +16,17 @@ export default class InvitationController {
       .where('nickname', payload.username)
       .first()
 
-    if (!user) {
-      return response.conflict({ message: 'User does not exist!' })
+    const channel = await Channel
+      .query()
+      .where('id', payload.channelId)
+      .first()
+
+    if (!user || !channel) {
+      return response.conflict('User or channel does not exist!')
+    }
+
+    if (channel.is_private === true && channel.owner_id != user.id) {
+      return response.unauthorized('You are not authorized to invite in this channel!')
     }
 
     const existingMember = await Member
@@ -27,18 +36,19 @@ export default class InvitationController {
       .first()
 
     if (existingMember) {
-      return response.conflict({ message: 'Cannot invite this user' })
+      if (existingMember?.is_kicked === true) {
+        existingMember.is_kicked = false
+        existingMember.kick_count = 0
+        existingMember.save()
+        return response.ok({ message: 'User has been unbanned!' })
+      }
+      return response.conflict('Cannot invite this user')
     }
 
-    const channel = await Channel
-      .query()
-      .where('id', payload.channelId)
-      .first()
-
-      const sender = await User
-      .query()
-      .where('id', payload.invitedBy)
-      .first()
+    const sender = await User
+    .query()
+    .where('id', payload.invitedBy)
+    .first()
 
     if (!user) {
       return response.conflict({ message: 'User does not exist!' })

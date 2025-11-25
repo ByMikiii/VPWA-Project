@@ -30,44 +30,107 @@
 
 
     <div id="channels-list">
-      <button v-for="channel in state.channels" :key="channel.id" @click="handleChannelChange(channel)" class="channel-button text-left row items-center" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
-        <svg
-          v-if="!channel.isPrivate"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="private-icon"
-        >
-          <path d="M5 11m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
-          <path d="M12 16m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-          <path d="M8 11v-5a4 4 0 0 1 8 0" />
-        </svg>
+      <li v-for="(inv, index) in state.newInvitations"
+      :key="index"
+      class="notification-item relative-position">
+        <div class="notif-info">
 
-        <svg
-          v-if="channel.isPrivate"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="private-icon"
-        >
-          <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" />
-          <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
-          <path d="M8 11v-4a4 4 0 1 1 8 0v4" />
-        </svg>
-        <span>{{ channel.name }}</span>
-      </button>
+          <div class="notif-header">
+            <span class="notif-user">{{ inv.invited_by_username }}</span>
+            <span> invited you to join channel </span>
+            <span class="notif-user">#{{ inv.channel_name }}</span>
+          </div>
+          <div class="inv-actions">
+            <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
+              Accept
+            </button>
+
+            <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
+              Decline
+            </button>
+          </div>
+        </div>
+      </li>
+      <div v-for="channel in state.channels" :key="channel.id" class="channel-button text-left row items-center" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
+        <button class="channel-but row items-center" @click="handleChannelChange(channel)">
+          <svg
+            v-if="!channel.isPrivate"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="private-icon"
+          >
+            <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+            <path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
+            <path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+            <path d="M17 10h2a2 2 0 0 1 2 2v1" />
+            <path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+            <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
+          </svg>
+
+          <svg
+            v-if="channel.isPrivate"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="private-icon"
+          >
+            <path d="M5 11m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
+            <path d="M12 16m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M8 11v-5a4 4 0 0 1 8 0" />
+          </svg>
+          <span>{{ channel.name }}</span>
+        </button>
+        <button @click="leaveChannel(channel.id)" class="row items-center">
+          <svg
+            v-if="channel.ownerId === Number(state.currentUser.id)"
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 7l16 0" />
+            <path d="M10 11l0 6" />
+            <path d="M14 11l0 6" />
+            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M13 12v.01" />
+            <path d="M3 21h18" />
+            <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5" />
+            <path d="M14 7h7m-3 -3l3 3l-3 3" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <Channel-buttons/>
@@ -133,9 +196,53 @@ const toggleChannels = () => {
       state.showChat = true;
     }
   }
+
+  const acceptInvitation = async (isAccepted: boolean, invitedBy: string, channelId: string) => {
+    await api.post<Channel>('/accept', {
+      receiver_id: state.currentUser.id,
+      invited_by: invitedBy,
+      channel_id: channelId,
+      is_accepted: isAccepted
+    })
+        .then(res =>  {
+          Notify.create("accepted");
+          console.log(res)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+  }
+
+  const leaveChannel = async (channel_id: string) => {
+    console.log("leaving...")
+    await api.post<string>('/members', {
+      user_id: state.currentUser.id,
+      channel_id: channel_id,
+    })
+        .then(res =>  {
+          Notify.create(res.data);
+          console.log(res.data)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+  }
 </script>
 
 <style scoped>
+  .channel-but {
+    width: 85%;
+    padding: 0.5rem 0;
+    padding-left: 1rem;
+  }
+  button svg {
+    opacity: 50%;
+  }
+  button svg:hover {
+    opacity: 70%;
+  }
   /* .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.2s ease;

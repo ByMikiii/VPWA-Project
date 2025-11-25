@@ -3,6 +3,7 @@
       :sent="sent"
       text-color="white"
       :bg-color="sent ? 'primary' : 'secondary'"
+      :class="highlighted ? 'highlighted-message' : ''"
     >
       <template v-slot:name>
         <span class="message-name">{{ name }}</span>
@@ -17,7 +18,6 @@
           src="profile-picture.webp"
         />
       </template>
-
       <q-spinner-dots v-if="typing" size="1.5rem" />
       <span v-else class="message-text">{{ message }}</span>
 
@@ -34,7 +34,6 @@
     const minutes = date.getMinutes().toString().padStart(2, '0')
     return `${hours}:${minutes}, ${day} ${month}`
   }
-
   defineProps({
     name: {
       type: String,
@@ -53,10 +52,18 @@
     typing: {
       type: Boolean,
       default: false
+    },
+    highlighted: {
+      type: Boolean,
     }
   })
+
 </script>
 
-<style>
-
+<style scoped>
+  .highlighted-message {
+    border: 2px solid yellow;
+    background-color: rgba(255, 255, 0, 0.2);
+    transition: background-color 0.3s, border 0.3s;
+  }
 </style>

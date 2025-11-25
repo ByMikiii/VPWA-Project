@@ -17,6 +17,8 @@ import ChannelController from '#controllers/channel_controller'
 import InvitationController from '#controllers/invitation_controller'
 import UserController from '#controllers/user_controller'
 import MessageController from '#controllers/message_controller'
+import MemberController from '#controllers/member_controller'
+import NotificationController from '#controllers/notification_controller'
 
 router.get('/', async () => {
   const users = await User.all()
@@ -65,3 +67,11 @@ router.post('/change_password', [AuthController, 'change_password'])
 router.post('/forgotten_password', [AuthController, 'forgotten_password'])
 
 router.post('/edit_profile', [AuthController, 'edit_profile'])
+
+router.post('/members', [MemberController, 'leaveChannel'])
+router.post('/revoke', [MemberController, 'kickFromChannel'])
+
+
+router.post('/notifications', [NotificationController, 'createNotification'])
+router.post('/readNotification', [NotificationController, 'readNotification'])
+router.get('/notifications', [NotificationController, 'fetchNotifications'])

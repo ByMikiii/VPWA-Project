@@ -19,6 +19,7 @@ export interface User {
   name: string
   surname: string
   status: UserStatus
+  only_mentions: boolean
 }
 
 export interface Message {
@@ -81,6 +82,14 @@ export interface MessageData {
   receiver_id: string | null
   content: string
   timestamp: string
+}
+
+export interface NotificationData {
+  user_id: string
+  sender_name: string
+  channel_name: string
+  content: string
+  notification_id: string
 }
 
 export interface ChannelUsers {
@@ -184,19 +193,19 @@ function handleMessage(message: string) {
 }
 
 const users: User[] = [
-  { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
-  { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
-  { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline' },
-  { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online' },
-  { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online' },
-  { id: '6', nickname: 'Frank987', email: 'frank@example.com', name: 'Frank', surname: 'Wilson', status: 'Away' },
-  { id: '7', nickname: 'Grace111', email: 'grace@example.com', name: 'Grace', surname: 'Moore', status: 'Offline' },
-  { id: '8', nickname: 'Heidi222', email: 'heidi@example.com', name: 'Heidi', surname: 'Taylor', status: 'Online' },
-  { id: '9', nickname: 'Ivan333', email: 'ivan@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
-  { id: '10', nickname: 'Judy444', email: 'judy@example.com', name: 'Judy', surname: 'Thomas', status: 'Online' },
-  { id: '11', nickname: 'Ivan336', email: 'ivan1@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
-  { id: '12', nickname: 'Ivan334', email: 'ivan2@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
-  { id: '13', nickname: 'Ivan335', email: 'ivan3@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away' },
+  { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online', only_mentions: false },
+  { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away', only_mentions: false },
+  { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline', only_mentions: false },
+  { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online', only_mentions: false },
+  { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online', only_mentions: false },
+  { id: '6', nickname: 'Frank987', email: 'frank@example.com', name: 'Frank', surname: 'Wilson', status: 'Away', only_mentions: false },
+  { id: '7', nickname: 'Grace111', email: 'grace@example.com', name: 'Grace', surname: 'Moore', status: 'Offline', only_mentions: false },
+  { id: '8', nickname: 'Heidi222', email: 'heidi@example.com', name: 'Heidi', surname: 'Taylor', status: 'Online', only_mentions: false },
+  { id: '9', nickname: 'Ivan333', email: 'ivan@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
+  { id: '10', nickname: 'Judy444', email: 'judy@example.com', name: 'Judy', surname: 'Thomas', status: 'Online', only_mentions: false },
+  { id: '11', nickname: 'Ivan336', email: 'ivan1@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
+  { id: '12', nickname: 'Ivan334', email: 'ivan2@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
+  { id: '13', nickname: 'Ivan335', email: 'ivan3@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
 ]
 
 // export const channels: Channel[] = [
@@ -516,11 +525,11 @@ const commands: Command[] = [
   { name: 'list', desc: 'list all users of current channel' },
 ]
 
-const notifications: Notification[] = [
-  { user: 'Miki', channel: 'general', message: 'cau ne' },
-  { user: 'Anna', channel: 'dev-chat', message: 'ahoj' },
-  { user: 'John', channel: 'random', message: 'ffdksjfkds kfdsj flksdj klfjsdkl fjsldkjf lksdj flksdjfsklj fkldsjl kfjdslk fjsdlkjf klsdjf lkdsjlkf jsdkl fjdsklj fkldsjklf jsdlkjf lksdj flk' },
-]
+// const notifications: Notification[] = [
+//   { user: 'Miki', channel: 'general', message: 'cau ne' },
+//   { user: 'Anna', channel: 'dev-chat', message: 'ahoj' },
+//   { user: 'John', channel: 'random', message: 'ffdksjfkds kfdsj flksdj klfjsdkl fjsldkjf lksdj flksdjfsklj fkldsjl kfjdslk fjsdlkjf klsdjf lkdsjlkf jsdkl fjdsklj fkldsjklf jsdlkjf lksdj flk' },
+// ]
 
 
 // export function getMessagesByChannelId(channelId: string): Message[] {
@@ -544,7 +553,7 @@ if (!users[0]) {
 
 
 
-let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
 //let currentUser = users[0];
 
 const savedUser = localStorage.getItem('currentUser');
@@ -567,6 +576,8 @@ let currentChannel: Channel = {
 let newInvitations: InvitationData[] = [];
 let newChannels: Channel[] = [];
 let newMessages: MessageData[] = [];
+let newNotifications: NotificationData[] = [];
+
 export const fetchChannelData = async () => {
   await api.get<ChannelUsers[]>('/users', {
     params: { channel_id: currentChannel.id }
@@ -618,6 +629,17 @@ if (currentUser.id !== '') {
       Notify.create(err.response.data.message);
     })
 
+  await api.get<NotificationData[]>('/notifications', {
+    params: { user_id: currentUser.id }
+  })
+    .then(res => {
+      newNotifications = res.data
+      console.log("new notif: ", res.data);
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+
   await fetchChannelData()
 
   console.log('channels: ', newChannels)
@@ -632,7 +654,7 @@ export const ChatState = reactive({
   currentChannel: currentChannel,
   messages: newMessages,
   commands: commands,
-  notifications: notifications,
+  notifications: newNotifications,
   showUsers: true,
   showChannels: true,
   showChat: true,

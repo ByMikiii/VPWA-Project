@@ -4,6 +4,8 @@ import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
 import Message from '#models/message'
+import { DateTime } from 'luxon'
+
 import Jwt from 'jsonwebtoken'
 import { connectedUsers } from '../../start/websocket.js'
 
@@ -44,6 +46,17 @@ export default class MessageController {
       return response.badRequest({ message: 'Failed to send a message!' })
     }
 
+    const foundUsername = /@(\w+)/
+    const mentionUsername = payload.message.match(foundUsername)
+
+    if (mentionUsername) {
+      const username = mentionUsername[1]
+      const user = await User.findBy('nickname', username)
+      if (user) {
+        payload.receiver_id = user?.id
+      }
+    }
+
     const message = new Message()
     message.message = payload.message;
     message.receiver_id = payload.receiver_id;
@@ -51,6 +64,8 @@ export default class MessageController {
     message.channel_id = payload.channel_id
     await message.save()
 
+    channel.latest_activity = DateTime.now()
+    channel.save()
     connectedUsers.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,

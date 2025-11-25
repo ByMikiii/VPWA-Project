@@ -127,7 +127,8 @@
             email: '',
             name: '',
             surname: '',
-            status: 'Offline'
+            status: 'Offline',
+            only_mentions: false
           };
           localStorage.removeItem('currentUser');
           localStorage.removeItem('token');
