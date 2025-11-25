@@ -8,6 +8,7 @@
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
+  import { connectWebSocket } from '../state/ChatState';
 
   const api = axios.create({
     baseURL: 'http://localhost:3333'
@@ -44,6 +45,7 @@
     }
     interface RegisterResponse {
       message: string;
+      token: string;
       user: {
         id: string;
         name: string;
@@ -60,8 +62,11 @@
         ChatState.currentUser.surname = formData.surname;
         ChatState.currentUser.nickname = formData.nickname;
         ChatState.currentUser.status = 'Online';
-        console.log(ChatState.currentUser.id)
-        console.log(res.data.user.id)
+        localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
+        localStorage.setItem('token', res.data.token);
+        console.log(ChatState.currentUser.id);
+        console.log(res.data.user.id);
+        connectWebSocket();
         return true;
       })
       .catch(err => {

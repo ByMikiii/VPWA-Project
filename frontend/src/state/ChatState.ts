@@ -90,6 +90,99 @@ export interface ChannelUsers {
   status: UserStatus
 }
 
+let socket: WebSocket | null = null;
+/*
+if (localStorage.getItem('token')){
+  socket = new WebSocket(`ws://localhost:8082?token=${localStorage.getItem('token')}`);
+
+  socket.onopen = () => {
+    console.log("WS connected");
+  };
+
+  socket.onmessage = (event) => {
+    console.log('Received:', event.data)
+    const data = (event.data);
+    handleMessage(data);
+  };
+}
+
+if (!localStorage.getItem('token')) {
+  if (socket){
+    socket.close();
+    socket = null;
+    console.log("WS connection closed")
+  }
+}
+*/
+
+export function connectWebSocket() {
+  if (socket) return; // neotváraj 2x
+
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  socket = new WebSocket(`ws://localhost:8082?token=${token}`);
+
+  socket.onopen = () => console.log("WS connected");
+
+  socket.onmessage = (event) => {
+    const data = event.data;
+    handleMessage(data);
+  };
+
+  socket.onclose = () => {
+    console.log("WS closed");
+    socket = null;
+  };
+}
+
+export function disconnectWebSocket() {
+  if (socket) {
+    socket.close();
+    socket = null;
+  }
+}
+
+if (localStorage.getItem('token')){
+  connectWebSocket();
+}
+
+function handleMessage(message: string) {
+  const data = JSON.parse(message);
+  console.log(data);
+
+  switch (data.type) {
+    case 'status_changed':{
+      const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
+      console.log(user);
+      if (user){
+        user.status = data.activity_status;
+      }
+      console.log(user);
+      break;
+    }
+    case 'invitation_created':{
+      console.log(newInvitations);
+      ChatState.newInvitations.push({id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
+        channel_name: data.channel_name, invited_by: data.invited_by, channel_id: data.channel_id
+      });
+      console.log(newInvitations);
+      break;
+    }
+    case 'message_sent':{
+      console.log(newMessages.length);
+      ChatState.messages.push({channel_id: data.channel_id,
+        sender_name: data.sender_name,
+        sender_id: data.sender_id,
+        receiver_id: data.receiver_id,
+        content: data.content,
+        timestamp: data.timestamp})
+        console.log(newMessages.length);
+        break;
+    }
+  }
+}
+
 const users: User[] = [
   { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online' },
   { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away' },
@@ -451,8 +544,14 @@ if (!users[0]) {
 
 
 
-// const currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
-const currentUser = users[0];
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+//let currentUser = users[0];
+
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) {
+  currentUser = JSON.parse(savedUser);
+}
+
 let currentChannel: Channel = {
   id: "1",
   name: "General",
@@ -501,7 +600,7 @@ if (currentUser.id !== '') {
       newChannels = res.data
       console.log('new; ', newChannels)
       if (newChannels[0]) {
-        currentChannel = newChannels[2]!
+        currentChannel = newChannels[0]!
         currentChannel.users = []
       }
     })
