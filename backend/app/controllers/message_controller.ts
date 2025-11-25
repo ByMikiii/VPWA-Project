@@ -70,7 +70,7 @@ export default class MessageController {
       if (client.readyState === client.OPEN) {
         client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
           channel_id: message.channel_id, sender_id: message.sender_id,
-          receiver_id: message.receiver_id, timestamp: message.createdAt
+          receiver_id: message.receiver_id, timestamp: DateTime.now().toMillis().toString()
         }))
       }
     })

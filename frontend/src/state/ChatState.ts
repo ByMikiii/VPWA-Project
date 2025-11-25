@@ -152,6 +152,14 @@ export function disconnectWebSocket() {
   }
 }
 
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
+//let currentUser = users[0];
+
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) {
+  currentUser = JSON.parse(savedUser);
+}
+
 if (localStorage.getItem('token')){
   connectWebSocket();
 }
@@ -180,14 +188,18 @@ function handleMessage(message: string) {
     }
     case 'message_sent':{
       console.log(newMessages.length);
-      ChatState.messages.push({channel_id: data.channel_id,
-        sender_name: data.sender_name,
-        sender_id: data.sender_id,
-        receiver_id: data.receiver_id,
-        content: data.content,
-        timestamp: data.timestamp})
-        console.log(newMessages.length);
-        break;
+      console.log(currentChannel.id);
+      console.log(data.channel_id);
+      if (data.channel_id == currentChannel.id){
+        ChatState.messages.push({channel_id: data.channel_id,
+          sender_name: data.sender_name,
+          sender_id: data.sender_id,
+          receiver_id: data.receiver_id,
+          content: data.content,
+          timestamp: data.timestamp})
+      }
+      console.log(newMessages.length);
+      break;
     }
   }
 }
@@ -551,15 +563,6 @@ if (!users[0]) {
   throw new Error('cfkdsjf')
 }
 
-
-
-let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
-//let currentUser = users[0];
-
-const savedUser = localStorage.getItem('currentUser');
-if (savedUser) {
-  currentUser = JSON.parse(savedUser);
-}
 
 let currentChannel: Channel = {
   id: "1",
