@@ -149,16 +149,24 @@ if (localStorage.getItem('token')){
 
 function handleMessage(message: string) {
   const data = JSON.parse(message);
+  console.log(data);
 
   switch (data.type) {
     case 'status_changed':{
-      console.log(data);
       const user = currentChannel.users.find(user => user.id == Number(data.user_id));
       console.log(user);
       if (user){
         user.status = data.activity_status;
       }
       console.log(user);
+      break;
+    }
+    case 'invitation_created':{
+      console.log(newInvitations);
+      newInvitations.push({id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
+        channel_name: data.channel_name, invited_by: data.invited_by, channel_id: data.channel_id
+      });
+      console.log(newInvitations);
       break;
     }
   }

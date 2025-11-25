@@ -36,12 +36,10 @@ wss.on('connection', (socket, req) => {
   const userId = decoded.id
 
   connectedUsers.set(userId, socket)
-  console.log(connectedUsers)
 
   socket.on('close', () => {
     connectedUsers.delete(userId)
     console.log("User disconnected:", userId)
-    console.log(connectedUsers)
   })
 
   socket.on('message', (data) => {
