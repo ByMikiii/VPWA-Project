@@ -19,12 +19,14 @@
     surname: string;
     nickname: string;
     id: string;
+    only_mentions: boolean;
   }
 
   const router = useRouter();
 
   async function handleEditProfile(formData: EditProfileFormData) {
-    console.log('Edit profile form data:', formData); 
+    console.log(formData)
+    console.log('Edit profile form data:', formData);
       if (!/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.name) || !/^[A-Za-zÁ-Žá-ž\s'-]+$/.test(formData.surname)) {
         Notify.create("Name and surname can only contain letters, spaces, apostrophes, and hyphens.");
       }
@@ -44,6 +46,7 @@
               ChatState.currentUser.name = formData.name;
               ChatState.currentUser.surname = formData.surname;
               ChatState.currentUser.nickname = formData.nickname;
+              ChatState.currentUser.only_mentions = formData.only_mentions;
               return true;
             })
             .catch(err => {

@@ -16,7 +16,7 @@
       label="Email"
       type="email"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -30,7 +30,7 @@
       label="Name"
       type="text"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -44,7 +44,7 @@
       label="Surname"
       type="text"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -53,12 +53,12 @@
       required
     />
 
-    <q-input v-if="['register', 'editProfile'].includes(mode)" 
+    <q-input v-if="['register', 'editProfile'].includes(mode)"
       v-model="nickname"
       label="Nickame"
       type="text"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -72,7 +72,7 @@
       label="Password"
       type="password"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -81,12 +81,12 @@
       required
     />
 
-    <q-input v-if="['forgottenPassword', 'changePassword'].includes(mode)" 
+    <q-input v-if="['forgottenPassword', 'changePassword'].includes(mode)"
       v-model="newPassword"
       label="New Password"
       type="password"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -95,12 +95,12 @@
       required
     />
 
-    <q-input v-if="['register', 'forgottenPassword', 'changePassword'].includes(mode)" 
+    <q-input v-if="['register', 'forgottenPassword', 'changePassword'].includes(mode)"
       v-model="repeatPassword"
       label="Repeat password"
       type="password"
       color="accent"
-      label-color="accent"  
+      label-color="accent"
       text-color="accent"
       rounded outlined
       field-border-color="accent"
@@ -108,13 +108,21 @@
       class = "q-mt-md"
       required
     />
+
+    <q-toggle v-if="['editProfile'].includes(mode)"
+      v-model="only_mentions"
+      label="Only Mentions Notifications"
+      color="secondary"
+      class="row full-width justify-center"
+    />
+
     <q-card-section class="q-mt-lg flex justify-center">
-      <q-btn 
-        type="submit" 
-        label="Submit" 
-        rounded 
-        outlined 
-        color="accent" 
+      <q-btn
+        type="submit"
+        label="Submit"
+        rounded
+        outlined
+        color="accent"
         text-color="primary"
         size="md"
         class="q-px-lg"
@@ -123,14 +131,14 @@
 
 
     <p v-if = 'mode === "login"' class = "q-mt-md full-width text-center">
-        Don't have an account? 
+        Don't have an account?
         <router-link to="/register" class="custom-link">Register here</router-link>
         <br>
         Forgotten password?
         <router-link to="/forgottenPassword" class="custom-link">Renew password here</router-link>
-    </p> 
+    </p>
     <p v-else-if = 'mode === "register"' class = "q-mt-md full-width text-center">
-        Already have an account? 
+        Already have an account?
         <router-link to="/login" class="custom-link">Login here</router-link>
     </p>
   </q-form>
@@ -154,14 +162,17 @@
     const nickname = ref('');
     const repeatPassword = ref('');
     const newPassword = ref('');
+    const only_mentions = ref(false)
 
     if (mode === 'editProfile') {
       email.value = ChatState.currentUser.email;
       name.value = ChatState.currentUser.name;
       surname.value = ChatState.currentUser.surname;
       nickname.value = ChatState.currentUser.nickname;
+      only_mentions.value = ChatState.currentUser.only_mentions;
+      console.log(only_mentions.value)
+      console.log(ChatState.currentUser.only_mentions)
     }
-
 
     const emit = defineEmits(['submit']);
 
@@ -173,7 +184,8 @@
             surname: surname.value,
             nickname: nickname.value,
             newPassword: newPassword.value,
-            repeatPassword: repeatPassword.value
+            repeatPassword: repeatPassword.value,
+            only_mentions: only_mentions.value
         });
     }
 

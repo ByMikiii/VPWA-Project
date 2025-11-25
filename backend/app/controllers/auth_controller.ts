@@ -90,7 +90,7 @@ export default class AuthController {
 
     const user = await User.findBy('id', payload.id)
 
-    if(!user) {
+    if (!user) {
       return response.notFound({ message: 'Not found' })
     }
 
@@ -102,7 +102,7 @@ export default class AuthController {
       return response.badRequest({ message: 'Passwords have to be same' })
     }
 
-    if(payload.password == payload.newPassword) {
+    if (payload.password == payload.newPassword) {
       return response.badRequest({ message: 'New password and old password have to be different' })
     }
 
@@ -124,7 +124,7 @@ export default class AuthController {
 
     const user = await User.findBy('email', payload.email)
 
-    if(!user) {
+    if (!user) {
       return response.notFound({ message: 'User with such e-mail does not exist' })
     }
 
@@ -148,7 +148,7 @@ export default class AuthController {
 
     const user = await User.findBy('id', payload.id)
 
-    if(!user) {
+    if (!user) {
       return response.notFound({ message: 'User with such e-mail does not exist' })
     }
 
@@ -180,6 +180,7 @@ export default class AuthController {
     user.name = payload.name
     user.surname = payload.surname
     user.nickname = payload.nickname
+    user.only_mentions = payload.only_mentions
     await user.save()
 
     return response.ok({ message: 'Profile edited successfully' })

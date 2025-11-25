@@ -24,13 +24,13 @@
     >
       <div class="notif-info">
         <div class="notif-header">
-          <span class="notif-user">{{ notif.user }}</span>
+          <span class="notif-user">{{ notif.sender_name }}</span>
           <span> in </span>
-          <span class="notif-user">#{{ notif.channel }}</span>
+          <span class="notif-user">#{{ notif.channel_name }}</span>
         </div>
-        <p class="notif-message">{{ notif.message }}</p>
+        <p class="notif-message">{{ notif.content }}</p>
       </div>
-      <button class="notif-remove absolute" @click.stop="removeNotification(index)">
+      <button class="notif-remove absolute" @click.stop="removeNotification(notif.notification_id)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
@@ -55,6 +55,12 @@
 <script setup lang="ts">
   import { inject, ref } from 'vue';
   import type { ChatState } from 'src/state/ChatState';
+  import { Notify } from 'quasar';
+  import axios from 'axios';
+
+  const api = axios.create({
+    baseURL: 'http://localhost:3333'
+  });
 
   const state = inject('ChatState') as typeof ChatState
 
@@ -63,7 +69,18 @@
     showList.value = !showList.value
   }
 
-  const removeNotification = (index: number) => {
-    state.notifications.splice(index, 1)
+  const removeNotification = async (index: string) => {
+    await api.post<string>('/readNotification', {
+      notification_id: index
+    })
+        .then(res =>  {
+          // Notify.create(res.data);
+          console.log(res.data)
+          // state.channels.push(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+    // state.notifications.splice(index, 1)
   }
 </script>

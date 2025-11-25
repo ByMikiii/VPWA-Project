@@ -338,9 +338,6 @@ watch(
     case '/invite':
       handleInvite(arg!).catch(console.error)
       break
-    case '/kick':
-      console.log('kick')
-      break
     case '/join':
       console.log('join')
       handleCreate(arg!, arg2).catch(console.error)

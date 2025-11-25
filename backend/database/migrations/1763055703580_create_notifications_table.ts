@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.boolean('is_read').defaultTo(false).notNullable()
       table.integer('user_id').references('id').inTable('users')
+      table.integer('message_id').references('id').inTable('messages')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
