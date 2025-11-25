@@ -173,7 +173,7 @@
   import ProfilePicture from 'components/ProfilePicture.vue';
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { UserStatus, ChannelRole, ChannelUsers, ChatState, MessageData, Channel } from '../state/ChatState'
+  import type { UserStatus, ChannelRole, ChannelUsers, ChatState, Channel } from '../state/ChatState'
   import { Notify } from 'quasar'
 
   const state = inject('ChatState') as typeof ChatState
@@ -215,8 +215,9 @@
   })
 
 watch(
-  () => state.messages.values.length,
+  () => state.messages.length,
   async () => {
+    console.log("new messages time to scroll")
     await nextTick()
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight

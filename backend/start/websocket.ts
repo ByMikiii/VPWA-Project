@@ -9,7 +9,7 @@ wss.on('connection', (socket, req) => {
   console.log('WS client connected')
   let token
 
-  if (req.url){
+  if (req.url) {
     const params = new URLSearchParams(req.url.replace('/?', ''))
     token = params.get('token')
   }

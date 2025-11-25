@@ -152,7 +152,7 @@ export function disconnectWebSocket() {
   }
 }
 
-if (localStorage.getItem('token')){
+if (localStorage.getItem('token')) {
   connectWebSocket();
 }
 
@@ -161,33 +161,36 @@ function handleMessage(message: string) {
   console.log(data);
 
   switch (data.type) {
-    case 'status_changed':{
+    case 'status_changed': {
       const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
       console.log(user);
-      if (user){
+      if (user) {
         user.status = data.activity_status;
       }
       console.log(user);
       break;
     }
-    case 'invitation_created':{
+    case 'invitation_created': {
       console.log(newInvitations);
-      ChatState.newInvitations.push({id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
+      ChatState.newInvitations.push({
+        id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
         channel_name: data.channel_name, invited_by: data.invited_by, channel_id: data.channel_id
       });
       console.log(newInvitations);
       break;
     }
-    case 'message_sent':{
+    case 'message_sent': {
       console.log(newMessages.length);
-      ChatState.messages.push({channel_id: data.channel_id,
+      ChatState.messages.push({
+        channel_id: data.channel_id,
         sender_name: data.sender_name,
         sender_id: data.sender_id,
         receiver_id: data.receiver_id,
         content: data.content,
-        timestamp: data.timestamp})
-        console.log(newMessages.length);
-        break;
+        timestamp: data.timestamp
+      })
+      console.log(newMessages.length);
+      break;
     }
   }
 }
