@@ -553,7 +553,7 @@ if (!users[0]) {
 
 
 
-let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline" };
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
 //let currentUser = users[0];
 
 const savedUser = localStorage.getItem('currentUser');

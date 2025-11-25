@@ -175,7 +175,6 @@
   import { computed, inject, ref, watch, nextTick  } from 'vue'
   import type { UserStatus, ChannelRole, ChannelUsers, ChatState, MessageData, Channel } from '../state/ChatState'
   import { Notify } from 'quasar'
-  import axios from 'axios';
 
   const state = inject('ChatState') as typeof ChatState
   const roles: ChannelRole[] = ['Owner', 'Admin', 'Moderator', 'Guest']
@@ -183,12 +182,6 @@
   const usersByRole = (role: ChannelUsers['role']) =>
     state.currentChannel.users.filter(user => user.role === role)
 
-
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
-  import type { ChatState } from '../state/ChatState'
-  import { Notify } from 'quasar'
   import { api } from 'boot/axios';
 
   console.log(state.currentChannel.id)

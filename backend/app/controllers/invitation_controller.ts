@@ -45,15 +45,10 @@ export default class InvitationController {
       return response.conflict('Cannot invite this user')
     }
 
-    const channel = await Channel
-      .query()
-      .where('id', payload.channelId)
-      .first()
-
-      const sender = await User
-      .query()
-      .where('id', payload.invitedBy)
-      .first()
+    const sender = await User
+    .query()
+    .where('id', payload.invitedBy)
+    .first()
 
     if (!user) {
       return response.conflict({ message: 'User does not exist!' })
