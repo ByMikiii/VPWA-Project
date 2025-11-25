@@ -143,7 +143,7 @@
 <script setup lang="ts">
   import ChatMessage from 'components/ChatMessage.vue'
   import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { ChatState, MessageData } from '../state/ChatState'
+  import type { ChatState } from '../state/ChatState'
   import { Notify } from 'quasar'
   import { api } from 'boot/axios';
 
@@ -208,6 +208,7 @@ watch(
     })
       .then(res =>  {
         Notify.create('Message has been sent!');
+        /*
         const newMessage: MessageData = {
           channel_id: state.currentChannel.id,
           sender_id: res.data.sender_id,
@@ -217,6 +218,7 @@ watch(
           timestamp: res.data.timestamp
         }
         state.messages.push(newMessage)
+        */
         chatText.value = '';
         console.log(res.data.message)
       })

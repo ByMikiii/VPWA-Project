@@ -169,6 +169,17 @@ function handleMessage(message: string) {
       console.log(newInvitations);
       break;
     }
+    case 'message_sent':{
+      console.log(newMessages.length);
+      ChatState.messages.push({channel_id: data.channel_id,
+        sender_name: data.sender_name,
+        sender_id: data.sender_id,
+        receiver_id: data.receiver_id,
+        content: data.content,
+        timestamp: data.timestamp})
+        console.log(newMessages.length);
+        break;
+    }
   }
 }
 

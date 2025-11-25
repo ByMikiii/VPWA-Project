@@ -5,6 +5,7 @@ import Member from '#models/member'
 import User from '#models/user'
 import Message from '#models/message'
 import Jwt from 'jsonwebtoken'
+import { connectedUsers } from '../../start/websocket.js'
 
 export default class MessageController {
   public async sendMessage({ request, response }: HttpContext) {
@@ -49,6 +50,15 @@ export default class MessageController {
     message.sender_id = Number(decoded.id);
     message.channel_id = payload.channel_id
     await message.save()
+
+    connectedUsers.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
+          channel_id: message.channel_id, sender_id: message.sender_id,
+          receiver_id: message.receiver_id, timestamp: message.createdAt
+        }))
+      }
+    })
 
     return response.ok({
       channel_id: message.channel_id,
