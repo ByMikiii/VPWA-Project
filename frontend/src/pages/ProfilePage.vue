@@ -102,11 +102,8 @@
     import ProfilePicture from '../components/ProfilePicture.vue';
     import StatusDropdown from '../components/StatusDropdown.vue';
 
-    import axios from 'axios';
-
-    const api = axios.create({
-      baseURL: 'http://localhost:3333'
-    });
+    import { api } from 'boot/axios';
+    import { disconnectWebSocket } from '../state/ChatState';
 
     const user = ChatState.currentUser;
 
@@ -117,9 +114,13 @@
       message: string;
     }
     const logout = async () => {
-      await api.post<LogoutResponse>('/logout', { id: ChatState.currentUser.id })
+      await api.post<LogoutResponse>('/logout')
         .then(res =>  {
           Notify.create(res.data.message);
+          const user = ChatState.currentChannel.users.find(user => user.id == Number(ChatState.currentUser.id));
+          if(user){
+            user.status = 'Offline';
+          }
           ChatState.currentUser = {
             id: '',
             nickname: '',
@@ -129,6 +130,9 @@
             status: 'Offline',
             only_mentions: false
           };
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('token');
+          disconnectWebSocket();
         })
 
       await router.push('/login');

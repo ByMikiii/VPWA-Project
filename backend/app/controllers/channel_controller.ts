@@ -53,7 +53,7 @@ export default class ChannelController {
     const user_id = request.qs().user_id
     console.log(user_id)
     if (!user_id) {
-      return response.badRequest({ error: 'user_id is required' })
+      return response.badRequest({ message: 'user_id is required' })
     }
 
     const memberships = await Member

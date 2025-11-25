@@ -187,6 +187,9 @@
   const api = axios.create({
     baseURL: 'http://localhost:3333'
   });
+  import type { ChatState } from '../state/ChatState'
+  import { Notify } from 'quasar'
+  import { api } from 'boot/axios';
 
   console.log(state.currentChannel.id)
   const showUsersWin = ref(false)
@@ -259,11 +262,11 @@ watch(
     await api.post<MessageResponse>('/messages', {
       message: text,
       receiver_id: "",
-      sender_id: state.currentUser.id,
       channel_id: state.currentChannel.id
     })
       .then(res =>  {
         Notify.create('Message has been sent!');
+        /*
         const newMessage: MessageData = {
           channel_id: state.currentChannel.id,
           sender_id: res.data.sender_id,
@@ -273,6 +276,7 @@ watch(
           timestamp: res.data.timestamp
         }
         state.messages.push(newMessage)
+        */
         chatText.value = '';
         console.log(res.data.message)
       })

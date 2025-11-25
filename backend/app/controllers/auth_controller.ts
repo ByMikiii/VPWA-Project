@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
+import Jwt from 'jsonwebtoken'
 
 export default class AuthController {
   public async register({ request, response }: HttpContext) {
@@ -40,7 +41,13 @@ export default class AuthController {
     user.activity_status = 'Online'
     await user.save()
 
-    return response.ok({ message: 'Registered successfully', user: user })
+    const token = Jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
+    )
+
+    return response.ok({ message: 'Registered successfully', user: user, token: token })
   }
 
 
@@ -63,26 +70,50 @@ export default class AuthController {
     user.activity_status = 'Online'
     await user.save()
 
-    return response.ok({ message: 'Logged in successfully', user: user })
+    const token = Jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
+    )
+
+    return response.ok({ message: 'Logged in successfully', user: user, token: token })
   }
 
 
   public async logout({ request, response }: HttpContext) {
-    const payload = request.body()
-    console.log(payload, "fdksfksdhjfkl jsdklhjf klsdhkl fsdkl")
+    const payload = request.header('authorization')
 
-    const user = await User.findBy('id', payload.id)
+    if (!payload){
+      return response.noContent()
+    }
+
+    const token = payload?.replace(/^Bearer\s+/, '')
+
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+      console.log('Decoded token:', decoded)
+    } catch (err) {
+      console.error('JWT verify error:', err)
+      return response.noContent()
+    }
+
+    const user = await User.find(decoded.id)
 
     if (user) {
       user.activity_status = 'Offline'
       await user.save()
     }
-    else {
-      return response.noContent()
-    }
 
     return response.ok({ message: 'Logged out successfully' })
   }
+
 
 
   public async change_password({ request, response }: HttpContext) {

@@ -6,19 +6,43 @@ import User from '#models/user'
 import Message from '#models/message'
 import { DateTime } from 'luxon'
 
+import Jwt from 'jsonwebtoken'
+import { connectedUsers } from '../../start/websocket.js'
 
 export default class MessageController {
   public async sendMessage({ request, response }: HttpContext) {
     const payload = request.body()
 
+    const header_token = request.header('authorization')
+    console.log(header_token)
+    if (!header_token){
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
+    const token = header_token.replace('Bearer ', '')
+    console.log(token)
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    console.log(decoded.id)
+    const sender = await User.find(decoded.id)
+
     const channel = await Channel.find(payload.channel_id)
-    const sender = await User.find(payload.sender_id)
     const member = await Member
       .query()
       .where('channel_id', payload.channel_id)
-      .andWhere('user_id', payload.sender_id)
+      .andWhere('user_id', decoded.id)
       .first()
-    if (!payload.message || !payload.sender_id || !sender || !channel || !member) {
+    if (!payload.message || !decoded.id || !sender || !channel || !member) {
       return response.badRequest({ message: 'Failed to send a message!' })
     }
 
@@ -36,12 +60,20 @@ export default class MessageController {
     const message = new Message()
     message.message = payload.message;
     message.receiver_id = payload.receiver_id;
-    message.sender_id = payload.sender_id;
+    message.sender_id = Number(decoded.id);
     message.channel_id = payload.channel_id
     await message.save()
 
     channel.latest_activity = DateTime.now()
     channel.save()
+    connectedUsers.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
+          channel_id: message.channel_id, sender_id: message.sender_id,
+          receiver_id: message.receiver_id, timestamp: message.createdAt
+        }))
+      }
+    })
 
     return response.ok({
       channel_id: message.channel_id,

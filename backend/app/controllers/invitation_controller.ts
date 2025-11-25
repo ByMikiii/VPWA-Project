@@ -4,6 +4,7 @@ import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
 import Invitation from '#models/invitation'
+import { connectedUsers } from '../../start/websocket.js'
 
 export default class InvitationController {
 
@@ -44,6 +45,20 @@ export default class InvitationController {
       return response.conflict('Cannot invite this user')
     }
 
+    const channel = await Channel
+      .query()
+      .where('id', payload.channelId)
+      .first()
+
+      const sender = await User
+      .query()
+      .where('id', payload.invitedBy)
+      .first()
+
+    if (!user) {
+      return response.conflict({ message: 'User does not exist!' })
+    }
+
     const invitation = new Invitation()
     invitation.accepted = false;
     invitation.invited_by = payload.invitedBy;
@@ -52,6 +67,17 @@ export default class InvitationController {
     invitation.string_code = [...Array(8)].map(() => (~~(Math.random() * 36)).toString(36)).join('').toUpperCase();
     invitation.valid_till = DateTime.now().plus({ days: 7 })
     await invitation.save()
+
+    const client = connectedUsers.get(user.id)
+    console.log(client)
+    if (client.readyState === client.OPEN) {
+      client.send(JSON.stringify({ type: "invitation_created", id: invitation.id,
+        string_code: invitation.string_code, valid_till: invitation.valid_till,
+        invited_by_username: sender?.nickname, channel_name: channel?.name, invited_by:invitation.invited_by,
+        channel_id: invitation.channel_id
+        }))
+    }
+    
 
     return response.ok({ message: 'Invitation has beed sent!' })
   }
