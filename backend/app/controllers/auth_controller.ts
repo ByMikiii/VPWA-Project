@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 import Jwt from 'jsonwebtoken'
+import { connectedUsers } from '../../start/websocket.js'
 
 export default class AuthController {
   public async register({ request, response }: HttpContext) {
@@ -47,6 +48,12 @@ export default class AuthController {
       { expiresIn: '1h' }
     )
 
+    connectedUsers.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(JSON.stringify({ type: "status_changed", user_id: user.id, activity_status: user.activity_status }))
+      }
+    })
+
     return response.ok({ message: 'Registered successfully', user: user, token: token })
   }
 
@@ -75,6 +82,12 @@ export default class AuthController {
       process.env.JWT_SECRET!,
       { expiresIn: '1h' }
     )
+
+    connectedUsers.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(JSON.stringify({ type: "status_changed", user_id: user.id, activity_status: user.activity_status }))
+      }
+    })
 
     return response.ok({ message: 'Logged in successfully', user: user, token: token })
   }
@@ -109,6 +122,12 @@ export default class AuthController {
     if (user) {
       user.activity_status = 'Offline'
       await user.save()
+
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "status_changed", user_id: user.id, activity_status: user.activity_status }))
+        }
+      })
     }
 
     return response.ok({ message: 'Logged out successfully' })
@@ -207,12 +226,21 @@ export default class AuthController {
       return response.conflict({ message: 'Nickname already in use' })
     }
 
+    if (user.nickname != payload.nickname){ //changed username
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "nickname_changed", user_id: user.id, nickname: payload.nickname}))
+        }
+      })
+    }
+
     user.email = payload.email
     user.name = payload.name
     user.surname = payload.surname
     user.nickname = payload.nickname
     user.only_mentions = payload.only_mentions
     await user.save()
+
 
     return response.ok({ message: 'Profile edited successfully' })
   }

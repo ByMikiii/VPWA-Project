@@ -201,6 +201,19 @@ function handleMessage(message: string) {
       console.log(newMessages.length);
       break;
     }
+    case 'nickname_changed':{
+      const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
+      console.log(user);
+      if (user){
+        user.username = data.nickname;
+      }
+      console.log(user);
+      break;
+    }
+    case 'new_channel_user':{
+      ChatState.currentChannel.users.push({id: data.user.id, username: data.user.nickname, 
+        role: "Guest", status: data.user.activityStatus});
+    }
   }
 }
 
