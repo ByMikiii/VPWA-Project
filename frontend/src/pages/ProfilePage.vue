@@ -103,6 +103,7 @@
     import StatusDropdown from '../components/StatusDropdown.vue';
 
     import { api } from 'boot/axios';
+    import { disconnectWebSocket } from '../state/ChatState';
 
     const user = ChatState.currentUser;
 
@@ -116,6 +117,10 @@
       await api.post<LogoutResponse>('/logout')
         .then(res =>  {
           Notify.create(res.data.message);
+          const user = ChatState.currentChannel.users.find(user => user.id == Number(ChatState.currentUser.id));
+          if(user){
+            user.status = 'Offline';
+          }
           ChatState.currentUser = {
             id: '',
             nickname: '',
@@ -126,6 +131,7 @@
           };
           localStorage.removeItem('currentUser');
           localStorage.removeItem('token');
+          disconnectWebSocket();
         })
 
       await router.push('/login');

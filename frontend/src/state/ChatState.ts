@@ -90,19 +90,69 @@ export interface ChannelUsers {
   status: UserStatus
 }
 
-const socket = new WebSocket("ws://localhost:8082");
+let socket: WebSocket | null = null;
+/*
+if (localStorage.getItem('token')){
+  socket = new WebSocket(`ws://localhost:8082?token=${localStorage.getItem('token')}`);
 
-socket.onmessage = (event) => {
-  console.log('Received:', event.data)
-  const data = (event.data);
-  handleMessage(data);
-};
+  socket.onopen = () => {
+    console.log("WS connected");
+  };
+
+  socket.onmessage = (event) => {
+    console.log('Received:', event.data)
+    const data = (event.data);
+    handleMessage(data);
+  };
+}
+
+if (!localStorage.getItem('token')) {
+  if (socket){
+    socket.close();
+    socket = null;
+    console.log("WS connection closed")
+  }
+}
+*/
+
+export function connectWebSocket() {
+  if (socket) return; // neotváraj 2x
+
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  socket = new WebSocket(`ws://localhost:8082?token=${token}`);
+
+  socket.onopen = () => console.log("WS connected");
+
+  socket.onmessage = (event) => {
+    const data = event.data;
+    handleMessage(data);
+  };
+
+  socket.onclose = () => {
+    console.log("WS closed");
+    socket = null;
+  };
+}
+
+export function disconnectWebSocket() {
+  if (socket) {
+    socket.close();
+    socket = null;
+  }
+}
+
+if (localStorage.getItem('token')){
+  connectWebSocket();
+}
 
 function handleMessage(message: string) {
   const data = JSON.parse(message);
 
   switch (data.type) {
     case 'status_changed':{
+      console.log(data);
       const user = currentChannel.users.find(user => user.id == Number(data.user_id));
       console.log(user);
       if (user){

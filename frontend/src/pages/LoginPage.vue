@@ -7,7 +7,7 @@
   import { useRouter } from 'vue-router';
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
-
+  import { connectWebSocket } from '../state/ChatState';
   import axios from 'axios';
 
   const api = axios.create({
@@ -45,8 +45,13 @@
           ChatState.currentUser.surname = res.data.user.surname;
           ChatState.currentUser.nickname = res.data.user.nickname;
           ChatState.currentUser.status = 'Online';
+          const user = ChatState.currentChannel.users.find(user => user.id == Number(ChatState.currentUser.id));
+          if(user){
+            user.status = 'Online';
+          }
           localStorage.setItem('currentUser', JSON.stringify(ChatState.currentUser));
           localStorage.setItem('token', res.data.token);
+          connectWebSocket();
           return true;
         })
         .catch(err => {

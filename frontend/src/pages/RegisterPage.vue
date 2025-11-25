@@ -8,6 +8,7 @@
   import { ChatState } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
+  import { connectWebSocket } from '../state/ChatState';
 
   const api = axios.create({
     baseURL: 'http://localhost:3333'
@@ -65,6 +66,7 @@
         localStorage.setItem('token', res.data.token);
         console.log(ChatState.currentUser.id);
         console.log(res.data.user.id);
+        connectWebSocket();
         return true;
       })
       .catch(err => {

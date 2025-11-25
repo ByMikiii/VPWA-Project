@@ -3,7 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 // import Member from '#models/member'
 import User from '#models/user'
 import Member from '#models/member'
-import wss from '../../start/websocket.js'
+import { connectedUsers } from '../../start/websocket.js'
 
 
 export default class UserController {
@@ -18,7 +18,7 @@ export default class UserController {
     user.activity_status = payload.status
     await user.save()
 
-    wss.clients.forEach((client) => {
+    connectedUsers.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(JSON.stringify({ type: "status_changed", user_id: user.id, activity_status: user.activity_status }))
       }

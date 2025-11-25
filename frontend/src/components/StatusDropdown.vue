@@ -62,6 +62,7 @@
     if(user){
       user.status = status;
     }
+    localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
   }
 </script>
 
