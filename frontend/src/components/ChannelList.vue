@@ -53,7 +53,7 @@
           </div>
         </li>
       </ul>
-      <div v-for="channel in state.channels" :key="channel.id" class="channel-button text-left row items-center" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
+      <div v-for="channel in state.channels" :key="channel.id" class="channel-button text-left row items-center justify-between" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
         <button class="channel-but row items-center" @click="handleChannelChange(channel)">
           <svg
             v-if="!channel.isPrivate"
@@ -235,7 +235,7 @@ const toggleChannels = () => {
 
 <style scoped>
   .channel-but {
-    width: 85%;
+    width: 84%;
     padding: 0.5rem 0;
     padding-left: 1rem;
   }

@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 import Channel from '#models/channel'
 import Member from '#models/member'
+import User from '#models/user'
 
 export default class MemberController {
   public async leaveChannel({ request, response }: HttpContext) {
@@ -36,9 +37,18 @@ export default class MemberController {
   public async kickFromChannel({ request, response }: HttpContext) {
     const payload = request.body()
 
-    const existingMember = await Member
+    const user = await User
       .query()
       .where('nickname', payload.username)
+      .first()
+
+    if (!user) {
+      return response.notFound({ message: 'User does not exist!' })
+    }
+
+    const existingMember = await Member
+      .query()
+      .where('user_id', user.id)
       .andWhere('channel_id', payload.channel_id)
       .first()
 

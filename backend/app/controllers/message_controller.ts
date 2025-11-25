@@ -15,10 +15,10 @@ export default class MessageController {
 
     const header_token = request.header('authorization')
     console.log(header_token)
-    if (!header_token){
+    if (!header_token) {
       return response.unauthorized({ message: "Invalid token" })
     }
-    
+
     const token = header_token.replace('Bearer ', '')
     console.log(token)
     interface JwtUserPayload {
@@ -41,6 +41,7 @@ export default class MessageController {
       .query()
       .where('channel_id', payload.channel_id)
       .andWhere('user_id', decoded.id)
+      .andWhere('is_kicked', '!=', true)
       .first()
     if (!payload.message || !decoded.id || !sender || !channel || !member) {
       return response.badRequest({ message: 'Failed to send a message!' })
@@ -68,7 +69,8 @@ export default class MessageController {
     channel.save()
     connectedUsers.forEach((client) => {
       if (client.readyState === client.OPEN) {
-        client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
+        client.send(JSON.stringify({
+          type: "message_sent", content: message.message, sender_name: sender.nickname,
           channel_id: message.channel_id, sender_id: message.sender_id,
           receiver_id: message.receiver_id, timestamp: message.createdAt
         }))

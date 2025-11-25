@@ -103,6 +103,7 @@ export default class InvitationController {
 
     if (payload.is_accepted === true) {
       existingInvitation.accepted = true;
+      existingInvitation.save()
       const member = new Member()
       member.is_kicked = false;
       member.kick_count = 0;
@@ -134,6 +135,7 @@ export default class InvitationController {
       .query()
       .where('receiver_id', user_id)
       .andWhere('valid_till', '>', DateTime.now().toJSDate())
+      .andWhere('accepted', '!=', 1)
       .join('users', 'invitations.invited_by', 'users.id')
       .join('channels', 'invitations.channel_id', 'channels.id')
       .select(

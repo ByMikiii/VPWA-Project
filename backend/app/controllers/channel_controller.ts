@@ -59,6 +59,7 @@ export default class ChannelController {
     const memberships = await Member
       .query()
       .where('user_id', user_id)
+      .andWhere('is_kicked', '!=', true)
       .select('channel_id')
 
     const channelIds = memberships.map((m) => m.channel_id)
