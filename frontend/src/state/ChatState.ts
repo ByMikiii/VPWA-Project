@@ -100,7 +100,8 @@ export interface ChannelUsers {
 }
 
 export interface ChatTypingUser {
-  user_id: number
+  channel_id: string
+  user_id: string
   username: string
   message: string
 }
@@ -143,6 +144,7 @@ export function connectWebSocket() {
   socket.onmessage = (event) => {
     const data = event.data;
     handleMessage(data);
+    console.log(data)
   };
 
   socket.onclose = () => {

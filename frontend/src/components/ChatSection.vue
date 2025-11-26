@@ -147,6 +147,7 @@
         spellcheck="false"
         maxlength="200"
         @keydown.enter.prevent="handleEnter($event)"
+        @input="handleTyping"
         >
       </textarea>
       <button class="send-button" @click="handleSend">
@@ -172,8 +173,8 @@
 <script setup lang="ts">
   import ProfilePicture from 'components/ProfilePicture.vue';
   import ChatMessage from 'components/ChatMessage.vue'
-  import { computed, inject, ref, nextTick, watch, onMounted } from 'vue'
-  import type { MessageData, ChannelRole, ChannelUsers, Channel } from '../state/ChatState'
+  import { computed, inject, ref, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+  import type { MessageData, ChannelRole, ChannelUsers, Channel, ChatTypingUser } from '../state/ChatState'
   import { Notify } from 'quasar'
   import { ChatState } from 'src/state/ChatState'
   const offset = ref(20)
@@ -208,6 +209,36 @@
   //   }
   //   state.currentChannel.users.push(userCopy)
   // }
+
+
+  import { connectWebSocket, disconnectWebSocket } from 'src/state/ChatState';
+
+  onMounted(() => {
+    connectWebSocket()
+  })
+  onBeforeUnmount(() => {
+    disconnectWebSocket()
+  })
+
+  function handleTyping() {
+    if (!chatText.value) {
+      return
+    }
+    console.log(chatText.value)
+    const typingData: ChatTypingUser = {
+      channel_id: state.currentChannel.id,
+      user_id: ChatState.currentUser.id,
+      username: ChatState.currentUser.nickname,
+      message: chatText.value
+    }
+    console.log("typing data: ", typingData)
+    // sendWebSocketMessage('typing', {
+    //   channel_id: state.currentChannel.id,
+    //   user_id: ChatState.currentUser.id,
+    //   username: ChatState.currentUser.nickname,
+    //   message: chatText.value
+    // })
+  }
 
   const showUsers = computed(() => chatText.value.startsWith('@'))
     const filteredUsers = computed(() => {
