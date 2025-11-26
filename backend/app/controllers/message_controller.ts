@@ -89,6 +89,8 @@ export default class MessageController {
 
   public async fetchMessages({ request, response }: HttpContext) {
     const channel_id = request.qs().channel_id
+    const limit = request.qs().limit
+    const offset = request.qs().offset
     console.log(channel_id)
     if (!channel_id) {
       return response.badRequest({ error: 'channel_id is required' })
@@ -107,6 +109,9 @@ export default class MessageController {
         'messages.receiver_id',
         'messages.created_at'
       )
+      .limit(limit)
+      .offset(offset)
+      .orderBy('created_at', 'desc')
 
     const messages = messagesTemp.map(msg => ({
       channel_id: msg.channel_id,
@@ -116,7 +121,7 @@ export default class MessageController {
       receiver_id: msg.receiver_id,
       timestamp: msg.createdAt.toMillis().toString()
     }))
-    return messages
+    return messages.reverse()
   }
 
 }

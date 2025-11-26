@@ -239,6 +239,10 @@ const toggleChannels = () => {
     padding: 0.5rem 0;
     padding-left: 1rem;
   }
+  .channel-but span{
+    max-width: 82%;
+    overflow: hidden;
+  }
   button svg {
     opacity: 50%;
   }

@@ -99,6 +99,12 @@ export interface ChannelUsers {
   status: UserStatus
 }
 
+export interface ChatTypingUser {
+  user_id: number
+  username: string
+  message: string
+}
+
 let socket: WebSocket | null = null;
 /*
 if (localStorage.getItem('token')){
@@ -595,7 +601,11 @@ export const fetchChannelData = async () => {
     })
 
   await api.get<MessageData[]>('/messages', {
-    params: { channel_id: currentChannel.id }
+    params: {
+      channel_id: currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
   })
     .then(res => {
       console.log("test: ", res.data)
