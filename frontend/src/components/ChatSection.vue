@@ -241,6 +241,17 @@
      })
   }
 
+  watch(
+  () => ChatState.typingUsers,
+  (newVal) => {
+    if (newVal.length > 0) {
+      const last = newVal[newVal.length - 1]
+      console.log("LATEST TYPING USER:", last?.message)
+    }
+  },
+  { deep: true }
+)
+
   const showUsers = computed(() => chatText.value.startsWith('@'))
     const filteredUsers = computed(() => {
       console.log()

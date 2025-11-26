@@ -115,6 +115,19 @@ export default class InvitationController {
         .query()
         .where('id', payload.channel_id)
         .first()
+
+      const user = await User
+        .query()
+        .where('id', payload.receiver_id)
+        .first()
+
+      if (channel){
+        connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "new_channel_user", channel_id: channel.id, user: user}))
+        }
+        })
+      }
       return response.ok(channel)
     } else {
       existingInvitation.valid_till = DateTime.now();
