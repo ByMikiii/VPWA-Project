@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { Notify } from 'quasar';
 import axios from 'axios';
+import { AppVisibility } from 'quasar'
 
 const api = axios.create({
   baseURL: 'http://localhost:3333'
@@ -134,9 +135,9 @@ export function connectWebSocket() {
 
   socket.onopen = () => console.log("WS connected");
 
-  socket.onmessage = (event) => {
+  socket.onmessage = async (event) => {
     const data = event.data;
-    handleMessage(data);
+    await handleMessage(data);
   };
 
   socket.onclose = () => {
@@ -152,11 +153,19 @@ export function disconnectWebSocket() {
   }
 }
 
+let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
+//let currentUser = users[0];
+
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) {
+  currentUser = JSON.parse(savedUser);
+}
+
 if (localStorage.getItem('token')){
   connectWebSocket();
 }
 
-function handleMessage(message: string) {
+async function handleMessage(message: string) {
   const data = JSON.parse(message);
   console.log(data);
 
@@ -179,17 +188,67 @@ function handleMessage(message: string) {
       break;
     }
     case 'message_sent':{
-      console.log(newMessages.length);
-      ChatState.messages.push({channel_id: data.channel_id,
-        sender_name: data.sender_name,
-        sender_id: data.sender_id,
-        receiver_id: data.receiver_id,
-        content: data.content,
-        timestamp: data.timestamp})
-        console.log(newMessages.length);
+      console.log(ChatState.currentChannel.id);
+      console.log(data.channel_id);
+      if (data.channel_id == ChatState.currentChannel.id){
+        ChatState.messages.push({channel_id: data.channel_id,
+          sender_name: data.sender_name,
+          sender_id: data.sender_id,
+          receiver_id: data.receiver_id,
+          content: data.content,
+          timestamp: data.timestamp})
+      }
+      console.log(ChatState.currentUser);
+      
+      if (data.sender_id == ChatState.currentUser.id){
         break;
+      }
+
+      if (ChatState.currentUser.status == "Do Not Disturb" || ChatState.currentUser.status == "Offline"){
+        break;
+      }
+      
+      if (ChatState.currentUser.only_mentions && data.receiver_id != ChatState.currentUser.id){
+        break;
+      }
+
+      await handleNewNotification(data.message_id);
+
+      break;
+    }
+    case 'nickname_changed':{
+      const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
+      console.log(user);
+      if (user){
+        user.username = data.nickname;
+      }
+      console.log(user);
+      break;
+    }
+    case 'new_channel_user':{
+      ChatState.currentChannel.users.push({id: data.user.id, username: data.user.nickname, 
+        role: "Guest", status: data.user.activityStatus});
     }
   }
+}
+
+async function handleNewNotification(message_id: number){
+  if (AppVisibility.appVisible){
+    return
+  }
+  await api.post<NotificationData>('/notifications', {
+    user_id: currentUser.id,  message_id: message_id, 
+  })
+    .then(res => {
+      console.log(ChatState.notifications);
+      ChatState.notifications.push({ user_id: res.data.user_id, sender_name: res.data.sender_name,
+        channel_name: res.data.channel_name, content: res.data.content, notification_id: res.data.notification_id
+       });
+      console.log(ChatState.notifications);
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
 }
 
 const users: User[] = [
@@ -551,15 +610,6 @@ if (!users[0]) {
   throw new Error('cfkdsjf')
 }
 
-
-
-let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
-//let currentUser = users[0];
-
-const savedUser = localStorage.getItem('currentUser');
-if (savedUser) {
-  currentUser = JSON.parse(savedUser);
-}
 
 let currentChannel: Channel = {
   id: "1",
