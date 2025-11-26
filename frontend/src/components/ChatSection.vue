@@ -211,7 +211,7 @@
   // }
 
 
-  import { connectWebSocket, disconnectWebSocket } from 'src/state/ChatState';
+  import { connectWebSocket, disconnectWebSocket, sendWebSocketMessage } from 'src/state/ChatState';
 
   onMounted(() => {
     connectWebSocket()
@@ -232,12 +232,13 @@
       message: chatText.value
     }
     console.log("typing data: ", typingData)
-    // sendWebSocketMessage('typing', {
-    //   channel_id: state.currentChannel.id,
-    //   user_id: ChatState.currentUser.id,
-    //   username: ChatState.currentUser.nickname,
-    //   message: chatText.value
-    // })
+
+    sendWebSocketMessage('typing', {
+      channel_id: state.currentChannel.id,
+      user_id: ChatState.currentUser.id,
+      username: ChatState.currentUser.nickname,
+      message: chatText.value
+     })
   }
 
   const showUsers = computed(() => chatText.value.startsWith('@'))

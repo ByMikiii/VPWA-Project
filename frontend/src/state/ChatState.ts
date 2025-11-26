@@ -160,6 +160,12 @@ export function disconnectWebSocket() {
   }
 }
 
+export function sendWebSocketMessage(type: string, data: object){
+  if (socket){
+    socket.send(JSON.stringify({type, data}));
+  }
+}
+
 if (localStorage.getItem('token')) {
   connectWebSocket();
 }
@@ -199,6 +205,14 @@ function handleMessage(message: string) {
       })
       console.log(newMessages.length);
       break;
+    }
+    case 'user_typing':{
+      const newTypingUser: ChatTypingUser = data.message;
+      if (ChatState.currentChannel.id == data.message.channel_id && newTypingUser){
+        const typingUser = ChatState.currentChannel.users.find(user => user.id == Number(newTypingUser.user_id));
+        if (!typingUser)
+          ChatState.typingUsers.push(newTypingUser);
+      }
     }
   }
 }
@@ -589,6 +603,7 @@ let newInvitations: InvitationData[] = [];
 let newChannels: Channel[] = [];
 let newMessages: MessageData[] = [];
 let newNotifications: NotificationData[] = [];
+const typingUsers: ChatTypingUser[] = [];
 
 export const fetchChannelData = async () => {
   await api.get<ChannelUsers[]>('/users', {
@@ -674,5 +689,6 @@ export const ChatState = reactive({
   showUsers: true,
   showChannels: true,
   showChat: true,
-  newInvitations: newInvitations
+  newInvitations: newInvitations,
+  typingUsers: typingUsers
 })
