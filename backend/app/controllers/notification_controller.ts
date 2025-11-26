@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Channel from '#models/channel'
 import Member from '#models/member'
 import Message from '#models/message'
+import User from '#models/user'
 import Notification from '#models/notification'
 
 export default class NotificationController {
@@ -32,13 +33,21 @@ export default class NotificationController {
       return response.notFound({ message: 'User or channel does not exist!' })
     }
 
+    const user = await User.query()
+      .where('id', message.sender_id)
+      .first()
+
     const newNotification = new Notification()
     newNotification.is_read = false;
     newNotification.user_id = receiver.user_id;
     newNotification.message_id = message.id;
     await newNotification.save()
 
-    return response.ok("Notification created!");
+    
+
+    return response.ok({message: "Notification created!", notification_id: newNotification.id, content: message.message,
+      user_id: message.sender_id, sender_name: user?.nickname, channel_name: channel.name
+    });
   }
 
   public async fetchNotifications({ request, response }: HttpContext) {

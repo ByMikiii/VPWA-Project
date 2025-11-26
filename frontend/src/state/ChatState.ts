@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { Notify } from 'quasar';
 import axios from 'axios';
+import { AppVisibility } from 'quasar'
 
 const api = axios.create({
   baseURL: 'http://localhost:3333'
@@ -134,9 +135,9 @@ export function connectWebSocket() {
 
   socket.onopen = () => console.log("WS connected");
 
-  socket.onmessage = (event) => {
+  socket.onmessage = async (event) => {
     const data = event.data;
-    handleMessage(data);
+    await handleMessage(data);
   };
 
   socket.onclose = () => {
@@ -164,7 +165,7 @@ if (localStorage.getItem('token')){
   connectWebSocket();
 }
 
-function handleMessage(message: string) {
+async function handleMessage(message: string) {
   const data = JSON.parse(message);
   console.log(data);
 
@@ -199,6 +200,22 @@ function handleMessage(message: string) {
           timestamp: data.timestamp})
       }
       console.log(newMessages.length);
+      console.log(ChatState.currentUser);
+      
+      if (data.sender_id == ChatState.currentUser.id){
+        break;
+      }
+
+      if (ChatState.currentUser.status == "Do Not Disturb" || ChatState.currentUser.status == "Offline"){
+        break;
+      }
+      
+      if (ChatState.currentUser.only_mentions && data.receiver_id != ChatState.currentUser.id){
+        break;
+      }
+
+      await handleNewNotification(data.message_id);
+
       break;
     }
     case 'nickname_changed':{
@@ -215,6 +232,25 @@ function handleMessage(message: string) {
         role: "Guest", status: data.user.activityStatus});
     }
   }
+}
+
+async function handleNewNotification(message_id: number){
+  if (AppVisibility.appVisible){
+    return
+  }
+  await api.post<NotificationData>('/notifications', {
+    user_id: currentUser.id,  message_id: message_id, 
+  })
+    .then(res => {
+      console.log(ChatState.notifications);
+      ChatState.notifications.push({ user_id: res.data.user_id, sender_name: res.data.sender_name,
+        channel_name: res.data.channel_name, content: res.data.content, notification_id: res.data.notification_id
+       });
+      console.log(ChatState.notifications);
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
 }
 
 const users: User[] = [

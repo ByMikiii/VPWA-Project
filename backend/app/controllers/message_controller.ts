@@ -66,13 +66,16 @@ export default class MessageController {
 
     channel.latest_activity = DateTime.now()
     channel.save()
-    connectedUsers.forEach((client) => {
+    connectedUsers.forEach(async (client, userId) => {
       if (client.readyState === client.OPEN) {
-        client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
-          channel_id: message.channel_id, sender_id: message.sender_id,
-          receiver_id: message.receiver_id, timestamp: DateTime.now().toMillis().toString()
-        }))
-      }
+        const user = await User.find(userId)
+        if (user?.activity_status != "Offline"){
+          client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
+            channel_id: message.channel_id, sender_id: message.sender_id,
+            receiver_id: message.receiver_id, timestamp: DateTime.now().toMillis().toString(), message_id: message.id
+          }))
+        }
+        }
     })
 
     return response.ok({
