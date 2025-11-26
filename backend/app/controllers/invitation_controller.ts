@@ -39,7 +39,7 @@ export default class InvitationController {
     if (existingMember) {
       if (existingMember?.is_kicked === true) {
         existingMember.is_kicked = false
-        existingMember.kick_count = 0
+        existingMember.kick_ids = '';
         existingMember.save()
         return response.ok({ message: 'User has been unbanned!' })
       }
@@ -106,7 +106,7 @@ export default class InvitationController {
       existingInvitation.save()
       const member = new Member()
       member.is_kicked = false;
-      member.kick_count = 0;
+      member.kick_ids = '';
       member.user_id = existingInvitation.receiver_id;
       member.channel_id = existingInvitation.channel_id;
       member.role = "Guest"

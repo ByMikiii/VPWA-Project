@@ -9,7 +9,7 @@ export default class Member extends BaseModel {
   declare is_kicked: boolean
 
   @column()
-  declare kick_count: number
+  declare kick_ids: string
 
   @column()
   declare user_id: number

@@ -29,7 +29,7 @@ export default class ChannelController {
       if (existingChannel.is_private === false && payload.private === false) {
         const member = new Member()
         member.is_kicked = false;
-        member.kick_count = 0;
+        member.kick_ids = '';
         member.user_id = user.id;
         member.channel_id = existingChannel.id;
         member.role = "Guest"
@@ -48,7 +48,7 @@ export default class ChannelController {
 
     const member = new Member()
     member.is_kicked = false;
-    member.kick_count = 0;
+    member.kick_ids = '';
     member.user_id = channel.owner_id;
     member.channel_id = channel.id;
     member.role = "Owner"
