@@ -15,10 +15,10 @@ export default class MessageController {
 
     const header_token = request.header('authorization')
     console.log(header_token)
-    if (!header_token){
+    if (!header_token) {
       return response.unauthorized({ message: "Invalid token" })
     }
-    
+
     const token = header_token.replace('Bearer ', '')
     console.log(token)
     interface JwtUserPayload {
@@ -41,6 +41,7 @@ export default class MessageController {
       .query()
       .where('channel_id', payload.channel_id)
       .andWhere('user_id', decoded.id)
+      .andWhere('is_kicked', '!=', true)
       .first()
     if (!payload.message || !decoded.id || !sender || !channel || !member) {
       return response.badRequest({ message: 'Failed to send a message!' })
@@ -69,13 +70,14 @@ export default class MessageController {
     connectedUsers.forEach(async (client, userId) => {
       if (client.readyState === client.OPEN) {
         const user = await User.find(userId)
-        if (user?.activity_status != "Offline"){
-          client.send(JSON.stringify({ type: "message_sent", content: message.message, sender_name: sender.nickname,
+        if (user?.activity_status != "Offline") {
+          client.send(JSON.stringify({
+            type: "message_sent", content: message.message, sender_name: sender.nickname,
             channel_id: message.channel_id, sender_id: message.sender_id,
             receiver_id: message.receiver_id, timestamp: DateTime.now().toMillis().toString(), message_id: message.id
           }))
         }
-        }
+      }
     })
 
     return response.ok({
@@ -90,6 +92,8 @@ export default class MessageController {
 
   public async fetchMessages({ request, response }: HttpContext) {
     const channel_id = request.qs().channel_id
+    const limit = request.qs().limit
+    const offset = request.qs().offset
     console.log(channel_id)
     if (!channel_id) {
       return response.badRequest({ error: 'channel_id is required' })
@@ -108,6 +112,9 @@ export default class MessageController {
         'messages.receiver_id',
         'messages.created_at'
       )
+      .limit(limit)
+      .offset(offset)
+      .orderBy('created_at', 'desc')
 
     const messages = messagesTemp.map(msg => ({
       channel_id: msg.channel_id,
@@ -117,7 +124,7 @@ export default class MessageController {
       receiver_id: msg.receiver_id,
       timestamp: msg.createdAt.toMillis().toString()
     }))
-    return messages
+    return messages.reverse()
   }
 
 }

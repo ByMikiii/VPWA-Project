@@ -100,6 +100,13 @@ export interface ChannelUsers {
   status: UserStatus
 }
 
+export interface ChatTypingUser {
+  channel_id: string
+  user_id: string
+  username: string
+  message: string
+}
+
 let socket: WebSocket | null = null;
 /*
 if (localStorage.getItem('token')){
@@ -153,6 +160,15 @@ export function disconnectWebSocket() {
   }
 }
 
+export function sendWebSocketMessage(type: string, data: object) {
+  if (socket) {
+    socket.send(JSON.stringify({ type, data }));
+  }
+}
+
+if (localStorage.getItem('token')) {
+  connectWebSocket();
+}
 let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
 //let currentUser = users[0];
 
@@ -161,7 +177,7 @@ if (savedUser) {
   currentUser = JSON.parse(savedUser);
 }
 
-if (localStorage.getItem('token')){
+if (localStorage.getItem('token')) {
   connectWebSocket();
 }
 
@@ -170,45 +186,60 @@ async function handleMessage(message: string) {
   console.log(data);
 
   switch (data.type) {
-    case 'status_changed':{
+    case 'status_changed': {
       const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
       console.log(user);
-      if (user){
+      if (user) {
         user.status = data.activity_status;
       }
       console.log(user);
       break;
     }
-    case 'invitation_created':{
+    case 'invitation_created': {
       console.log(newInvitations);
-      ChatState.newInvitations.push({id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
+      ChatState.newInvitations.push({
+        id: data.id, string_code: data.string_code, valid_till: data.valid_till, invited_by_username: data.invited_by_username,
         channel_name: data.channel_name, invited_by: data.invited_by, channel_id: data.channel_id
       });
       console.log(newInvitations);
       break;
     }
-    case 'message_sent':{
+    case 'user_typing': {
+      const newTypingUser: ChatTypingUser = data.message;
+      console.log(data)
+      console.log(`${ChatState.currentChannel.id} ${data.message.data.channel_id} ${newTypingUser.user_id} ${ChatState.currentUser.id}`)
+      if (ChatState.currentChannel.id == data.message.channel_id && newTypingUser && newTypingUser.user_id != ChatState.currentUser.id) {
+        // const typingUser = ChatState.currentChannel.users.find(user => user.id == Number(newTypingUser.user_id));
+        // if (!typingUser)
+        ChatState.typingUsers.push(newTypingUser);
+        console.log("Typing users:", ChatState.typingUsers);
+      }
+      break;
+    }
+    case 'message_sent': {
       console.log(ChatState.currentChannel.id);
       console.log(data.channel_id);
-      if (data.channel_id == ChatState.currentChannel.id){
-        ChatState.messages.push({channel_id: data.channel_id,
+      if (data.channel_id == ChatState.currentChannel.id) {
+        ChatState.messages.push({
+          channel_id: data.channel_id,
           sender_name: data.sender_name,
           sender_id: data.sender_id,
           receiver_id: data.receiver_id,
           content: data.content,
-          timestamp: data.timestamp})
+          timestamp: data.timestamp
+        })
       }
       console.log(ChatState.currentUser);
-      
-      if (data.sender_id == ChatState.currentUser.id){
+
+      if (data.sender_id == ChatState.currentUser.id) {
         break;
       }
 
-      if (ChatState.currentUser.status == "Do Not Disturb" || ChatState.currentUser.status == "Offline"){
+      if (ChatState.currentUser.status == "Do Not Disturb" || ChatState.currentUser.status == "Offline") {
         break;
       }
-      
-      if (ChatState.currentUser.only_mentions && data.receiver_id != ChatState.currentUser.id){
+
+      if (ChatState.currentUser.only_mentions && data.receiver_id != ChatState.currentUser.id) {
         break;
       }
 
@@ -216,34 +247,37 @@ async function handleMessage(message: string) {
 
       break;
     }
-    case 'nickname_changed':{
+    case 'nickname_changed': {
       const user = ChatState.currentChannel.users.find(user => user.id == Number(data.user_id));
       console.log(user);
-      if (user){
+      if (user) {
         user.username = data.nickname;
       }
       console.log(user);
       break;
     }
-    case 'new_channel_user':{
-      ChatState.currentChannel.users.push({id: data.user.id, username: data.user.nickname, 
-        role: "Guest", status: data.user.activityStatus});
+    case 'new_channel_user': {
+      ChatState.currentChannel.users.push({
+        id: data.user.id, username: data.user.nickname,
+        role: "Guest", status: data.user.activityStatus
+      });
     }
   }
 }
 
-async function handleNewNotification(message_id: number){
-  if (AppVisibility.appVisible){
+async function handleNewNotification(message_id: number) {
+  if (AppVisibility.appVisible) {
     return
   }
   await api.post<NotificationData>('/notifications', {
-    user_id: currentUser.id,  message_id: message_id, 
+    user_id: currentUser.id, message_id: message_id,
   })
     .then(res => {
       console.log(ChatState.notifications);
-      ChatState.notifications.push({ user_id: res.data.user_id, sender_name: res.data.sender_name,
+      ChatState.notifications.push({
+        user_id: res.data.user_id, sender_name: res.data.sender_name,
         channel_name: res.data.channel_name, content: res.data.content, notification_id: res.data.notification_id
-       });
+      });
       console.log(ChatState.notifications);
     })
     .catch(err => {
@@ -576,11 +610,12 @@ const users: User[] = [
 // ]
 
 const commands: Command[] = [
-  { name: 'help', desc: 'shows help information' },
   { name: 'invite', desc: 'invites certain user' },
-  { name: 'revoke', desc: 'kicks selected user' },
-  { name: 'quit', desc: 'leave/delete channel' },
-  { name: 'cancel', desc: 'deletes channel' },
+  { name: 'join', desc: 'joins or creates channel (/join name [private])' },
+  { name: 'revoke', desc: 'owner kicks selected user' },
+  { name: 'kick', desc: 'vote to kick' },
+  { name: 'quit', desc: 'deletes channel' },
+  { name: 'cancel', desc: 'leave or if owner delete channel' },
   { name: 'list', desc: 'list all users of current channel' },
 ]
 
@@ -627,6 +662,7 @@ let newInvitations: InvitationData[] = [];
 let newChannels: Channel[] = [];
 let newMessages: MessageData[] = [];
 let newNotifications: NotificationData[] = [];
+const typingUsers: ChatTypingUser[] = [];
 
 export const fetchChannelData = async () => {
   await api.get<ChannelUsers[]>('/users', {
@@ -641,7 +677,11 @@ export const fetchChannelData = async () => {
     })
 
   await api.get<MessageData[]>('/messages', {
-    params: { channel_id: currentChannel.id }
+    params: {
+      channel_id: currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
   })
     .then(res => {
       console.log("test: ", res.data)
@@ -708,5 +748,6 @@ export const ChatState = reactive({
   showUsers: true,
   showChannels: true,
   showChat: true,
-  newInvitations: newInvitations
+  newInvitations: newInvitations,
+  typingUsers: typingUsers
 })

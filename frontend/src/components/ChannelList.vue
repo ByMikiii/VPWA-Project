@@ -30,28 +30,30 @@
 
 
     <div id="channels-list">
-      <li v-for="(inv, index) in state.newInvitations"
-      :key="index"
-      class="notification-item relative-position">
-        <div class="notif-info">
+      <ul class="channel-invitations">
+        <li v-for="(inv, index) in state.newInvitations"
+        :key="index"
+        class="notification-item relative-position">
+          <div class="notif-info">
 
-          <div class="notif-header">
-            <span class="notif-user">{{ inv.invited_by_username }}</span>
-            <span> invited you to join channel </span>
-            <span class="notif-user">#{{ inv.channel_name }}</span>
-          </div>
-          <div class="inv-actions">
-            <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
-              Accept
-            </button>
+            <div class="notif-header">
+              <span class="notif-user">{{ inv.invited_by_username }}</span>
+              <span> invited you to join channel </span>
+              <span class="notif-user">#{{ inv.channel_name }}</span>
+            </div>
+            <div class="inv-actions">
+              <button class="notif-accept" @click="acceptInvitation(true, inv.invited_by, inv.channel_id)">
+                Accept
+              </button>
 
-            <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
-              Decline
-            </button>
+              <button class="notif-decline" @click="acceptInvitation(false, inv.invited_by, inv.channel_id)">
+                Decline
+              </button>
+            </div>
           </div>
-        </div>
-      </li>
-      <div v-for="channel in state.channels" :key="channel.id" class="channel-button text-left row items-center" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
+        </li>
+      </ul>
+      <div v-for="channel in state.channels" :key="channel.id" class="channel-button text-left row items-center justify-between" :class="{ 'bg-primary': state.currentChannel.id === channel.id }" type="button">
         <button class="channel-but row items-center" @click="handleChannelChange(channel)">
           <svg
             v-if="!channel.isPrivate"
@@ -233,15 +235,23 @@ const toggleChannels = () => {
 
 <style scoped>
   .channel-but {
-    width: 85%;
+    width: 84%;
     padding: 0.5rem 0;
     padding-left: 1rem;
+  }
+  .channel-but span{
+    max-width: 82%;
+    overflow: hidden;
   }
   button svg {
     opacity: 50%;
   }
   button svg:hover {
     opacity: 70%;
+  }
+  .channel-invitations{
+    max-height: 218px;
+    overflow-y: auto;
   }
   /* .fade-enter-active,
   .fade-leave-active {

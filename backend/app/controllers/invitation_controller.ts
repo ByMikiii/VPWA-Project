@@ -10,7 +10,7 @@ export default class InvitationController {
 
   public async createInvitation({ request, response }: HttpContext) {
     const payload = request.body()
-    console.log(payload)
+    console.log('create invitation: ', payload)
     const user = await User
       .query()
       .where('nickname', payload.username)
@@ -20,12 +20,13 @@ export default class InvitationController {
       .query()
       .where('id', payload.channelId)
       .first()
+    console.log('invited to: ', channel)
 
     if (!user || !channel) {
       return response.conflict('User or channel does not exist!')
     }
 
-    if (channel.is_private === true && channel.owner_id != user.id) {
+    if (channel.is_private === true && channel.owner_id != payload.invitedBy) {
       return response.unauthorized('You are not authorized to invite in this channel!')
     }
 
@@ -38,7 +39,7 @@ export default class InvitationController {
     if (existingMember) {
       if (existingMember?.is_kicked === true) {
         existingMember.is_kicked = false
-        existingMember.kick_count = 0
+        existingMember.kick_ids = '';
         existingMember.save()
         return response.ok({ message: 'User has been unbanned!' })
       }
@@ -46,9 +47,9 @@ export default class InvitationController {
     }
 
     const sender = await User
-    .query()
-    .where('id', payload.invitedBy)
-    .first()
+      .query()
+      .where('id', payload.invitedBy)
+      .first()
 
     if (!user) {
       return response.conflict({ message: 'User does not exist!' })
@@ -65,14 +66,15 @@ export default class InvitationController {
 
     const client = connectedUsers.get(user.id)
     console.log(client)
-    if (client.readyState === client.OPEN) {
-      client.send(JSON.stringify({ type: "invitation_created", id: invitation.id,
+    if (client && client.readyState && client.readyState === client.OPEN) {
+      client.send(JSON.stringify({
+        type: "invitation_created", id: invitation.id,
         string_code: invitation.string_code, valid_till: invitation.valid_till,
-        invited_by_username: sender?.nickname, channel_name: channel?.name, invited_by:invitation.invited_by,
+        invited_by_username: sender?.nickname, channel_name: channel?.name, invited_by: invitation.invited_by,
         channel_id: invitation.channel_id
-        }))
+      }))
     }
-    
+
 
     return response.ok({ message: 'Invitation has beed sent!' })
   }
@@ -101,9 +103,10 @@ export default class InvitationController {
 
     if (payload.is_accepted === true) {
       existingInvitation.accepted = true;
+      existingInvitation.save()
       const member = new Member()
       member.is_kicked = false;
-      member.kick_count = 0;
+      member.kick_ids = '';
       member.user_id = existingInvitation.receiver_id;
       member.channel_id = existingInvitation.channel_id;
       member.role = "Guest"
@@ -129,6 +132,7 @@ export default class InvitationController {
     } else {
       existingInvitation.valid_till = DateTime.now();
       existingInvitation.save()
+      console.log('invit declined')
       return response.ok(null)
     }
   }
@@ -144,6 +148,7 @@ export default class InvitationController {
       .query()
       .where('receiver_id', user_id)
       .andWhere('valid_till', '>', DateTime.now().toJSDate())
+      .andWhere('accepted', '!=', 1)
       .join('users', 'invitations.invited_by', 'users.id')
       .join('channels', 'invitations.channel_id', 'channels.id')
       .select(

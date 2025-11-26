@@ -9,7 +9,7 @@ wss.on('connection', (socket, req) => {
   console.log('WS client connected')
   let token
 
-  if (req.url){
+  if (req.url) {
     const params = new URLSearchParams(req.url.replace('/?', ''))
     token = params.get('token')
   }
@@ -43,7 +43,19 @@ wss.on('connection', (socket, req) => {
   })
 
   socket.on('message', (data) => {
-    console.log(`Message from ${userId}:`, data.toString()) //tu je miesto na spracovanie posielana sprav/socketov z frontendu
+    const text = data.toString();
+    const message = JSON.parse(text);
+    console.log(message)
+    if (message.type === 'typing') {
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({
+            type: "user_typing",
+            message: message,
+          }))
+        }
+      })
+    }
   })
 
   socket.send(JSON.stringify('WS authenticated and connected!'))

@@ -58,7 +58,7 @@
       .catch(err => {
         Notify.create(err)
       })
-    
+
     if (status == "Offline"){
       disconnectWebSocket();
     }
@@ -81,6 +81,7 @@
         .then(res => {
           console.log("test: ", res.data)
           state.messages = res.data
+
         })
         .catch(err => {
           Notify.create(err.response.data.message);
@@ -92,7 +93,7 @@
       user.status = status;
     }
     localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
-    
+
   }
 </script>
 

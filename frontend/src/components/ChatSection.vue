@@ -79,20 +79,20 @@
       </div>
     </div>
 
-
-    <div id="messages" ref="messagesContainer">
-      <ChatMessage
-        v-for="message in state.messages"
-        :name="message.sender_name || 'Unknown'"
-        :key="message.timestamp"
-        :timestamp="message.timestamp || ''"
-        :message="message.content || ''"
-        :sent="message.sender_id === state.currentUser.id"
-        :highlighted="message.receiver_id == state.currentUser.id"
-      />
-      <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
+    <div ref="messagesContainer" class="messages-cont" @scroll="onScroll">
+      <div id="messages">
+        <ChatMessage
+          v-for="msg in ChatState.messages"
+          :key="msg.timestamp"
+          :name="msg.sender_name || 'Unknown'"
+          :timestamp="msg.timestamp || ''"
+          :message="msg.content || ''"
+          :sent="msg.sender_id === state.currentUser.id"
+          :highlighted="msg.receiver_id === state.currentUser.id"
+        />
+        <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
+      </div>
     </div>
-
 
     <div id="chat-area" class="rounded-borders relative">
 
@@ -147,6 +147,7 @@
         spellcheck="false"
         maxlength="200"
         @keydown.enter.prevent="handleEnter($event)"
+        @input="handleTyping"
         >
       </textarea>
       <button class="send-button" @click="handleSend">
@@ -172,10 +173,12 @@
 <script setup lang="ts">
   import ProfilePicture from 'components/ProfilePicture.vue';
   import ChatMessage from 'components/ChatMessage.vue'
-  import { computed, inject, ref, watch, nextTick  } from 'vue'
-  import type { UserStatus, ChannelRole, ChannelUsers, ChatState, Channel } from '../state/ChatState'
+  import { computed, inject, ref, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+  import type { MessageData, ChannelRole, ChannelUsers, Channel, ChatTypingUser } from '../state/ChatState'
   import { Notify } from 'quasar'
-
+  import { ChatState } from 'src/state/ChatState'
+  const offset = ref(20)
+  const loadingOlder = ref(false)
   const state = inject('ChatState') as typeof ChatState
   const roles: ChannelRole[] = ['Owner', 'Admin', 'Moderator', 'Guest']
 
@@ -193,19 +196,61 @@
       return state.commands.filter(c => c.name.startsWith(input))
   })
 
-  // edge case
-  for (let index = 0; index < 30; index++) {
-    const userCopy = {
-      ...state.currentChannel.users[0],
-      id: state.currentChannel.users.length + 1
-    } as {
-      id: number
-      username: string
-      role: ChannelRole
-      status: UserStatus
+  // // edge case
+  // for (let index = 0; index < 30; index++) {
+  //   const userCopy = {
+  //     ...state.currentChannel.users[0],
+  //     id: state.currentChannel.users.length + 1
+  //   } as {
+  //     id: number
+  //     username: string
+  //     role: ChannelRole
+  //     status: UserStatus
+  //   }
+  //   state.currentChannel.users.push(userCopy)
+  // }
+
+
+  import { connectWebSocket, disconnectWebSocket, sendWebSocketMessage } from 'src/state/ChatState';
+
+  onMounted(() => {
+    connectWebSocket()
+  })
+  onBeforeUnmount(() => {
+    disconnectWebSocket()
+  })
+
+  function handleTyping() {
+    if (!chatText.value) {
+      return
     }
-    state.currentChannel.users.push(userCopy)
+    console.log(chatText.value)
+    const typingData: ChatTypingUser = {
+      channel_id: state.currentChannel.id,
+      user_id: ChatState.currentUser.id,
+      username: ChatState.currentUser.nickname,
+      message: chatText.value
+    }
+    console.log("typing data: ", typingData)
+
+    sendWebSocketMessage('typing', {
+      channel_id: state.currentChannel.id,
+      user_id: ChatState.currentUser.id,
+      username: ChatState.currentUser.nickname,
+      message: chatText.value
+     })
   }
+
+  watch(
+  () => ChatState.typingUsers,
+  (newVal) => {
+    if (newVal.length > 0) {
+      const last = newVal[newVal.length - 1]
+      console.log("LATEST TYPING USER:", last?.message)
+    }
+  },
+  { deep: true }
+)
 
   const showUsers = computed(() => chatText.value.startsWith('@'))
     const filteredUsers = computed(() => {
@@ -214,17 +259,26 @@
       return state.currentChannel.users.filter(u => u.username.toLowerCase().startsWith(input))
   })
 
-watch(
-  () => state.messages.values.length,
-  async () => {
-    await nextTick()
-    if (messagesContainer.value) {
+  const scrollToBottom = ref(true)
+
+  watch(
+    () => state.messages.length,
+    async () => {
+      console.log("new messages time to scroll")
+      await nextTick()
+      if (messagesContainer.value && scrollToBottom.value) {
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      }
+    },
+    { deep: true }
+  )
+
+
+  onMounted(() => {
+  if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
     }
-  },
-  { deep: true }
-)
-
+  })
   const chatText = ref('')
   const selectedIndex = ref(0)
 
@@ -319,7 +373,7 @@ watch(
         Notify.create("Missing  command!");
         return
     }
-    if(parts[1] == null && parts[0] != '/list'){
+    if(parts[1] == null && parts[0] in ['/list', '/cancel', '/quit']){
       Notify.create("Missing argument");
       return
     }
@@ -350,6 +404,14 @@ watch(
     case '/list':
       console.log('list')
       showUsersWin.value = true
+      break
+    case '/quit':
+      console.log('quit')
+      handleQuit().catch(console.error)
+      break
+    case '/cancel':
+      console.log('cancel')
+      handleCancel().catch(console.error)
       break
     default:
       Notify.create(`Unknown command:, ${command}`)
@@ -401,7 +463,11 @@ watch(
       .then(res =>  {
         state.channels.push(res.data)
         console.log('isprivate: ', `${isPrivate}, ${privateChannel}`,);
-        Notify.create("Channel has been created!");
+        if(res.data.ownerId != Number(state.currentUser.id)){
+          Notify.create("Successfully joined public channel!");
+        }else{
+          Notify.create("Channel has been created!");
+        }
       })
       .catch(err => {
         Notify.create(err.response.data.message);
@@ -424,12 +490,89 @@ watch(
           Notify.create(err.response.data.message);
         })
   }
+
+  const handleQuit = async () => {
+    if(state.currentChannel.ownerId != Number(state.currentUser.id)){
+      Notify.create("You are not owner of this channel!")
+      return
+    }
+    await handleCancel().catch(console.error)
+  }
+
+  const handleCancel = async () => {
+    await api.post<string>('/members', {
+      user_id: state.currentUser.id,
+      channel_id: state.currentChannel.id,
+    })
+        .then(res =>  {
+          Notify.create(res.data);
+          console.log(res.data)
+        })
+        .catch(err => {
+          Notify.create(err.response.data.message);
+        })
+  }
+
+  const loadOlderMessages = async () => {
+  if (loadingOlder.value){
+    return
+  }
+  loadingOlder.value = true
+
+  const container = messagesContainer.value
+  const prevHeight = container?.scrollHeight || 0
+
+  try {
+    const res = await api.get<MessageData[]>('/messages', {
+      params: {
+        channel_id: state.currentChannel.id,
+        limit: 2, offset:
+        offset.value
+      }
+    })
+
+    if (!res.data.length) {
+      return
+    }
+    console.log("fteching 2 messages")
+    ChatState.messages.unshift(...res.data)
+    offset.value += res.data.length
+    await nextTick()
+
+    if (container) {
+      const newHeight = container.scrollHeight
+      container.scrollTop = newHeight - prevHeight
+    }
+  } finally {
+    loadingOlder.value = false
+  }
+  // 2s delay aby sa scroll nebil s infinity scrollom
+  new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
+  scrollToBottom.value = true
+  }).catch(console.error);
+}
+
+const onScroll = () => {
+  const container = messagesContainer.value
+  if (!container || loadingOlder.value) {
+    return
+  }
+  if (container.scrollTop <= 20) {
+    scrollToBottom.value = false
+    loadOlderMessages().catch(console.error)
+  }
+}
+
 </script>
 
 <style scoped>
   .users-list-main {
     width: 320px;
     height: 70%;
+  }
+  #chat-title{
+    max-width: 330px;
+    overflow: hidden;
   }
   /* .fade-enter-active,
   .fade-leave-active {
