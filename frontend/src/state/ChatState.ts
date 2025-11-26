@@ -188,10 +188,9 @@ async function handleMessage(message: string) {
       break;
     }
     case 'message_sent':{
-      console.log(newMessages.length);
-      console.log(currentChannel.id);
+      console.log(ChatState.currentChannel.id);
       console.log(data.channel_id);
-      if (data.channel_id == currentChannel.id){
+      if (data.channel_id == ChatState.currentChannel.id){
         ChatState.messages.push({channel_id: data.channel_id,
           sender_name: data.sender_name,
           sender_id: data.sender_id,
@@ -199,7 +198,6 @@ async function handleMessage(message: string) {
           content: data.content,
           timestamp: data.timestamp})
       }
-      console.log(newMessages.length);
       console.log(ChatState.currentUser);
       
       if (data.sender_id == ChatState.currentUser.id){
