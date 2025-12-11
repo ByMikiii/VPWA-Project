@@ -220,10 +220,19 @@
     disconnectWebSocket()
   })
 
+  let lastTypingTime = 0;
   function handleTyping() {
     if (!chatText.value) {
       return
     }
+
+    // 100 milisekundovy throttle
+    const now = Date.now();
+    if (now - lastTypingTime < 300) {
+      return
+    };
+    lastTypingTime = now;
+
     console.log(chatText.value)
     const typingData: ChatTypingUser = {
       channel_id: state.currentChannel.id,
@@ -231,7 +240,7 @@
       username: ChatState.currentUser.nickname,
       message: chatText.value
     }
-    console.log("typing data: ", typingData)
+    console.log("jeetyping data: ", typingData)
 
     sendWebSocketMessage('typing', {
       channel_id: state.currentChannel.id,
