@@ -205,13 +205,25 @@ async function handleMessage(message: string) {
       break;
     }
     case 'user_typing': {
-      const newTypingUser: ChatTypingUser = data.message;
+      const newTypingUser: ChatTypingUser = data.message.data;
       console.log(data)
       console.log(`${ChatState.currentChannel.id} ${data.message.data.channel_id} ${newTypingUser.user_id} ${ChatState.currentUser.id}`)
-      if (ChatState.currentChannel.id == data.message.channel_id && newTypingUser && newTypingUser.user_id != ChatState.currentUser.id) {
-        // const typingUser = ChatState.currentChannel.users.find(user => user.id == Number(newTypingUser.user_id));
-        // if (!typingUser)
-        ChatState.typingUsers.push(newTypingUser);
+      if (ChatState.currentChannel.id == data.message.data.channel_id && newTypingUser && newTypingUser.user_id != ChatState.currentUser.id) {
+        const index = ChatState.typingUsers.findIndex(
+          user => user.user_id === newTypingUser.user_id
+        );
+        // replace ak uz existuje
+        if (newTypingUser.message === "") {
+          if (index !== -1) {
+            ChatState.typingUsers.splice(index, 1);
+          }
+        }
+        else if (index !== -1) {
+          ChatState.typingUsers[index] = newTypingUser;
+        } else {
+          ChatState.typingUsers.push(newTypingUser);
+        }
+
         console.log("Typing users:", ChatState.typingUsers);
       }
       break;

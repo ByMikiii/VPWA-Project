@@ -90,7 +90,15 @@
           :sent="msg.sender_id === state.currentUser.id"
           :highlighted="msg.receiver_id === state.currentUser.id"
         />
-        <ChatMessage name="User" :sent="false" :typing="true"></ChatMessage>
+
+        <ChatMessage
+          v-for="user in ChatState.typingUsers"
+          :key="user.user_id"
+          :name="user.username"
+          :sent="false"
+          :typing="true"
+          :message="user.message">
+        </ChatMessage>
       </div>
     </div>
 
@@ -228,7 +236,7 @@
 
     // 100 milisekundovy throttle
     const now = Date.now();
-    if (now - lastTypingTime < 300) {
+    if (now - lastTypingTime < 80) {
       return
     };
     lastTypingTime = now;
@@ -273,6 +281,29 @@
   watch(
     () => state.messages.length,
     async () => {
+      const lastMessage = state.messages.at(-1);
+
+      if(lastMessage){
+        ChatState.typingUsers = ChatState.typingUsers.filter(
+          user =>
+            !(user.channel_id === lastMessage.channel_id &&
+              user.user_id === lastMessage.sender_id)
+        );
+        console.log("typing deleted")
+      }
+      console.log("new messages time to scroll")
+      await nextTick()
+      if (messagesContainer.value && scrollToBottom.value) {
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      }
+    },
+    { deep: true }
+  )
+
+    watch(
+      () => state.typingUsers.length,
+    async () => {
+
       console.log("new messages time to scroll")
       await nextTick()
       if (messagesContainer.value && scrollToBottom.value) {

@@ -1,9 +1,13 @@
 <template>
     <q-chat-message
+      @click="typingActive = !typingActive"
       :sent="sent"
       text-color="white"
       :bg-color="sent ? 'primary' : 'secondary'"
-      :class="highlighted ? 'highlighted-message' : ''"
+      :class="{
+        'highlighted-message': highlighted,
+        'cursor-pointer': typing
+      }"
     >
       <template v-slot:name>
         <span class="message-name">{{ name }}</span>
@@ -18,13 +22,16 @@
           src="profile-picture.webp"
         />
       </template>
-      <q-spinner-dots v-if="typing" size="1.5rem" />
+      <q-spinner-dots v-if="typing && !typingActive" size="1.5rem" />
+      <!-- <span v-if="typing && !typingActive">{{ props.message }}</span> -->
       <span v-else class="message-text">{{ message }}</span>
 
     </q-chat-message>
 </template>
 
 <script setup lang="ts">
+  import { ChatState } from 'src/state/ChatState'
+  import { ref } from 'vue';
 
   function formatTimestamp(timestamp: string): string {
     const date = new Date(typeof timestamp === 'string' ? parseInt(timestamp) : timestamp)
@@ -34,7 +41,10 @@
     const minutes = date.getMinutes().toString().padStart(2, '0')
     return `${hours}:${minutes}, ${day} ${month}`
   }
-  defineProps({
+
+  const typingActive = ref<boolean>(false)
+
+  const props = defineProps({
     name: {
       type: String,
       required: true
@@ -57,6 +67,22 @@
       type: Boolean,
     }
   })
+
+  if(props.typing) {
+      console.log("typing message")
+      setTimeout(() => {
+        const index = ChatState.typingUsers.findIndex(
+          user =>
+            user.username === props.name &&
+            user.channel_id === ChatState.currentChannel.id
+        );
+
+        if (index !== -1) {
+          ChatState.typingUsers.splice(index, 1);
+          console.log("Removed typing user:", props.name);
+        }
+    }, 5000);
+  }
 
 </script>
 
