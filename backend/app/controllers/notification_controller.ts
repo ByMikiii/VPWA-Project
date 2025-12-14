@@ -79,6 +79,14 @@ export default class NotificationController {
       .query()
       .where('user_id', user_id)
       .andWhere('is_read', false)
+      .whereIn('notifications.id', (sub) => {
+        sub
+          .from('notifications')
+          .join('messages', 'messages.id', 'notifications.message_id')
+          .where('notifications.user_id', user_id)
+          .groupBy('messages.channel_id')
+          .max('notifications.id')
+      })
       .join('messages', 'messages.id', 'notifications.message_id')
       .join('users', 'messages.sender_id', 'users.id')
       .join('channels', 'messages.channel_id', 'channels.id')
@@ -89,6 +97,7 @@ export default class NotificationController {
         'notifications.id',
         'messages.message as content'
       )
+
 
     const notifications = notificationTemp.map(r => ({
       sender_name: r.$extras.username,

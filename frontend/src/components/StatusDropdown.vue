@@ -37,8 +37,7 @@
 
 <script setup lang="ts">
   import { inject } from 'vue'
-  import { connectWebSocket, disconnectWebSocket, type ChatState, type UserStatus } from '../state/ChatState'
-  import type { ChannelUsers, MessageData } from '../state/ChatState';
+  import { connectWebSocket, disconnectWebSocket, getAllData, type ChatState, type UserStatus } from '../state/ChatState'
   import { Notify } from 'quasar'
   import { api } from 'boot/axios';
   import { invalid_token } from '../state/ChatState';
@@ -75,28 +74,7 @@
     }
     if (state.currentUser.status == "Offline" && status!="Offline"){
       connectWebSocket();
-      await api.get<ChannelUsers[]>('/users', {
-        params: { channel_id: state.currentChannel.id }
-      })
-        .then(res => {
-          console.log('users: ', res.data)
-          state.currentChannel.users = res.data
-        })
-        .catch(err => {
-          Notify.create(err.response.data.error);
-        })
-
-      await api.get<MessageData[]>('/messages', {
-        params: { channel_id: state.currentChannel.id }
-      })
-        .then(res => {
-          console.log("test: ", res.data)
-          state.messages = res.data
-
-        })
-        .catch(err => {
-          Notify.create(err.response.data.message);
-        })
+      await getAllData();
     }
     state.currentUser.status = status;
     const user = state.currentChannel.users.find(user => user.id == Number(state.currentUser.id));
