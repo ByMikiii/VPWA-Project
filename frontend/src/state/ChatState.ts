@@ -172,14 +172,39 @@ if (localStorage.getItem('token')) {
 let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
 //let currentUser = users[0];
 
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    console.warn("error accessing system notif");
+    return;
+  }
+
+  console.log("notifications request sent")
+  if (Notification.permission === "default") {
+    await Notification.requestPermission();
+  }
+}
+
+export function sendSystemNotification(title: string, body: string) {
+  if (Notification.permission !== "granted") return;
+
+  new Notification(title, {
+    body,
+    icon: "/icons/favicon-32x32.png",
+    silent: false,
+  });
+}
+
 const savedUser = localStorage.getItem('currentUser');
 if (savedUser) {
   currentUser = JSON.parse(savedUser);
+  await requestNotificationPermission();
 }
 
 if (localStorage.getItem('token')) {
   connectWebSocket();
 }
+
+const typingTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
 async function handleMessage(message: string) {
   const data = JSON.parse(message);
@@ -217,14 +242,43 @@ async function handleMessage(message: string) {
           if (index !== -1) {
             ChatState.typingUsers.splice(index, 1);
           }
+          const existingTimeout = typingTimeouts.get(newTypingUser.user_id);
+          if (existingTimeout) {
+            clearTimeout(existingTimeout);
+            typingTimeouts.delete(newTypingUser.user_id);
+          }
+
+          return;
         }
         else if (index !== -1) {
-          ChatState.typingUsers[index] = newTypingUser;
+          // ChatState.typingUsers[index] = newTypingUser;
+          ChatState.typingUsers.push(newTypingUser);
+          ChatState.typingUsers.splice(index, 1);
         } else {
           ChatState.typingUsers.push(newTypingUser);
         }
 
         console.log("Typing users:", ChatState.typingUsers);
+
+        const existingTimeout = typingTimeouts.get(newTypingUser.user_id);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+        }
+
+        const timeout = setTimeout(() => {
+          const index = ChatState.typingUsers.findIndex(
+            user => user.user_id === newTypingUser.user_id
+          );
+
+          if (index !== -1) {
+            ChatState.typingUsers.splice(index, 1);
+            console.log("Removed typing user:", newTypingUser.user_id);
+          }
+
+          typingTimeouts.delete(newTypingUser.user_id);
+        }, 5000);
+
+        typingTimeouts.set(newTypingUser.user_id, timeout);
       }
       break;
     }
@@ -290,336 +344,13 @@ async function handleNewNotification(message_id: number) {
         user_id: res.data.user_id, sender_name: res.data.sender_name,
         channel_name: res.data.channel_name, content: res.data.content, notification_id: res.data.notification_id
       });
+      sendSystemNotification("New message", res.data.content);
       console.log(ChatState.notifications);
     })
     .catch(err => {
       Notify.create(err.response.data.message);
     })
 }
-
-const users: User[] = [
-  { id: '2', nickname: 'Alice123', email: 'alice@example.com', name: 'Alice', surname: 'Smith', status: 'Online', only_mentions: false },
-  { id: '1', nickname: 'Bob456fdsjfh jdshjkfh ds', email: 'bob@example.com', name: 'Bob', surname: 'Johnson', status: 'Away', only_mentions: false },
-  { id: '3', nickname: 'Charlie789', email: 'charlie@example.com', name: 'Charlie', surname: 'Brown', status: 'Offline', only_mentions: false },
-  { id: '4', nickname: 'Dave321', email: 'dave@example.com', name: 'Dave', surname: 'Davis', status: 'Online', only_mentions: false },
-  { id: '5', nickname: 'Eve654', email: 'eve@example.com', name: 'Eve', surname: 'Miller', status: 'Online', only_mentions: false },
-  { id: '6', nickname: 'Frank987', email: 'frank@example.com', name: 'Frank', surname: 'Wilson', status: 'Away', only_mentions: false },
-  { id: '7', nickname: 'Grace111', email: 'grace@example.com', name: 'Grace', surname: 'Moore', status: 'Offline', only_mentions: false },
-  { id: '8', nickname: 'Heidi222', email: 'heidi@example.com', name: 'Heidi', surname: 'Taylor', status: 'Online', only_mentions: false },
-  { id: '9', nickname: 'Ivan333', email: 'ivan@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
-  { id: '10', nickname: 'Judy444', email: 'judy@example.com', name: 'Judy', surname: 'Thomas', status: 'Online', only_mentions: false },
-  { id: '11', nickname: 'Ivan336', email: 'ivan1@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
-  { id: '12', nickname: 'Ivan334', email: 'ivan2@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
-  { id: '13', nickname: 'Ivan335', email: 'ivan3@example.com', name: 'Ivan', surname: 'Anderson', status: 'Away', only_mentions: false },
-]
-
-// export const channels: Channel[] = [
-// {
-//   id: '1',
-//   name: 'General',
-//   private: false,
-//   users: [
-//     { id: '1', role: 'Owner' },
-//     { id: '2', role: 'Admin' },
-//     { id: '3', role: 'Moderator' },
-//     { id: '4', role: 'Guest' },
-//     { id: '5', role: 'Guest' },
-//     { id: '6', role: 'Guest' },
-//     { id: '7', role: 'Guest' },
-//     { id: '8', role: 'Guest' },
-//     { id: '9', role: 'Guest' },
-//     { id: '10', role: 'Guest' },
-//     { id: '11', role: 'Guest' },
-//     { id: '12', role: 'Guest' },
-//     { id: '13', role: 'Guest' },
-//   ]
-// },
-//   {
-//     id: '2',
-//     name: 'Random',
-//     private: true,
-//     users: [
-//       { id: '6', role: 'Owner' },
-//       { id: '7', role: 'Admin' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '9', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '3',
-//     name: 'Development',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '3', role: 'Admin' },
-//       { id: '5', role: 'Moderator' },
-//       { id: '7', role: 'Moderator' },
-//       { id: '9', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '4',
-//     name: 'Marketing',
-//     private: true,
-//     users: [
-//       { id: '2', role: 'Owner' },
-//       { id: '4', role: 'Admin' },
-//       { id: '6', role: 'Moderator' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '5',
-//     name: 'Support',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Moderator' },
-//       { id: '5', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '7',
-//     name: 'General',
-//     private: false,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Guest' },
-//       { id: '5', role: 'Guest' },
-//       { id: '6', role: 'Guest' },
-//       { id: '7', role: 'Guest' },
-//       { id: '8', role: 'Guest' },
-//       { id: '9', role: 'Guest' },
-//       { id: '10', role: 'Guest' },
-//       { id: '11', role: 'Guest' },
-//       { id: '12', role: 'Guest' },
-//       { id: '13', role: 'Guest' },
-//     ]
-//   },
-//   {
-//     id: '8',
-//     name: 'Random',
-//     private: true,
-//     users: [
-//       { id: '6', role: 'Owner' },
-//       { id: '7', role: 'Admin' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '9', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '9',
-//     name: 'Development',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '3', role: 'Admin' },
-//       { id: '5', role: 'Moderator' },
-//       { id: '7', role: 'Moderator' },
-//       { id: '9', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '10',
-//     name: 'Marketing',
-//     private: true,
-//     users: [
-//       { id: '2', role: 'Owner' },
-//       { id: '4', role: 'Admin' },
-//       { id: '6', role: 'Moderator' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '11',
-//     name: 'Support',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Moderator' },
-//       { id: '5', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '12',
-//     name: 'General',
-//     private: false,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Guest' },
-//       { id: '5', role: 'Guest' },
-//       { id: '6', role: 'Guest' },
-//       { id: '7', role: 'Guest' },
-//       { id: '8', role: 'Guest' },
-//       { id: '9', role: 'Guest' },
-//       { id: '10', role: 'Guest' },
-//       { id: '11', role: 'Guest' },
-//       { id: '12', role: 'Guest' },
-//       { id: '13', role: 'Guest' },
-//     ]
-//   },
-//   {
-//     id: '13',
-//     name: 'Random',
-//     private: true,
-//     users: [
-//       { id: '6', role: 'Owner' },
-//       { id: '7', role: 'Admin' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '9', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '14',
-//     name: 'Development',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '3', role: 'Admin' },
-//       { id: '5', role: 'Moderator' },
-//       { id: '7', role: 'Moderator' },
-//       { id: '9', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '15',
-//     name: 'Marketing',
-//     private: true,
-//     users: [
-//       { id: '2', role: 'Owner' },
-//       { id: '4', role: 'Admin' },
-//       { id: '6', role: 'Moderator' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '16',
-//     name: 'Support',
-//     private: true,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Moderator' },
-//       { id: '5', role: 'Guest' }
-//     ]
-//   },
-//   {
-//     id: '17',
-//     name: 'General',
-//     private: false,
-//     users: [
-//       { id: '1', role: 'Owner' },
-//       { id: '2', role: 'Admin' },
-//       { id: '3', role: 'Moderator' },
-//       { id: '4', role: 'Guest' },
-//       { id: '5', role: 'Guest' },
-//       { id: '6', role: 'Guest' },
-//       { id: '7', role: 'Guest' },
-//       { id: '8', role: 'Guest' },
-//       { id: '9', role: 'Guest' },
-//       { id: '10', role: 'Guest' },
-//       { id: '11', role: 'Guest' },
-//       { id: '12', role: 'Guest' },
-//       { id: '13', role: 'Guest' },
-//     ]
-//   },
-//   {
-//     id: '18',
-//     name: 'Random',
-//     private: true,
-//     users: [
-//       { id: '6', role: 'Owner' },
-//       { id: '7', role: 'Admin' },
-//       { id: '8', role: 'Moderator' },
-//       { id: '9', role: 'Moderator' },
-//       { id: '10', role: 'Guest' }
-//     ]
-//   }
-// ]
-
-// const messages: Message[] = [
-//   {
-//     channelId: '1',
-//     senderId: '1',
-//     content: 'ahoj',
-//     timestamp: '1767076500000'
-//   },
-//   {
-//     channelId: '1',
-//     senderId: '2',
-//     content: 'ako sa mas',
-//     timestamp: '1767076560000'
-//   },
-//   {
-//     channelId: '1',
-//     senderId: '1',
-//     content: 'dobrze',
-//     timestamp: '1767076620000'
-//   },
-//   {
-//     channelId: '1',
-//     senderId: '3',
-//     content: 'co robis',
-//     timestamp: '1767076680000'
-//   },
-//   {
-//     channelId: '2',
-//     senderId: '4',
-//     content: 'ahoj vsetci',
-//     timestamp: '1767076740000'
-//   },
-//   {
-//     channelId: '2',
-//     senderId: '5',
-//     content: 'ideme von',
-//     timestamp: '1767076800000'
-//   },
-//   {
-//     channelId: '3',
-//     senderId: '6',
-//     content: 'dnes pekne pocasie',
-//     timestamp: '1767076860000'
-//   },
-//   {
-//     channelId: '3',
-//     senderId: '7',
-//     content: 'mam hlad',
-//     timestamp: '1767076920000'
-//   },
-//   {
-//     channelId: '3',
-//     senderId: '6',
-//     content: 'pojdem jest',
-//     timestamp: '1767076980000'
-//   },
-//   {
-//     channelId: '1',
-//     senderId: '2',
-//     content: 'superg sdgdsjkjgskj fksdjh kfjsdh jkfsdjkfdj hsdkj hfkjsdh jkfhsdkj fhkjsdh fjksdh kjfhsdkj fhdskjh fkjsdh fkjsdh kjfhksjd hfkjsdh fkjshd kjfhdskj hfkjsd fhkjsdh fkjhsd kj',
-//     timestamp: '1767077040000'
-//   },
-//   {
-//     channelId: '1',
-//     senderId: '2',
-//     content: '.',
-//     timestamp: '1767077040000'
-//   }
-// ]
 
 const commands: Command[] = [
   { name: 'invite', desc: 'invites certain user' },
@@ -630,33 +361,6 @@ const commands: Command[] = [
   { name: 'cancel', desc: 'leave or if owner delete channel' },
   { name: 'list', desc: 'list all users of current channel' },
 ]
-
-// const notifications: Notification[] = [
-//   { user: 'Miki', channel: 'general', message: 'cau ne' },
-//   { user: 'Anna', channel: 'dev-chat', message: 'ahoj' },
-//   { user: 'John', channel: 'random', message: 'ffdksjfkds kfdsj flksdj klfjsdkl fjsldkjf lksdj flksdjfsklj fkldsjl kfjdslk fjsdlkjf klsdjf lkdsjlkf jsdkl fjdsklj fkldsjklf jsdlkjf lksdj flk' },
-// ]
-
-
-// export function getMessagesByChannelId(channelId: string): Message[] {
-//   return ChatState.messages.filter(m => m.channelId === channelId)
-// }
-
-// export const getUserById = (id: string): User | undefined => {
-//   return users.find(user => user.id === id)
-// }
-
-// export const getUsersFromCurrentChannel = (): string[] => {
-//   return currentChannel.users.map(userChannel => {
-//     const user = getUserById(userChannel.id)
-//     return user!.nickname;
-//   })
-// }
-
-if (!users[0]) {
-  throw new Error('cfkdsjf')
-}
-
 
 let currentChannel: Channel = {
   id: "1",
