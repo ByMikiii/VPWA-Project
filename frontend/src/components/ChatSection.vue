@@ -184,7 +184,7 @@
   import { computed, inject, ref, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
   import type { MessageData, ChannelRole, ChannelUsers, Channel, ChatTypingUser } from '../state/ChatState'
   import { Notify } from 'quasar'
-  import { ChatState } from 'src/state/ChatState'
+  import { ChatState, getChannelData } from 'src/state/ChatState'
   const offset = ref(20)
   const loadingOlder = ref(false)
   const state = inject('ChatState') as typeof ChatState
@@ -540,21 +540,28 @@
   }
 
   const handleCancel = async () => {
-    await api.post<string>('/members', {
-      user_id: state.currentUser.id,
-      channel_id: state.currentChannel.id,
-    })
-        .then(res =>  {
-          Notify.create(res.data);
-          ChatState.channels = ChatState.channels.filter(ch => ch.id !== ChatState.currentChannel.id);
-          if (ChatState.channels[0]){
-            ChatState.currentChannel = ChatState.channels[0];
-          }
-          console.log(res.data)
-        })
-        .catch(err => {
-          Notify.create(err.response.data.message);
-        })
+    const success = await api.post<string>('/members', {
+        user_id: state.currentUser.id,
+        channel_id: state.currentChannel.id,
+      })
+          .then(res =>  {
+            Notify.create(res.data);
+            ChatState.channels = ChatState.channels.filter(ch => ch.id !== ChatState.currentChannel.id);
+            if (ChatState.channels[0]){
+              ChatState.currentChannel = ChatState.channels[0];
+            }
+            console.log(res.data)
+            console.log(ChatState.currentChannel);
+            console.log(ChatState.channels);
+            return true;
+          })
+          .catch(err => {
+            Notify.create(err.response.data.message);
+            return false;
+          })
+    if (success && ChatState.channels[0]){
+      await getChannelData();
+    }
   }
 
   const loadOlderMessages = async () => {

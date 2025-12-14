@@ -277,10 +277,6 @@ async function handleMessage(message: string) {
       break;
     }
     case 'deleted_channel_user': {
-      if (data.channel_id == ChatState.currentChannel.id && data.user_id == ChatState.currentUser.id && ChatState.channels[0]){
-        ChatState.currentChannel.users = ChatState.currentChannel.users.filter(u => u.id !== data.user_id)
-        ChatState.currentChannel = ChatState.channels[0];
-      }
       if (data.channel_id == ChatState.currentChannel.id)
         ChatState.currentChannel.users = ChatState.currentChannel.users.filter(u => u.id !== data.user_id);
       break;
@@ -288,7 +284,7 @@ async function handleMessage(message: string) {
     case 'deleted_channel': {
       if (String(ChatState.currentChannel.ownerId) != ChatState.currentUser.id)
         ChatState.channels = ChatState.channels.filter(ch => ch.id !== data.channel_id);
-      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0]){
+      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0] && String(ChatState.currentChannel.ownerId) != ChatState.currentUser.id){
         ChatState.currentChannel = ChatState.channels[0];
       }
       break;

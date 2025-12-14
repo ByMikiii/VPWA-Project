@@ -150,6 +150,7 @@
   import type { ChannelUsers, MessageData } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
+  import { getChannelData } from '../state/ChatState';
 
   const state = inject('ChatState') as typeof ChatState
   const api = axios.create({
@@ -218,17 +219,26 @@ const toggleChannels = () => {
 
   const leaveChannel = async (channel_id: string) => {
     console.log("leaving...")
-    await api.post<string>('/members', {
-      user_id: state.currentUser.id,
-      channel_id: channel_id,
-    })
-        .then(res =>  {
-          Notify.create(res.data);
-          console.log(res.data)
-        })
-        .catch(err => {
-          Notify.create(err.response.data.message);
-        })
+    const success = await api.post<string>('/members', {
+        user_id: state.currentUser.id,
+        channel_id: channel_id,
+      })
+          .then(res =>  {
+            Notify.create(res.data);
+            state.channels = state.channels.filter(ch => ch.id !== channel_id);
+            if (state.channels[0] && channel_id == state.currentChannel.id){
+              state.currentChannel = state.channels[0];
+            }
+            console.log(res.data)
+            return true;
+          })
+          .catch(err => {
+            Notify.create(err.response.data.message);
+            return false;
+          })
+    if (success && state.channels[0] && channel_id == state.currentChannel.id){
+      await getChannelData();
+    }
   }
 </script>
 
