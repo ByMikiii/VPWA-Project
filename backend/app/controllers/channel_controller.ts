@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
+import { connectedUsers } from '../../start/websocket.js'
 
 const deleteInactive = async () => {
   const cutoffDate = DateTime.now().minus({ days: 30 }).toJSDate();
@@ -34,6 +35,11 @@ export default class ChannelController {
         member.channel_id = existingChannel.id;
         member.role = "Guest"
         await member.save()
+        connectedUsers.forEach((client) => {
+          if (client.readyState === client.OPEN) {
+            client.send(JSON.stringify({ type: "new_channel_user", channel_id: existingChannel.id, user: user}))
+          }
+          })
         return response.ok(existingChannel)
       }
       return response.conflict({ message: 'Channel name already exists' })

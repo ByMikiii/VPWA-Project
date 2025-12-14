@@ -269,10 +269,36 @@ async function handleMessage(message: string) {
       break;
     }
     case 'new_channel_user': {
-      ChatState.currentChannel.users.push({
-        id: data.user.id, username: data.user.nickname,
-        role: "Guest", status: data.user.activityStatus
-      });
+      if (data.user.id != ChatState.currentUser.id)
+        ChatState.currentChannel.users.push({
+          id: data.user.id, username: data.user.nickname,
+          role: "Guest", status: data.user.activityStatus
+        });
+      break;
+    }
+    case 'deleted_channel_user': {
+      if (data.channel_id == ChatState.currentChannel.id && data.user_id == ChatState.currentUser.id && ChatState.channels[0]){
+        ChatState.currentChannel.users = ChatState.currentChannel.users.filter(u => u.id !== data.user_id)
+        ChatState.currentChannel = ChatState.channels[0];
+      }
+      if (data.channel_id == ChatState.currentChannel.id)
+        ChatState.currentChannel.users = ChatState.currentChannel.users.filter(u => u.id !== data.user_id);
+      break;
+    }
+    case 'deleted_channel': {
+      if (String(ChatState.currentChannel.ownerId) != ChatState.currentUser.id)
+        ChatState.channels = ChatState.channels.filter(ch => ch.id !== data.channel_id);
+      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0]){
+        ChatState.currentChannel = ChatState.channels[0];
+      }
+      break;
+    }
+    case 'kicked': { //unicast
+      ChatState.channels = ChatState.channels.filter(ch => ch.id !== data.channel_id);
+      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0]){
+        ChatState.currentChannel = ChatState.channels[0];
+      }
+      break;
     }
   }
 }
@@ -703,6 +729,7 @@ export const fetchChannelData = async () => {
       Notify.create(err.response.data.message);
     })
 }
+
 if (currentUser.id !== '') {
   console.log("usr: ", currentUser.id)
   await api.get<Channel[]>('/channels', {

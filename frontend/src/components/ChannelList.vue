@@ -146,7 +146,7 @@
   import ProfileTab from './ProfileTab.vue';
   import ChannelButtons from './ChannelButtons.vue';
   import { inject } from 'vue'
-  import type { Channel, ChatState} from '../state/ChatState'
+  import type { Channel, ChatState} from '../state/ChatState';
   import type { ChannelUsers, MessageData } from '../state/ChatState';
   import { Notify } from 'quasar';
   import axios from 'axios';
@@ -225,7 +225,6 @@ const toggleChannels = () => {
         .then(res =>  {
           Notify.create(res.data);
           console.log(res.data)
-          // state.channels.push(res.data)
         })
         .catch(err => {
           Notify.create(err.response.data.message);

@@ -546,6 +546,10 @@
     })
         .then(res =>  {
           Notify.create(res.data);
+          ChatState.channels = ChatState.channels.filter(ch => ch.id !== ChatState.currentChannel.id);
+          if (ChatState.channels[0]){
+            ChatState.currentChannel = ChatState.channels[0];
+          }
           console.log(res.data)
         })
         .catch(err => {
