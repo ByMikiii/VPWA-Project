@@ -91,14 +91,25 @@
           :highlighted="msg.receiver_id === state.currentUser.id"
         />
 
-        <ChatMessage
-          v-for="user in ChatState.typingUsers"
-          :key="user.user_id"
-          :name="user.username"
-          :sent="false"
-          :typing="true"
-          :message="user.message">
-        </ChatMessage>
+        <template v-if="ChatState.typingUsers.length <= 3">
+          <ChatMessage
+            v-for="user in ChatState.typingUsers"
+            :key="user.user_id"
+            :name="user.username"
+            :sent="false"
+            :typing="true"
+            :message="user.message"
+          />
+        </template>
+
+        <template v-else>
+          <ChatMessage
+            :name="`${ChatState.typingUsers.length} people are typing...`"
+            :sent="false"
+            :typing="true"
+            message=""
+          />
+        </template>
       </div>
     </div>
 

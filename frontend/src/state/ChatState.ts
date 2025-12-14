@@ -181,6 +181,8 @@ if (localStorage.getItem('token')) {
   connectWebSocket();
 }
 
+const typingTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
 async function handleMessage(message: string) {
   const data = JSON.parse(message);
   console.log(data);
@@ -217,14 +219,43 @@ async function handleMessage(message: string) {
           if (index !== -1) {
             ChatState.typingUsers.splice(index, 1);
           }
+          const existingTimeout = typingTimeouts.get(newTypingUser.user_id);
+          if (existingTimeout) {
+            clearTimeout(existingTimeout);
+            typingTimeouts.delete(newTypingUser.user_id);
+          }
+
+          return;
         }
         else if (index !== -1) {
-          ChatState.typingUsers[index] = newTypingUser;
+          // ChatState.typingUsers[index] = newTypingUser;
+          ChatState.typingUsers.push(newTypingUser);
+          ChatState.typingUsers.splice(index, 1);
         } else {
           ChatState.typingUsers.push(newTypingUser);
         }
 
         console.log("Typing users:", ChatState.typingUsers);
+
+        const existingTimeout = typingTimeouts.get(newTypingUser.user_id);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+        }
+
+        const timeout = setTimeout(() => {
+          const index = ChatState.typingUsers.findIndex(
+            user => user.user_id === newTypingUser.user_id
+          );
+
+          if (index !== -1) {
+            ChatState.typingUsers.splice(index, 1);
+            console.log("Removed typing user:", newTypingUser.user_id);
+          }
+
+          typingTimeouts.delete(newTypingUser.user_id);
+        }, 5000);
+
+        typingTimeouts.set(newTypingUser.user_id, timeout);
       }
       break;
     }
