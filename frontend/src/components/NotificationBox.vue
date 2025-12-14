@@ -18,7 +18,7 @@
 
   <ul v-if="showList" class="notification-list">
     <li
-      v-for="(notif, index) in state.notifications"
+      v-for="(notif, index) in state.notifications.slice().reverse()"
       :key="index"
       class="notification-item relative-position"
     >

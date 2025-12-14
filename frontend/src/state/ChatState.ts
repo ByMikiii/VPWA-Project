@@ -172,9 +172,32 @@ if (localStorage.getItem('token')) {
 let currentUser: User = { id: '', nickname: '', email: '', name: '', surname: '', status: "Offline", only_mentions: false };
 //let currentUser = users[0];
 
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    console.warn("error accessing system notif");
+    return;
+  }
+
+  console.log("notifications request sent")
+  if (Notification.permission === "default") {
+    await Notification.requestPermission();
+  }
+}
+
+export function sendSystemNotification(title: string, body: string) {
+  if (Notification.permission !== "granted") return;
+
+  new Notification(title, {
+    body,
+    icon: "/icons/favicon-32x32.png",
+    silent: false,
+  });
+}
+
 const savedUser = localStorage.getItem('currentUser');
 if (savedUser) {
   currentUser = JSON.parse(savedUser);
+  await requestNotificationPermission();
 }
 
 if (localStorage.getItem('token')) {
@@ -321,6 +344,7 @@ async function handleNewNotification(message_id: number) {
         user_id: res.data.user_id, sender_name: res.data.sender_name,
         channel_name: res.data.channel_name, content: res.data.content, notification_id: res.data.notification_id
       });
+      sendSystemNotification("New message", res.data.content);
       console.log(ChatState.notifications);
     })
     .catch(err => {

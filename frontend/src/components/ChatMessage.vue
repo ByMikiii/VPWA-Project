@@ -3,9 +3,8 @@
       @click="typingActive = !typingActive"
       :sent="sent"
       text-color="white"
-      :bg-color="sent ? 'primary' : 'secondary'"
+      :bg-color="highlighted ? 'red' : sent ? 'primary' : 'secondary'"
       :class="{
-        'highlighted-message': highlighted,
         'cursor-pointer': typing
       }"
     >
