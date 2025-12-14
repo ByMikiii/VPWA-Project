@@ -60,15 +60,15 @@
   import type { Channel, ChatState } from 'src/state/ChatState'
   import { ref, inject } from 'vue'
   import { Notify } from 'quasar';
-  import axios from 'axios';
+  import { api } from 'boot/axios';
   const state = inject('ChatState') as typeof ChatState
   const showDialog = ref(false)
   const channelName = ref('')
   const isPrivate = ref(false)
+  import { invalid_token } from '../state/ChatState';
+  import { useRouter } from 'vue-router';
 
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
+  const router = useRouter();
 
   interface CreateChannelData {
     name: string;
@@ -88,6 +88,8 @@
       user_id: state.currentUser.id
     }
 
+    let success = true;
+
     await api.post<Channel>('/channels', newChannel)
       .then(res =>  {
         state.channels.push(res.data)
@@ -95,8 +97,17 @@
       })
       .catch(err => {
         Notify.create(err.response.data.message);
+        if (err.response.status == 401){
+          invalid_token();
+          success = false;
+        }
       })
-
+    
+    
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
 
     nullData();
   }

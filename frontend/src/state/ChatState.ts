@@ -1,11 +1,7 @@
 import { reactive } from 'vue'
 import { Notify } from 'quasar';
-import axios from 'axios';
+import { api } from 'boot/axios';
 import { AppVisibility } from 'quasar'
-
-const api = axios.create({
-  baseURL: 'http://localhost:3333'
-});
 
 
 export type UserStatus = 'Online' | 'Offline' | 'Away' | 'Do Not Disturb'
@@ -323,10 +319,32 @@ async function handleMessage(message: string) {
       break;
     }
     case 'new_channel_user': {
-      ChatState.currentChannel.users.push({
-        id: data.user.id, username: data.user.nickname,
-        role: "Guest", status: data.user.activityStatus
-      });
+      if (data.user.id != ChatState.currentUser.id)
+        ChatState.currentChannel.users.push({
+          id: data.user.id, username: data.user.nickname,
+          role: "Guest", status: data.user.activityStatus
+        });
+      break;
+    }
+    case 'deleted_channel_user': {
+      if (data.channel_id == ChatState.currentChannel.id)
+        ChatState.currentChannel.users = ChatState.currentChannel.users.filter(u => u.id !== data.user_id);
+      break;
+    }
+    case 'deleted_channel': {
+      if (String(ChatState.currentChannel.ownerId) != ChatState.currentUser.id)
+        ChatState.channels = ChatState.channels.filter(ch => ch.id !== data.channel_id);
+      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0] && String(ChatState.currentChannel.ownerId) != ChatState.currentUser.id){
+        ChatState.currentChannel = ChatState.channels[0];
+      }
+      break;
+    }
+    case 'kicked': { //unicast
+      ChatState.channels = ChatState.channels.filter(ch => ch.id !== data.channel_id);
+      if (ChatState.currentChannel.id == data.channel_id && ChatState.channels[0]){
+        ChatState.currentChannel = ChatState.channels[0];
+      }
+      break;
     }
   }
 }
@@ -407,6 +425,7 @@ export const fetchChannelData = async () => {
       Notify.create(err.response.data.message);
     })
 }
+
 if (currentUser.id !== '') {
   console.log("usr: ", currentUser.id)
   await api.get<Channel[]>('/channels', {
@@ -467,3 +486,129 @@ export const ChatState = reactive({
   newInvitations: newInvitations,
   typingUsers: typingUsers
 })
+
+export async function getAllData(){
+  await api.get<Channel[]>('/channels', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      console.log('jsdfjk', res.data)
+      ChatState.channels = res.data
+      console.log('new; ', newChannels)
+      if (ChatState.channels[0]) {
+        ChatState.currentChannel = newChannels[0]!
+        ChatState.currentChannel.users = []
+      }
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: ChatState.currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      ChatState.currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: {
+      channel_id: ChatState.currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      ChatState.messages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+  await api.get<InvitationData[]>('/invitations', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      ChatState.newInvitations = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+
+  await api.get<NotificationData[]>('/notifications', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      ChatState.notifications = res.data
+      console.log("new notif: ", res.data);
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}
+
+
+export async function getChannelData(){
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: ChatState.currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      ChatState.currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: {
+      channel_id: ChatState.currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      ChatState.messages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}
+
+export function invalid_token(){
+  ChatState.currentUser = {
+      id: '',
+      nickname: '',
+      email: '',
+      name: '',
+      surname: '',
+      status: 'Offline',
+      only_mentions: false
+    };
+    ChatState.channels = [];
+    ChatState.currentChannel = {
+      id: "1",
+      name: "General",
+      description: "Default general chat channel",
+      isPrivate: false,
+      isDeleted: false,
+      ownerId: 1,
+      latestActivity: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      users: []
+    }
+    ChatState.channels = [];
+    ChatState.messages = [];
+    ChatState.notifications = [];
+    ChatState.newInvitations = [];
+    ChatState.typingUsers = [];
+    
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    disconnectWebSocket();
+} 

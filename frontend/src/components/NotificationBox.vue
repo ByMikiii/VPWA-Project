@@ -56,11 +56,11 @@
   import { inject, ref } from 'vue';
   import type { ChatState } from 'src/state/ChatState';
   import { Notify } from 'quasar';
-  import axios from 'axios';
+  import { api } from 'boot/axios';
+  import { invalid_token } from '../state/ChatState';
+  import { useRouter } from 'vue-router';
 
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
+  const router = useRouter();
 
   const state = inject('ChatState') as typeof ChatState
 
@@ -70,6 +70,7 @@
   }
 
   const removeNotification = async (index: string) => {
+    let success = true;
     await api.post<string>('/readNotification', {
       notification_id: index
     })
@@ -80,7 +81,15 @@
         })
         .catch(err => {
           Notify.create(err.response.data.message);
+          if (err.response.status == 401){
+            invalid_token();
+            success = false;
+          }
         })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
     // state.notifications.splice(index, 1)
   }
 </script>

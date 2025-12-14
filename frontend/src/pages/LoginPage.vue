@@ -9,6 +9,7 @@
   import { Notify } from 'quasar';
   import { connectWebSocket } from '../state/ChatState';
   import axios from 'axios';
+  import { getAllData } from '../state/ChatState';
 
   const api = axios.create({
     baseURL: 'http://localhost:3333'
@@ -37,7 +38,7 @@
     }
     else{
       const success = await api.post<LoginResponse>('/login', formData)
-        .then(res =>  {
+        .then(res => {
           Notify.create(res.data.message);
           ChatState.currentUser.email = formData.email;
           ChatState.currentUser.id = res.data.user.id;
@@ -65,6 +66,7 @@
         })
 
       if (success){
+        await getAllData();
         await router.push('/');
       }
     }

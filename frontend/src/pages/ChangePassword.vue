@@ -6,12 +6,8 @@
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
   import { Notify } from 'quasar';
-  import axios from 'axios';
-  import { ChatState } from '../state/ChatState';
-
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
+  import { api } from 'boot/axios';
+  import { ChatState, invalid_token } from '../state/ChatState';
 
   interface changePasswordFormData {
     password: string;
@@ -61,6 +57,10 @@
 
             if (success){
               await router.push('/profile');
+            }
+            else{
+              invalid_token();
+              await router.push('/login');
             }
         }
       }    

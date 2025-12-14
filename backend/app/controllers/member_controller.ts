@@ -3,9 +3,30 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
+import { connectedUsers } from '../../start/websocket.js'
+import Jwt from 'jsonwebtoken'
 
 export default class MemberController {
   public async leaveChannel({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
     const payload = request.body()
 
     const existingMember = await Member
@@ -27,14 +48,43 @@ export default class MemberController {
       channel.is_deleted = true
       channel.name = DateTime.now().toISO()
       channel.save()
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "deleted_channel", channel_id: channel.id}))
+        }
+        })
       return response.ok("You successfully deleted the channel!")
     } else {
       existingMember.delete()
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "deleted_channel_user", channel_id: channel.id, user_id: payload.user_id}))
+        }
+        })
       return response.ok("You successfully left the channel!")
     }
   }
 
   public async kickFromChannel({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
     const payload = request.body()
 
     const user = await User
@@ -70,6 +120,18 @@ export default class MemberController {
       existingMember.save()
       channel.latest_activity = DateTime.now()
       channel.save()
+      const client = connectedUsers.get(user.id)
+      if (client && client.readyState && client.readyState === client.OPEN) {
+        client.send(JSON.stringify({
+          type: "kicked", channel_id: payload.channel_id 
+        }))
+      }
+
+      connectedUsers.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify({ type: "deleted_channel_user", channel_id: channel.id, user_id: user.id}))
+        }
+        })
       return response.ok("You successfully kicked user!")
     } else if (channel.is_private === false) {
       let kickedBy = existingMember.kick_ids ? existingMember.kick_ids.split(',').map(Number) : []
@@ -89,6 +151,18 @@ export default class MemberController {
       if (kickedBy.length >= 3) {
         existingMember.is_kicked = true;
         existingMember.save()
+        const client = connectedUsers.get(user.id)
+        if (client && client.readyState && client.readyState === client.OPEN) {
+          client.send(JSON.stringify({
+            type: "kicked", channel_id: payload.channel_id 
+          }))
+        }
+
+        connectedUsers.forEach((client) => {
+          if (client.readyState === client.OPEN) {
+            client.send(JSON.stringify({ type: "deleted_channel_user", channel_id: channel.id, user_id: user.id}))
+          }
+          })
         return response.ok("You successfully voted out user!")
       }
       return response.ok(`You successfully voted for user kick! (${kickedBy.length}/3)`)
