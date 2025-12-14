@@ -4,6 +4,7 @@ import Channel from '#models/channel'
 import Member from '#models/member'
 import User from '#models/user'
 import { connectedUsers } from '../../start/websocket.js'
+import Jwt from 'jsonwebtoken'
 
 const deleteInactive = async () => {
   const cutoffDate = DateTime.now().minus({ days: 30 }).toJSDate();
@@ -16,6 +17,25 @@ const deleteInactive = async () => {
 
 export default class ChannelController {
   public async createChannel({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
     await deleteInactive()
     const payload = request.body()
     console.log(payload.name)

@@ -5,13 +5,9 @@
 <script setup lang="ts">
   import AuthForm from 'components/AuthForm.vue';
   import { useRouter } from 'vue-router';
-  import { ChatState } from '../state/ChatState';
+  import { ChatState, invalid_token } from '../state/ChatState';
   import { Notify } from 'quasar';
-  import axios from 'axios';
-
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
+  import { api } from 'boot/axios';
 
   interface EditProfileFormData {
     email: string;
@@ -60,11 +56,18 @@
               else if (err.response.status === 404) {
                 Notify.create(err.response.data.message);
               }
+              else if (err.response.status === 401) {
+                Notify.create(err.response.data.message);
+              }
               return false;
             })
 
           if (success){
             await router.push('/profile');
+          }
+          else{
+            invalid_token();
+            await router.push('/login');
           }
         }
       }

@@ -185,6 +185,10 @@
   import type { MessageData, ChannelRole, ChannelUsers, Channel, ChatTypingUser } from '../state/ChatState'
   import { Notify } from 'quasar'
   import { ChatState, getChannelData } from 'src/state/ChatState'
+  import { invalid_token } from '../state/ChatState';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
   const offset = ref(20)
   const loadingOlder = ref(false)
   const state = inject('ChatState') as typeof ChatState
@@ -346,6 +350,7 @@
       receiver_id: string | null
       timestamp: string
     }
+    let success = true;
     await api.post<MessageResponse>('/messages', {
       message: text,
       receiver_id: "",
@@ -370,7 +375,15 @@
       .catch(err => {
         Notify.create(err)
         console.error(err)
+        if (err.response.status == 401){
+          invalid_token();
+          success = false;
+        }
       })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
   }
 
   const toggleUsers = () => {
@@ -459,6 +472,7 @@
   }
 
   const handleInvite = async (username: string) => {
+    let success = true;
     console.log(state.currentUser.id, ' invited ', username, ' to ', state.currentChannel.id)
     await api.post<string>('/invite', {
       invitedBy: state.currentUser.id,
@@ -472,7 +486,15 @@
       .catch(err => {
         Notify.create(err.response.data)
         console.error(err)
+        if (err.response.status == 401){
+          invalid_token();
+          success = false;
+        }
       })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
   }
 
   const handleCreate = async (channelName: string, privateChannel: string) => {
@@ -499,6 +521,7 @@
       user_id: state.currentUser.id
     }
 
+    let success = true;
     await api.post<Channel>('/channels', newChannel)
       .then(res =>  {
         state.channels.push(res.data)
@@ -511,11 +534,20 @@
       })
       .catch(err => {
         Notify.create(err.response.data.message);
+        if (err.response.status == 401){
+          invalid_token();
+          success = false;
+        }
       })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
   }
 
   const handleRevoke = async(username: string) => {
     console.log("revoking...", username)
+    let success = true;
     await api.post<string>('/revoke', {
       current_id: state.currentUser.id,
       username: username,
@@ -528,7 +560,15 @@
         })
         .catch(err => {
           Notify.create(err.response.data.message);
+          if (err.response.status == 401){
+            invalid_token();
+            success = false;
+          }
         })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
   }
 
   const handleQuit = async () => {
@@ -561,6 +601,10 @@
           })
     if (success && ChatState.channels[0]){
       await getChannelData();
+    }
+    else{
+      invalid_token();
+      await router.push('/login');
     }
   }
 

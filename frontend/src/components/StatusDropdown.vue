@@ -40,14 +40,16 @@
   import { connectWebSocket, disconnectWebSocket, type ChatState, type UserStatus } from '../state/ChatState'
   import type { ChannelUsers, MessageData } from '../state/ChatState';
   import { Notify } from 'quasar'
-  import axios from 'axios';
+  import { api } from 'boot/axios';
+  import { invalid_token } from '../state/ChatState';
+  import { useRouter } from 'vue-router';
 
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
+  const router = useRouter();
+
   const state = inject('ChatState') as typeof ChatState
 
   const handleStatusChange = async (status: UserStatus) => {
+    let success = true;
     await api.post<string>('/status', {
       user_id: state.currentUser.id,
       status: status
@@ -57,7 +59,16 @@
       })
       .catch(err => {
         Notify.create(err)
+        if (err.response.status == 401){
+          invalid_token();
+          success = false;
+        }
       })
+    
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
 
     if (status == "Offline"){
       disconnectWebSocket();

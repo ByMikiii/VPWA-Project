@@ -5,10 +5,30 @@ import Member from '#models/member'
 import User from '#models/user'
 import Invitation from '#models/invitation'
 import { connectedUsers } from '../../start/websocket.js'
+import Jwt from 'jsonwebtoken'
 
 export default class InvitationController {
 
   public async createInvitation({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
     const payload = request.body()
     console.log('create invitation: ', payload)
     const user = await User
@@ -81,6 +101,25 @@ export default class InvitationController {
 
 
   public async acceptInvitation({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
     const payload = request.body()
     console.log(payload, "fdksfksdhjfkl jsdklhjf klsdhkl fsdkl")
 

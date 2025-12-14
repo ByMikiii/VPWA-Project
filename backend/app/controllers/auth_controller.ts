@@ -136,6 +136,25 @@ export default class AuthController {
 
 
   public async change_password({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
     const payload = request.body()
 
     const user = await User.findBy('id', payload.id)
@@ -194,6 +213,25 @@ export default class AuthController {
 
 
   public async edit_profile({ request, response }: HttpContext) {
+    const header_token = request.header('authorization')
+    if (!header_token) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+
+    const token = header_token.replace('Bearer ', '')
+    interface JwtUserPayload {
+      id: number
+      iat?: number
+      exp?: number
+    }
+
+    let decoded: JwtUserPayload
+    try {
+      decoded = Jwt.verify(token, process.env.JWT_SECRET!) as JwtUserPayload
+    } catch (err) {
+      return response.unauthorized({ message: "Invalid token" })
+    }
+    
     const payload = request.body()
 
     const user = await User.findBy('id', payload.id)

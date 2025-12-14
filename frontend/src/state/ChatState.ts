@@ -1,11 +1,7 @@
 import { reactive } from 'vue'
 import { Notify } from 'quasar';
-import axios from 'axios';
+import { api } from 'boot/axios';
 import { AppVisibility } from 'quasar'
-
-const api = axios.create({
-  baseURL: 'http://localhost:3333'
-});
 
 
 export type UserStatus = 'Online' | 'Offline' | 'Away' | 'Do Not Disturb'
@@ -878,3 +874,37 @@ export async function getChannelData(){
       Notify.create(err.response.data.message);
     })
 }
+
+export function invalid_token(){
+  ChatState.currentUser = {
+      id: '',
+      nickname: '',
+      email: '',
+      name: '',
+      surname: '',
+      status: 'Offline',
+      only_mentions: false
+    };
+    ChatState.channels = [];
+    ChatState.currentChannel = {
+      id: "1",
+      name: "General",
+      description: "Default general chat channel",
+      isPrivate: false,
+      isDeleted: false,
+      ownerId: 1,
+      latestActivity: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      users: []
+    }
+    ChatState.channels = [];
+    ChatState.messages = [];
+    ChatState.notifications = [];
+    ChatState.newInvitations = [];
+    ChatState.typingUsers = [];
+    
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    disconnectWebSocket();
+} 

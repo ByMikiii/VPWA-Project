@@ -149,13 +149,14 @@
   import type { Channel, ChatState} from '../state/ChatState';
   import type { ChannelUsers, MessageData } from '../state/ChatState';
   import { Notify } from 'quasar';
-  import axios from 'axios';
+  import { api } from 'boot/axios';
   import { getChannelData } from '../state/ChatState';
+  import { invalid_token } from '../state/ChatState';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const state = inject('ChatState') as typeof ChatState
-  const api = axios.create({
-    baseURL: 'http://localhost:3333'
-  });
 
   const handleChannelChange = async (channel: Channel) => {
     state.currentChannel = {
@@ -201,6 +202,7 @@ const toggleChannels = () => {
   }
 
   const acceptInvitation = async (isAccepted: boolean, invitedBy: string, channelId: string) => {
+    let success = true;
     await api.post<Channel>('/accept', {
       receiver_id: state.currentUser.id,
       invited_by: invitedBy,
@@ -214,11 +216,20 @@ const toggleChannels = () => {
         })
         .catch(err => {
           Notify.create(err.response.data.message);
+          if (err.response.status == 401){
+            invalid_token();
+            success = false;
+          }
         })
+    if (!success){
+      invalid_token();
+      await router.push('/login');
+    }
   }
 
   const leaveChannel = async (channel_id: string) => {
     console.log("leaving...")
+
     const success = await api.post<string>('/members', {
         user_id: state.currentUser.id,
         channel_id: channel_id,
@@ -238,6 +249,10 @@ const toggleChannels = () => {
           })
     if (success && state.channels[0] && channel_id == state.currentChannel.id){
       await getChannelData();
+    }
+    if (!success){
+      invalid_token();
+      await router.push('/login');
     }
   }
 </script>
