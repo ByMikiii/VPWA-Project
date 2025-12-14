@@ -790,3 +790,95 @@ export const ChatState = reactive({
   newInvitations: newInvitations,
   typingUsers: typingUsers
 })
+
+export async function getAllData(){
+  await api.get<Channel[]>('/channels', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      console.log('jsdfjk', res.data)
+      ChatState.channels = res.data
+      console.log('new; ', newChannels)
+      if (ChatState.channels[0]) {
+        ChatState.currentChannel = newChannels[0]!
+        ChatState.currentChannel.users = []
+      }
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: ChatState.currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      ChatState.currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: {
+      channel_id: ChatState.currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      ChatState.messages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+  await api.get<InvitationData[]>('/invitations', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      ChatState.newInvitations = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+
+  await api.get<NotificationData[]>('/notifications', {
+    params: { user_id: ChatState.currentUser.id }
+  })
+    .then(res => {
+      ChatState.notifications = res.data
+      console.log("new notif: ", res.data);
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}
+
+
+export async function getChannelData(){
+  await api.get<ChannelUsers[]>('/users', {
+    params: { channel_id: ChatState.currentChannel.id }
+  })
+    .then(res => {
+      console.log('users: ', res.data)
+      ChatState.currentChannel.users = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.error);
+    })
+
+  await api.get<MessageData[]>('/messages', {
+    params: {
+      channel_id: ChatState.currentChannel.id,
+      limit: 20,
+      offset: 0
+    }
+  })
+    .then(res => {
+      console.log("test: ", res.data)
+      ChatState.messages = res.data
+    })
+    .catch(err => {
+      Notify.create(err.response.data.message);
+    })
+}

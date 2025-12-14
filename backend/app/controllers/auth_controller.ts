@@ -45,7 +45,7 @@ export default class AuthController {
     const token = Jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET!,
-      { expiresIn: '1h' }
+      { expiresIn: '6h' }
     )
 
     connectedUsers.forEach((client) => {
@@ -80,7 +80,7 @@ export default class AuthController {
     const token = Jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET!,
-      { expiresIn: '1h' }
+      { expiresIn: '6h' }
     )
 
     connectedUsers.forEach((client) => {

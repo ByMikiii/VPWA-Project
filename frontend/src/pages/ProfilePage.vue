@@ -130,6 +130,25 @@
             status: 'Offline',
             only_mentions: false
           };
+          ChatState.channels = [];
+          ChatState.currentChannel = {
+            id: "1",
+            name: "General",
+            description: "Default general chat channel",
+            isPrivate: false,
+            isDeleted: false,
+            ownerId: 1,
+            latestActivity: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            users: []
+          }
+          ChatState.channels = [];
+          ChatState.messages = [];
+          ChatState.notifications = [];
+          ChatState.newInvitations = [];
+          ChatState.typingUsers = [];
+          
           localStorage.removeItem('currentUser');
           localStorage.removeItem('token');
           disconnectWebSocket();
